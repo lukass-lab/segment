@@ -1,56 +1,91 @@
-# Segment Platform — Research Foundation Document
+---
+title: "Segment Platform Research Foundation Document"
+subtitle: "Browser-Based Interactive 3D Medical Segmentation with SAM-Med3D-turbo"
+author: "Steffen Lukas <steffen.lukas@charite.de>"
+date: "13 March 2026"
+version: "2026-03-13"
+status: "Technical reference"
+documentclass: article
+geometry:
+  - top=2.5cm
+  - bottom=1.5cm
+  - left=2.5cm
+  - right=2.0cm
+fontsize: 11pt
+linestretch: 1.2
+pdf-engine: xelatex
+bibliography: references.bib
+csl: vancouver-superscript.csl
+reference-section-title: References
+numbersections: true
+toc: true
+toc-depth: 2
+header-includes: |
+  \usepackage{booktabs}
+  \usepackage{fontspec}
+  \usepackage{amsmath}
+  \usepackage{amssymb}
+  \usepackage{tabularx}
+  \usepackage{fancyhdr}
+  \IfFontExistsTF{Arial}{\newfontfamily\headerfont{Arial}}{\newfontfamily\headerfont{Arimo}}
+  \setlength{\headheight}{14pt}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \fancyhead[L]{\headerfont\fontsize{9}{11}\selectfont Segment Platform Research Foundation Document}
+  \fancyhead[R]{\headerfont\fontsize{9}{11}\selectfont \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+  \makeatletter\let\ps@plain\ps@fancy\makeatother
+---
 
-**Browser-Based Interactive 3D Medical Segmentation with SAM-Med3D-turbo**
+## Abstract {-}
+
+This document is a technical and research foundation for the Segment platform, a browser-based 3D medical segmentation environment built around SAM-Med3D-turbo. It defines the clinical targets, model assumptions, workflow patterns, system architecture, and evaluation path for two initial application domains: coronary CCTA in DISCHARGE and prostate mpMRI. It is an internal technical reference and research planning document rather than a deployment certification package.
+
+## Purpose {-}
+
+This reference serves as the working document for framing the segmentation problem, the platform requirements, and the validation roadmap for Charité-led development.
+
+It includes architecture and deployment notes only where they directly affect segmentation planning, validation, and implementation sequencing.
+
+It is **not**:
+
+- a standalone production deployment architecture specification;
+- a finished browser-platform product brief;
+- a standalone funding proposal.
+
+## Why Segmentation Matters Here {-}
+
+The current programme needs segmentation for three distinct but linked tasks:
+
+1. **Coronary lumen geometry** for stenosis quantification, centreline extraction, and straightened MPR analysis.
+2. **Outer-wall and plaque context** where vessel-wall estimation and plaque-burden measurements are clinically relevant.
+3. **Prostate zones, lesions, and organs at risk** for biopsy support, radiotherapy planning, and multi-domain testing of foundation-model generalisation.
+
+## Document Snapshot {-}
 
 | Field | Detail |
 |-------|--------|
-| **Institution** | Charité – Universitätsmedizin Berlin |
+| **Institution** | Charité - Universitätsmedizin Berlin |
 | **Core Stack** | TypeScript · Vite · Niivue 0.66 · FastAPI · PyTorch |
 | **Foundation Model** | SAM-Med3D-turbo (3D ViT-B/16, 91 M params) |
-| **Primary Dataset** | DISCHARGE (25 M CCTA images, 3 561 patients) |
+| **Primary Dataset** | DISCHARGE (~25 M DICOM slices across 3,561 patients) |
+| **External Validation Dataset** | SCOT-HEART (4,146 patients) |
 | **Pre-training Corpus** | SA-Med3D-140K (21 729 volumes, 143 518 masks, 245 categories) |
-| **Clinical Domains** | Coronary CTA (lumen / outer wall / plaque) · Prostate mpMRI (zones / lesions / OARs) |
-| **Document Version** | 2026-03-12 |
+| **Clinical Domains** | Coronary CCTA (lumen / outer wall / plaque) · Prostate mpMRI (zones / lesions / OARs) |
 
----
+## Executive Summary & Research Vision
 
-## Table of Contents
-
-1. [Executive Summary & Research Vision](#executive-summary-research-vision)
-   - 1.1 Clinical Gap
-   - 1.2 Our Solution
-   - 1.3 Research Foundation
-   - 1.4 Success Targets (6-month horizon)
-   - [1.5 Hardware & Deployment Requirements](#hardware-deployment-requirements)
-2. [Foundation Model: SAM-Med3D-turbo — Verified Technical Profile](#foundation-model-sam-med3d-turbo-verified-technical-profile)
-3. [Clinical Domain A: Coronary CTA Segmentation (DISCHARGE)](#clinical-domain-a-coronary-cta-segmentation-discharge)
-4. [Clinical Domain B: Prostate mpMRI Segmentation](#clinical-domain-b-prostate-mpmri-segmentation)
-5. [Technical Challenges & Model-Aware Solutions](#technical-challenges-model-aware-solutions)
-6. [Clinical Workflows](#clinical-workflows)
-7. [System Architecture](#system-architecture)
-8. [Frontend: Niivue Viewer & UI/UX](#frontend-niivue-viewer-uiux)
-9. [Backend: Inference Pipeline & API](#backend-inference-pipeline-api)
-10. [MEDIS TXT Legacy Pipeline](#medis-txt-legacy-pipeline)
-11. [Mesh Generation Strategies](#mesh-generation-strategies)
-12. [Centerline Extraction & Straightened MPR (CPR)](#centerline-extraction-straightened-mpr-cpr)
-13. [Deployment, Performance & Security](#deployment-performance-security)
-14. [Research Roadmap & Milestones](#research-roadmap-milestones)
-15. [References & Resources](#references-resources)
-
----
-
-## 1. Executive Summary & Research Vision
-
-### 1.1 Clinical Gap
+### Clinical Gap
 
 | Problem | Impact |
 |---------|--------|
 | Manual coronary segmentation | 30–60 min / case, €200–400 |
-| Limited scalability | DISCHARGE (3 561 patients) still largely un-segmented |
+| Limited scalability | DISCHARGE (3,561 patients) still largely un-segmented; SCOT-HEART external validation remains to be established |
 | Prostate mpMRI zone/lesion contouring | Equally time-intensive for biopsy/radiotherapy planning |
 | Centre-specific expertise | Manual segmentation available only at specialised sites |
 
-### 1.2 Our Solution
+### Our Solution
 
 A **single, universal, browser-based platform** powered by **SAM-Med3D-turbo**:
 
@@ -59,16 +94,16 @@ A **single, universal, browser-based platform** powered by **SAM-Med3D-turbo**:
 - **On-premise GPU inference** at Charité (GDPR-compliant; no data leaves the hospital)
 - **Interactive workflow** for radiologists + **batch research mode** for DISCHARGE processing + **active-learning loop** for continuous improvement
 
-### 1.3 Research Foundation
+### Research Foundation
 
 This platform is a **test-bed for foundation-model research** in cardiovascular imaging:
 
-1. Evaluate **zero-shot / few-shot generalisation** of SAM-Med3D-turbo on unseen DISCHARGE cases
+1. Evaluate **zero-shot / few-shot generalisation** of SAM-Med3D-turbo on unseen DISCHARGE cases, then test external generalisation on SCOT-HEART
 2. Quantify **active-learning gains** (weekly fine-tuning on expert corrections)
-3. Benchmark against **nnU-Net** task-specific models on clinical endpoints (stenosis %, plaque burden, FFR-CT correlation)
+3. Benchmark against **nnU-Net** task-specific models on segmentation-derived endpoints (stenosis %, plaque burden, myocardium volume)
 4. Open-source modular components for the broader MedAI community
 
-### 1.4 Success Targets (6-month horizon)
+### Success Targets (6-month horizon)
 
 | Metric | Target |
 |--------|--------|
@@ -78,77 +113,15 @@ This platform is a **test-bed for foundation-model research** in cardiovascular 
 | Dice (prostate whole-gland) | > 0.90 vs. expert |
 | Cost reduction | 10× cheaper than manual contouring |
 
-> **Critical note on Dice targets:** The SAM-Med3D paper reports **87.12 % Dice on cardiac structures** with 1 prompt point (Table 5 in [1]). However, this was measured on the ACDC dataset (cardiac MRI short-axis cine), **not** coronary CTA. Coronary arteries are smaller, noisier, and motion-affected — published coronary lumen Dice values for task-specific models (nnU-Net) range 0.75–0.88 depending on vessel branch. Our 0.85 target is therefore ambitious but grounded.
+> **Critical note on Dice targets:** The SAM-Med3D paper reports **87.12 % Dice on cardiac structures** with 1 prompt point (Table 5 in [@Zhang2024SAMMed3D]). However, this was measured on the ACDC dataset (cardiac MRI short-axis cine), **not** coronary CTA. Coronary arteries are smaller, noisier, and motion-affected — published coronary lumen Dice values for task-specific models (nnU-Net [@Isensee2021nnUNet]) range 0.75–0.88 depending on vessel branch. Our 0.85 target is therefore ambitious but grounded.
 
-### 1.5 Hardware & Deployment Requirements
-
-#### 1.5.1 Development Environment
-
-| Component | Minimum | Recommended | Current Setup |
-|-----------|---------|-------------|---------------|
-| **GPU** | RTX 3060 (8GB) | RTX 2080 Ti (11GB) | 2x RTX 2080 Ti (11GB each) |
-| **CPU** | 6-core | 8+ core | Modern workstation |
-| **RAM** | 16GB | 32GB+ | Sufficient |
-| **Storage** | 500GB SSD | 1TB+ NVMe | Adequate |
-| **CUDA** | 11.8+ | 12.2+ | CUDA 12.2 |
-
-**Development Use Cases:**
-- Model testing and validation
-- Single-user interactive segmentation
-- DISCHARGE dataset research (subset processing)
-- Active learning experiments
-
-#### 1.5.2 Production Environment (Charité Clinical Deployment)
-
-| Component | Minimum | Recommended | Notes |
-|-----------|---------|-------------|-------|
-| **GPU Cluster** | 2x RTX 4090 (24GB) | 4x A100/H100 (40-80GB) | Concurrent clinical users |
-| **CPU** | 16-core | 32+ core | FastAPI + preprocessing |
-| **RAM** | 64GB | 128GB+ | Multiple 3D volumes in memory |
-| **Storage** | 10TB+ | 50TB+ | DISCHARGE + clinical data |
-| **Network** | 10Gbps | 25Gbps+ | Fast volume transfers |
-| **Redundancy** | RAID 10 | Distributed storage | Clinical data safety |
-
-**Production Requirements:**
-- **GDPR Compliance**: All patient data must remain on-premise
-- **High Availability**: 99.9% uptime for clinical workflows
-- **Concurrent Users**: 5-10 radiologists simultaneously
-- **Batch Processing**: Full DISCHARGE dataset (3,561 patients)
-- **Disaster Recovery**: Automated backups and failover
-
-#### 1.5.3 Critical Medical Deployment Constraint
-
-**WARNING: IN-HOUSE BACKEND MANDATORY FOR MEDICAL USE**
-
-For any clinical deployment, the SAM-Med3D-turbo model **MUST** run on Charité's on-premise infrastructure:
-
-| Requirement | Reason | Alternative |
-|------------|--------|-------------|
-| **On-premise GPU servers** | GDPR compliance - patient data cannot leave hospital | Not allowed: cloud inference (HIPAA/GDPR violation) |
-| **Charité network** | Secure medical data transmission | Not allowed: public internet (security risk) |
-| **Hospital authentication** | User access control and audit trails | Not allowed: anonymous access (non-compliant) |
-| **Medical device certification** | Clinical safety and regulatory compliance | Not allowed: research-only deployment |
-
-**Architecture Implications:**
-```
-Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
-       ↓                           ↓                        ↓
-   UI/UX + Niivue            Load Balancer          SAM-Med3D-turbo
-   3D visualization          + Authentication       PyTorch Inference
-   User prompts              + Logging               + Medical Data Store
-```
-
-**Non-Medical Use Cases:**
-- **Research demos**: Can use cloud GPU with anonymized data
-- **Development**: Local workstation with sample datasets
-- **Open-source contributions**: Public GitHub with synthetic data
-- **Educational**: Browser-only UI with mock backend
+> **Hardware & deployment requirements** (GPU specs, production cluster, GDPR constraints) are in [Deployment, Performance & Security](#deployment-performance-security).
 
 ---
 
-## 2. Foundation Model: SAM-Med3D-turbo — Verified Technical Profile
+## Foundation Model: SAM-Med3D-turbo — Verified Technical Profile
 
-### 2.1 Paper & Publication
+### Paper & Publication
 
 | Field | Value |
 |-------|-------|
@@ -158,7 +131,7 @@ Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
 | **arXiv** | [2310.15161](https://arxiv.org/abs/2310.15161) |
 | **License** | Apache 2.0 |
 
-### 2.2 Architecture (Verified from Paper §4.1 & GitHub)
+### Architecture (Verified from Paper §4.1 & GitHub)
 
 SAM-Med3D uses a **fully 3D architecture trained from scratch** (Method 3 in the paper). The authors explicitly compared three adaptation strategies in preliminary experiments (Table 2):
 
@@ -181,7 +154,7 @@ SAM-Med3D uses a **fully 3D architecture trained from scratch** (Method 3 in the
 
 > **Critical note:** The paper states "86M encoder + 5M decoder" in various summaries. The exact split varies by source. The model is **not** a modified SAM (Meta) — it is architecturally distinct, sharing only the conceptual prompt-based paradigm.
 
-### 2.3 Training (Verified from Paper §4.2)
+### Training (Verified from Paper §4.2)
 
 **Two-stage procedure:**
 
@@ -195,7 +168,7 @@ SAM-Med3D uses a **fully 3D architecture trained from scratch** (Method 3 in the
 - Optimised for **sub-second inference** with FP16
 - This is the recommended checkpoint for deployment
 
-### 2.4 SA-Med3D-140K Dataset (Verified from HuggingFace)
+### SA-Med3D-140K Dataset (Verified from HuggingFace)
 
 | Statistic | Value |
 |-----------|-------|
@@ -203,10 +176,10 @@ SAM-Med3D uses a **fully 3D architecture trained from scratch** (Method 3 in the
 | Total 3D masks | 143 518 |
 | Anatomical categories | 245 |
 | Modalities | 28 (CT, MR, US, and more) |
-| Sources | 70 public datasets + 8 128 privately licensed cases from 24 hospitals |
+| Sources | 70 public datasets + 8,128 privately licensed cases from 24 hospitals |
 | Primary task | General-purpose promptable segmentation |
 
-### 2.5 Verified Performance (from Paper Tables 3–5)
+### Verified Performance (from Paper Tables 3–5) {#verified-performance}
 
 **Overall (Table 3):**
 - SAM-Med3D with 1 point: **+60.12 % overall Dice** improvement over original SAM
@@ -228,20 +201,23 @@ SAM-Med3D uses a **fully 3D architecture trained from scratch** (Method 3 in the
 
 > **Critical caveat for our project:** The "cardiac" results (87.12 %) are from the **ACDC dataset** (cardiac MRI, short-axis cine — segmenting LV/RV/myocardium). This is **not** coronary artery segmentation from CTA. Coronary arteries are 1.5–4 mm diameter, motion-affected, and require dual-wall segmentation — a substantially harder task not directly evaluated in the paper. The model has **never been benchmarked on coronary CTA lumen segmentation**. Our project will provide this missing evaluation.
 
-### 2.6 Official Resources
+> **Strategic implication:** Because LV/RV/myocardium from cardiac MRI *is* the dominant pre-trained cardiac target, **myocardial segmentation from CCTA should be the first zero-shot validation task** — not coronary lumen. It is the easiest coronary-domain target for the model given pre-training priors, provides a large structure for establishing an initial Dice baseline, and gives a lower-risk first test of CCTA cardiac generalisation. The coronary lumen evaluation should follow once the myocardial baseline is established.
+
+### Official Resources
 
 | Resource | Link |
 |----------|------|
 | GitHub | [uni-medical/SAM-Med3D](https://github.com/uni-medical/SAM-Med3D) |
 | Paper | [arXiv:2310.15161](https://arxiv.org/abs/2310.15161) |
 | Supplementary | [ECCV Supplementary PDF](https://github.com/uni-medical/SAM-Med3D/blob/main/paper/SAM_Med3D_ECCV_Supplementary.pdf) |
-| Turbo checkpoint | [HuggingFace: sam_med3d_turbo.pth](https://huggingface.co/blueyo0/SAM-Med3D/blob/main/sam_med3d_turbo.pth) |
+| Turbo checkpoint | [HuggingFace: sam_med3d_turbo.pth](https://huggingface.co/blueyo0/SAM-Med3D/resolve/main/sam_med3d_turbo.pth) |
 | Dataset | [HuggingFace: SA-Med3D-140K](https://huggingface.co/datasets/blueyo0/SA-Med3D-140K) |
 | MedIM loader | [uni-medical/MedIM](https://github.com/uni-medical/MedIM) |
 | CVPR25 Challenge | [MedSegFM Competition](https://www.codabench.org/competitions/5263/) |
 
-### 2.7 Environment Setup (Verified from GitHub README)
+### Environment Setup (Verified from GitHub README)
 
+**Model / research environment:**
 ```bash
 conda create --name sammed3d python=3.10
 conda activate sammed3d
@@ -250,7 +226,19 @@ uv pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0
 uv pip install torchio opencv-python-headless matplotlib prefetch_generator monai edt surface-distance medim
 ```
 
-### 2.8 Model Loading (Verified from GitHub)
+**Backend (FastAPI server) — additional dependencies:**
+```bash
+uv pip install fastapi uvicorn nibabel SimpleITK celery redis
+```
+
+**Compile this document to PDF:**
+```bash
+./code/md2pdf.sh plan/sam3d.md
+# Optional: also produce DOCX
+./code/md2pdf.sh plan/sam3d.md --docx
+```
+
+### Model Loading (Verified from GitHub)
 
 ```python
 import medim
@@ -270,13 +258,15 @@ model = medim.create_model(
 # Optimise for inference
 import torch
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model = model.to(device).half()  # FP16 for speed + memory
+model = model.to(device)
+if device == "cuda":
+    model = model.half()  # FP16 for speed + memory on GPU
 model.eval()
 ```
 
-### 2.9 Data Format for Fine-tuning (Verified from GitHub)
+### Data Format for Fine-tuning (Verified from GitHub) {#fine-tuning-data-format}
 
-SAM-Med3D expects **nnU-Net-style** directory layout with **per-structure binary masks**. Unlike nnU-Net which accepts a single multi-class integer mask (0=background, 1=class1, …), SAM-Med3D requires one separate binary NIfTI file (values 0/1) per anatomical structure. Using a single multi-class mask will silently produce incorrect training prompts.
+SAM-Med3D expects **nnU-Net-style** [@Isensee2021nnUNet] directory layout with **per-structure binary masks**. Unlike nnU-Net which accepts a single multi-class integer mask (0=background, 1=class1, …), SAM-Med3D requires one separate binary NIfTI file (values 0/1) per anatomical structure. Using a single multi-class mask will silently produce incorrect training prompts.
 
 ```
 data/medical_preprocessed/
@@ -296,7 +286,7 @@ data/medical_preprocessed/
 
 > **Important (from GitHub):** Ground-truth labels are required to generate prompt points during training. For inference without ground truth, "generate a fake ground-truth with the target region for prompt annotated."
 
-### 2.10 Turbo vs. Standard Comparison
+### Turbo vs. Standard Comparison
 
 | Metric | Standard (base .pth) | Turbo (sam_med3d_turbo.pth) |
 |--------|----------------------|-----------------------------|
@@ -307,21 +297,33 @@ data/medical_preprocessed/
 
 ---
 
-## 3. Clinical Domain A: Coronary CTA Segmentation (DISCHARGE)
+## Clinical Domain A: Coronary CCTA Segmentation (DISCHARGE)
 
-### 3.1 DISCHARGE Trial Overview
+### DISCHARGE Trial Overview
 
 | Field | Value |
 |-------|-------|
 | **Full name** | Diagnostic Imaging Strategies for Patients with Stable Chest Pain and Intermediate Risk of Coronary Artery Disease |
-| **Reference** | Dewey et al., NEJM 2022 |
+| **Reference** | Dewey et al., NEJM 2022 [@DISCHARGE2022NEJM] |
 | **Design** | Multicentre randomised controlled trial |
-| **Patients** | 3 561 |
-| **Images** | ~25 M CCTA images |
+| **Patients** | 3,561 |
+| **Images** | ~25 M DICOM slices |
 | **Modality** | Coronary Computed Tomography Angiography (CCTA) |
 | **Institution** | Charité, Berlin (lead site) |
 
-### 3.2 Standardised Nomenclature (CAD-RADS / AHA 17-segment compatible)
+### SCOT-HEART Trial Overview
+
+| Field | Value |
+|-------|-------|
+| **Full name** | Scottish COmputed Tomography of the HEART Trial |
+| **References** | Williams et al., Lancet 2015 [@Williams2015SCOTHEART]; 10-year follow-up [@Williams2025SCOTHEART10yr] |
+| **Design** | Multicentre randomised controlled trial |
+| **Patients** | 4,146 |
+| **Key result** | CCTA-guided management → 41 % reduction in CHD death/MI at 10 years (HR 0.59) |
+| **Modality** | CCTA |
+| **Role in this project** | Secondary validation dataset; extends generalisability beyond Charité site |
+
+### Standardised Nomenclature (CAD-RADS 2.0 / AHA 17-segment compatible) [@Maurovich2020CADRADS]
 
 | Clinical Feature | Segmentation Class Label | Description | HU Range (contrast-enhanced CT) |
 |-----------------|--------------------------|-------------|-------------------------------|
@@ -333,7 +335,7 @@ data/medical_preprocessed/
 | **Fibrous Plaque** | `Plaque_Fibrous` | Intermediate-density plaque | 60–130 HU |
 | **Low-Attenuation Plaque** | `Plaque_LAP` | Lipid-rich / necrotic core — **high risk** | < 60 HU |
 
-### 3.3 Why Coronary Arteries are the Hardest Segmentation Target
+### Why Coronary Arteries are the Hardest Segmentation Target
 
 | Challenge | Detail | Impact |
 |-----------|--------|--------|
@@ -344,7 +346,7 @@ data/medical_preprocessed/
 | **Complex topology** | Bifurcations, overlapping branches, tortuosity | Single-click prompts often insufficient |
 | **Dual-wall requirement** | Must segment lumen AND outer wall separately | Wall thickness 0.5–3 mm = 1–5 voxels |
 
-### 3.4 SAM-Med3D-turbo Prompting Strategy for Coronary CTA
+### SAM-Med3D-turbo Prompting Strategy for Coronary CCTA
 
 #### A. Multi-Point Centerline Prompt ("String" Prompt)
 
@@ -371,9 +373,11 @@ lumen_mask_refined = model.segment(
 )
 ```
 
-#### B. Dual-Wall Nested Segmentation (Lumen → EEM)
+#### B. Dual-Wall Nested Segmentation (Lumen → EEM) {#coronary-dual-wall-segmentation}
 
 Critical for calculating **stenosis %** and **plaque burden**:
+
+> **Stenosis % definition:** Report **diameter stenosis** = (1 − D_min / D_ref) × 100, consistent with CAD-RADS 2.0 grading. D_ref is the mean diameter of the nearest healthy proximal and distal reference segments. Do **not** use area stenosis (more sensitive but not the CAD-RADS standard), and document the reference segment selection method explicitly — QAngio CT (MEDIS) uses interpolated reference; our pipeline must match this for Dice/correlation comparisons against expert measurements.
 
 1. **Step 1:** Segment lumen (bright contrast, easier target)
 2. **Step 2:** Use lumen mask as **dense prompt** → expand outward to EEM
@@ -419,7 +423,9 @@ def characterise_plaque(volume, vessel_wall_mask):
     }
 ```
 
-### 3.5 DISCHARGE-Specific Processing Considerations
+> **HU calibration warning:** The thresholds above (< 60 LAP, 60–130 fibrous, > 130 calcified) are defined for **standard 120 kVp with soft-kernel reconstruction**. DISCHARGE is a multi-centre trial with varying tube voltages (80–140 kVp) and reconstruction kernels (soft vs. sharp). Sharp-kernel reconstruction shifts apparent HU upward and increases blooming around calcification. These thresholds require per-centre calibration against phantom measurements or paired soft/sharp kernel scans before cross-site plaque comparisons are valid. Record the reconstruction kernel and tube voltage for every DISCHARGE case in the metadata.
+
+### DISCHARGE-Specific Processing Considerations
 
 | Consideration | Detail |
 |---------------|--------|
@@ -432,18 +438,18 @@ def characterise_plaque(volume, vessel_wall_mask):
 
 ---
 
-## 4. Clinical Domain B: Prostate mpMRI Segmentation
+## Clinical Domain B: Prostate mpMRI Segmentation
 
-### 4.1 Imaging Standard
+### Imaging Standard
 
 **Multiparametric MRI (mpMRI)** is the clinical standard for prostate imaging, using:
 - **T2-weighted (T2W):** Anatomical detail — zonal anatomy
 - **Diffusion-weighted imaging (DWI) + ADC map:** Cellularity — lesion detection
 - **Dynamic contrast-enhanced (DCE):** Vascularity — supplementary
 
-Reporting follows **PI-RADS v2.1** (Prostate Imaging-Reporting and Data System).
+Reporting follows **PI-RADS v2.1** (Prostate Imaging-Reporting and Data System) [@Turkbey2019PIRADS].
 
-### 4.2 Anatomical Segmentation — The "Zones"
+### Anatomical Segmentation — The "Zones"
 
 The prostate is divided into distinct zones with different MRI appearances and cancer risk:
 
@@ -454,7 +460,7 @@ The prostate is divided into distinct zones with different MRI appearances and c
 | **Central Zone** | CZ | < 5 % of cancers | Low signal (dense stroma) | Indistinguishable from TZ on MRI — grouped with TZ per PI-RADS v2.1 |
 | **Anterior Fibromuscular Stroma** | AFMS | Non-glandular | Very low signal | Can be invaded by anterior tumours |
 
-### 4.3 Pathology Segmentation — The "Lesions"
+### Pathology Segmentation — The "Lesions"
 
 When segmenting pathology, the target is **clinically significant prostate cancer (csPCa)**:
 
@@ -465,7 +471,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 | **Extracapsular Extension (ECE)** | Tumour breaches the prostatic capsule | Staging: T3a — affects surgical planning |
 | **Seminal Vesicle Invasion (SVI)** | Tumour extends into seminal vesicles | Staging: T3b — impacts prognosis |
 
-### 4.4 Organs at Risk (OARs) for Radiotherapy
+### Organs at Risk (OARs) for Radiotherapy
 
 | Structure | Abbreviation | Why Segment? |
 |-----------|-------------|-------------|
@@ -473,7 +479,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 | **Rectal Wall** | Rectum_Wall | Monitor tumour–rectum distance |
 | **Bladder Neck** | Bladder_Neck | Preserve urinary continence |
 
-### 4.5 Segmentation Class Labels for the AI Model
+### Segmentation Class Labels for the AI Model
 
 | Segment Name | Class Label | Modality | Clinical Goal |
 |-------------|------------|----------|---------------|
@@ -485,7 +491,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 | Neurovascular Bundles | `NVB` | T2W | Nerve-sparing planning |
 | Rectal Wall | `OAR_Rectum` | T2W | Radiotherapy constraints |
 
-### 4.6 SAM-Med3D-turbo Prompting Strategy for Prostate mpMRI
+### SAM-Med3D-turbo Prompting Strategy for Prostate mpMRI
 
 **Context-dependent prompting:** The same model must switch behaviour based on *where* the user clicks and *which sequence* is active.
 
@@ -504,7 +510,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 
 #### Scenario 2: Lesion Segmentation (DWI/ADC)
 
-> **Implementation warning:** Step 2 below references using a prior PZ mask as a dense prompt. This is the same unimplemented `dense_prompt` issue described in §3.4B — the same two implementation paths apply: (a) custom prompt encoder modification, or (b) sampling the PZ mask boundary into additional point prompts.
+> **Implementation warning:** Step 2 below references using a prior PZ mask as a dense prompt. This is the same unimplemented `dense_prompt` issue described in [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation) — the same two implementation paths apply: (a) custom prompt encoder modification, or (b) sampling the PZ mask boundary into additional point prompts.
 
 ```
 1. User clicks hypointense spot on ADC map
@@ -512,14 +518,25 @@ When segmenting pathology, the target is **clinically significant prostate cance
 
 2. [PLANNED] Use prior PZ mask as dense prompt context
    → Constrains lesion to within prostate boundary
-   → Requires dense_prompt implementation (see §3.4B)
+   → Requires dense_prompt implementation (see [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation))
 
 3. Measure lesion volume → maps to PI-RADS size criterion
 ```
 
 > **Critical note:** SAM-Med3D was pre-trained on **MR data** (SA-Med3D-140K includes MR modalities). However, the dataset card does not specify which MR sequences or whether prostate mpMRI is represented. Zero-shot performance on prostate zones may be moderate; fine-tuning on Charité prostate data will likely be necessary. Whole-gland segmentation (a large, well-defined structure) should work well zero-shot; zonal segmentation (PZ vs. TZ) is harder due to subtle signal differences.
 
-### 4.7 Prostate vs. Coronary: Difficulty Comparison
+### SAM-Med3D-specific Challenges for Prostate mpMRI
+
+| Challenge | Detail | Mitigation |
+|-----------|--------|------------|
+| **Multi-sequence input** | SAM-Med3D accepts a single 3D volume; mpMRI has T2W + ADC + DCE | Run separate inferences per sequence; fuse masks post-hoc. Do not naively concatenate sequences — model was not trained on multi-channel input. |
+| **PZ–TZ boundary** | Gradual signal transition, not a sharp edge | Use morphological priors (PZ wraps inferolaterally around TZ); negative prompts at suspected boundary to sharpen |
+| **Lesion detection vs. segmentation** | PI-RADS lesions can be < 5 mm — smaller than SAM-Med3D's 128³ patch at typical prostate resolution | Ensure patch is centred on clicked lesion; use higher-resolution input if available |
+| **Unknown pre-training coverage** | SA-Med3D-140K dataset card does not confirm prostate mpMRI is represented | Treat prostate as low-confidence zero-shot; plan early fine-tuning on Charité cohort |
+| **Intensity normalisation (MRI)** | MRI intensities are not calibrated across scanners (no HU equivalent) | Apply per-volume z-score normalisation independently for each sequence before inference |
+| **OAR segmentation** | Neurovascular bundles (NVB) are extremely thin on T2W | Multi-point prompts along bundle; expect low zero-shot Dice — fine-tuning required |
+
+### Prostate vs. Coronary: Difficulty Comparison
 
 | Factor | Prostate | Coronary |
 |--------|----------|----------|
@@ -532,7 +549,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 
 ---
 
-## 5. Technical Challenges & Model-Aware Solutions
+## Technical Challenges & Model-Aware Solutions
 
 ### Challenge 1: Coronary Artery Motion Artefacts
 
@@ -550,6 +567,8 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
     else:
         return model.segment(volume_4d[:,:,:,0], points=prompt_points, labels=prompt_labels)
 ```
+
+> **Topology warning:** Pixel-wise median of binary masks across 10 phases is **not** topologically safe for thin structures. A distal coronary voxel present in only 4/10 phases will be excluded by the median, potentially severing the centreline. Preferred alternative: select the optimal cardiac phase (75 % R-R for RCA, 65 % R-R for LAD/LCx at HR < 70) rather than fusing all phases. If multi-phase fusion is required, apply connected-component analysis post-median and re-link broken segments by dilation along the centreline.
 
 **Additional strategies:**
 - Edge-preserving denoising (bilateral filter) pre-processing
@@ -569,7 +588,7 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
 
 **Problem:** Must segment both lumen and outer wall; wall thickness only 0.5–3 mm (1–5 voxels).
 
-**Solution:** Sequential prompting (see §3.4B above).
+**Solution:** Sequential prompting (see [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation)).
 
 ### Challenge 4: Prostate Zone Boundaries
 
@@ -587,44 +606,45 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
 | No coronary CTA in pre-training | Zero-shot may underperform | Fine-tune on DISCHARGE annotations |
 | Binary mask output only | Cannot directly predict PI-RADS score | Post-processing pipeline (volume, ADC stats) |
 | No `dense_prompt` in codebase | Lumen-as-prior strategy needs engineering | Custom prompt encoder modification |
-| 128³ patch size constraint | Coronary arteries span > 128 voxels | Sliding window with overlap + stitching |
+| 128³ patch size constraint | Coronary arteries span > 128 voxels (300–400 voxels at 0.5 mm) | Sliding window with 50 % overlap; Gaussian-weighted blending at boundaries to prevent double-thick seams; connected-component check post-stitch |
 | No multi-class output | One mask per inference call | Multiple sequential inferences per case |
 
 ---
 
-## 6. Clinical Workflows
+## Clinical Workflows
 
-### 6.1 Workflow 1: Interactive Coronary Segmentation (Radiologist)
+### Workflow 1: Interactive Coronary Segmentation (Radiologist)
 
 1. Radiologist opens browser → logs in (Charité SSO)
 2. Loads DISCHARGE CCTA scan from PACS
 3. Clicks proximal LAD + distal tip → AI segments entire lumen in < 2 s
 4. Optionally: places negative point to prune vein leakage
-5. Clicks "Expand to Wall" → second inference → outer wall mask
-6. Right panel shows: stenosis %, plaque composition, volume
+5. Clicks "Expand to Wall" → second inference → outer wall mask **[PLANNED — requires `dense_prompt` implementation; see [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation)]**
+6. Right panel shows: stenosis % (diameter stenosis, CAD-RADS 2.0), plaque composition, volume
 7. Exports segmentation (NIfTI / DICOM-SEG / CSV report)
 
-### 6.2 Workflow 2: Batch Processing for DISCHARGE Research
+### Workflow 2: Batch Processing for DISCHARGE Research
 
 1. Research coordinator uploads 100 DISCHARGE cases
-2. AI processes overnight (Celery + multi-GPU batch mode)
-3. Quality control: auto-flag cases with Dice < 0.75 or disconnected components
-4. Expert reviews flagged cases → corrections feed active-learning loop
-5. Export refined segmentations for MACE prediction analysis
+2. **Automated ostium seeding:** template-based registration to a reference coronary atlas provides initial prompt coordinates; cases where registration confidence is low are queued for manual prompt review before inference
+3. AI processes overnight (Celery + multi-GPU batch mode)
+4. Quality control: auto-flag cases with **disconnected mask components, mask volume outside 3σ of cohort distribution, or model confidence score below threshold** (ground truth is not available in batch mode — Dice cannot be computed)
+5. Expert reviews flagged cases → corrections exported as corrected per-structure binary NIfTI masks → feed active-learning loop
+6. Export refined segmentations for MACE prediction analysis
 
-### 6.3 Workflow 3: MEDIS TXT + Mesh + Straightened MPR (Legacy)
+### Workflow 3: MEDIS TXT + Mesh + Straightened MPR (Reference Contours)
 
-1. Load CTA volume (NIfTI.gz) in browser
+1. Load CCTA volume (NIfTI.gz) in browser
 2. Load MEDIS TXT file (expert contour rings)
 3. Client-side mesh generation: parse TXT → NVMesh (50–100 ms)
-4. Overlay lumen + vessel wall meshes on CTA
+4. Overlay lumen + vessel wall meshes on CCTA
 5. Generate straightened MPR for longitudinal plaque assessment
 
 ---
 
-## 7. System Architecture
+## System Architecture
 
-### 7.1 High-Level Overview
+### High-Level Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -651,7 +671,7 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 7.2 Frontend Directory Structure
+### Frontend Directory Structure
 
 ```
 flow-segment-frontend/
@@ -671,7 +691,7 @@ flow-segment-frontend/
 │   │   ├── loader.ts              # NIfTI.gz + DICOM loading
 │   │   ├── medisParser.ts         # MEDIS TXT parsing
 │   │   ├── medisMeshDirect.ts     # Client-side contour→mesh
-│   │   ├── straightenedMPR.ts     # CPR (see §12)
+│   │   ├── straightenedMPR.ts     # CPR and transport-frame math
 │   │   └── auth.ts                # LDAP/SSO
 │   ├── types/
 │   │   ├── volume.ts
@@ -688,7 +708,7 @@ flow-segment-frontend/
 └── index.html
 ```
 
-### 7.3 Backend Directory Structure
+### Backend Directory Structure
 
 ```
 flow-segment-backend/
@@ -717,9 +737,9 @@ flow-segment-backend/
 
 ---
 
-## 8. Frontend: Niivue Viewer & UI/UX
+## Frontend: Niivue Viewer & UI/UX [@Niivue2024]
 
-### 8.1 Key Niivue v0.66.0 Capabilities
+### Key Niivue v0.66.0 Capabilities
 
 - WebGL2 rendering: 60 FPS for 512³ volumes
 - `onLocationChange` / `onMouseUp` → capture 3D mm coordinates for prompts
@@ -728,7 +748,7 @@ flow-segment-backend/
 - Full TypeScript definitions
 - In-browser DICOM via dcm2niix-wasm
 
-### 8.2 UI Layout: Single View (Default)
+### UI Layout: Single View (Default)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -754,7 +774,7 @@ flow-segment-backend/
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 8.3 UI Layout: Quad View (MPR + 3D)
+### UI Layout: Quad View (MPR + 3D)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -770,14 +790,27 @@ flow-segment-backend/
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 8.4 Design Principles
+### Design Principles
 
 - **Dark theme** (#1a1a1a) — reduces eye strain for long sessions
 - **Minimal chrome** — maximise canvas area
 - **Radiologist-first** — optimised for clinical workflow
 - Primary: Blue (#3b82f6), Accent: Green (#10b981), Warning: Orange (#f59e0b), Error: Red (#ef4444)
 
-### 8.5 General-Purpose Rotatable Volume Viewer
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `P` | Place positive prompt point |
+| `N` | Place negative prompt point |
+| `Enter` | Run segmentation with current prompts |
+| `Z` | Undo last prompt point |
+| `Escape` | Cancel current prompt session |
+| `Q` | Toggle single / quad view |
+| `W` / `L` | Adjust window / level (hold + drag) |
+| `Space` | Toggle mesh overlay visibility |
+
+### General-Purpose Rotatable Volume Viewer
 
 Port of legacy `viewer.py` (PyQtGraph) to WebGL:
 
@@ -789,9 +822,9 @@ Port of legacy `viewer.py` (PyQtGraph) to WebGL:
 
 ---
 
-## 9. Backend: Inference Pipeline & API
+## Backend: Inference Pipeline & API
 
-### 9.1 API Endpoints
+### API Endpoints
 
 ```
 # Segmentation (AI)
@@ -823,39 +856,82 @@ POST /api/auth/login           # LDAP / Charité SSO
 GET  /api/health               # Health check + GPU status
 ```
 
-### 9.2 Segmentation Endpoint (Core)
+### HU Intensity Normalisation (CCTA Pre-processing)
+
+SAM-Med3D was trained on data with modality-specific intensity normalisation. Raw CCTA HU values span −1000 to +3000, but only the cardiovascular window is relevant. Feeding unnormalised values will degrade segmentation quality.
+
+**Required pre-processing before inference:**
+
+```python
+def normalise_ccta(volume: np.ndarray, clip_min: float = -100, clip_max: float = 700) -> np.ndarray:
+    """
+    Clip to cardiovascular window and normalise to [0, 1].
+    clip_min=-100 HU: excludes air; clip_max=700 HU: captures calcification peak.
+    Adjust clip_max to 400 HU for lumen-only work (excludes dense calcium blooming).
+    """
+    volume = np.clip(volume, clip_min, clip_max)
+    volume = (volume - clip_min) / (clip_max - clip_min)  # → [0, 1]
+    return volume.astype(np.float32)
+```
+
+> **Note:** The exact normalisation used in SAM-Med3D's SA-Med3D-140K training pipeline is not fully documented for CT modalities. The values above are a clinically reasonable starting point. Measure Dice vs. normalisation window on a held-out validation set and tune accordingly. For prostate mpMRI, normalise each sequence (T2W, ADC) independently using per-volume z-score normalisation.
+
+### Segmentation Endpoint (Core)
 
 ```python
 from typing import Optional
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 import nibabel as nib
 import numpy as np
+import torch
 import medim
 
 router = APIRouter()
 
-# Model loaded once at startup
+class SegmentRequest(BaseModel):
+    volume_id: str
+    coordinates: list[list[float]]   # [[x,y,z], ...] in mm — one or more points
+    labels: Optional[list[int]] = None  # 1=positive, 0=negative per point; defaults to all-1
+
+# Model loaded once at startup (inside FastAPI lifespan event in production)
 model = medim.create_model(
     "SAM-Med3D", pretrained=True,
     checkpoint_path="app/models/checkpoints/sam_med3d_turbo.pth"
 )
-model = model.cuda().half().eval()
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+if device == "cuda":
+    model = model.half()
+model.eval()
 
+# Use def (not async def): FastAPI runs sync endpoints in a thread pool,
+# keeping the event loop free during blocking GPU inference.
 @router.post("/api/segment/point")
-async def segment_point(
-    volume_id: str,
-    coordinates: list[float],   # [x, y, z] in mm
-    labels: Optional[list[int]] = None,   # 1=positive, 0=negative; defaults to [1]
-):
+def segment_point(req: SegmentRequest):
+    if not req.coordinates:
+        raise HTTPException(status_code=400, detail="At least one coordinate is required.")
+    if any(len(pt) != 3 for pt in req.coordinates):
+        raise HTTPException(status_code=400, detail="Each coordinate must be [x, y, z] in mm.")
+    if req.labels is not None and len(req.labels) != len(req.coordinates):
+        raise HTTPException(status_code=400, detail="labels length must match coordinates length.")
+
     # Load volume from cache/disk
-    vol_nii = nib.load(f"/data/volumes/{volume_id}.nii.gz")
-    volume = vol_nii.get_fdata()
+    vol_nii = nib.load(f"/data/volumes/{req.volume_id}.nii.gz")
+    volume = vol_nii.get_fdata(dtype=np.float32)
 
-    # Convert mm → voxel coordinates
-    voxel_coords = np.linalg.inv(vol_nii.affine) @ [*coordinates, 1]
+    # Normalise HU values to cardiovascular window before inference
+    volume = normalise_ccta(volume)
 
-    # Run SAM-Med3D inference
-    mask = model.segment(volume, points=[voxel_coords[:3]], labels=labels or [1])
+    # Convert mm → voxel coordinates for each point
+    inv_affine = np.linalg.inv(vol_nii.affine)
+    voxel_points = [(inv_affine @ [*pt, 1])[:3] for pt in req.coordinates]
+
+    effective_labels = req.labels if req.labels is not None else [1] * len(voxel_points)
+
+    # Run SAM-Med3D inference — no_grad disables gradient tracking to halve VRAM use
+    with torch.no_grad():
+        mask = model.segment(volume, points=voxel_points, labels=effective_labels)
 
     # Return mask as NIfTI
     mask_nii = nib.Nifti1Image(mask.astype(np.uint8), vol_nii.affine)
@@ -864,16 +940,16 @@ async def segment_point(
 
 ---
 
-## 10. MEDIS TXT Legacy Pipeline
+## MEDIS TXT Reference Pipeline
 
-### 10.1 Format Description
+### Format Description
 
 MEDIS TXT contains vessel wall contours from MEDIS QAngio CT:
 - **Lumen** contours: define inner wall (blood pool boundary)
 - **VesselWall** contours: define outer wall (including plaque)
 - Each contour: group label, slice distance, N points in 3D mm coordinates
 
-### 10.2 Parser (TypeScript)
+### Parser (TypeScript)
 
 ```typescript
 export interface MedisContour {
@@ -913,7 +989,7 @@ export function parseMedisTxt(content: string): MedisContour[] {
 }
 ```
 
-### 10.3 Direct Client-Side Mesh Construction (< 100 ms)
+### Direct Client-Side Mesh Construction (< 100 ms)
 
 Contour rings are connected into a tube mesh directly in the browser — no backend round-trip needed. Algorithm: connect ring N to ring N+1 with triangle pairs.
 
@@ -925,9 +1001,9 @@ Contour rings are connected into a tube mesh directly in the browser — no back
 
 ---
 
-## 11. Mesh Generation Strategies
+## Mesh Generation Strategies
 
-### 11.1 Three Approaches
+### Three Approaches
 
 | Approach | Method | Speed | Quality | Use Case |
 |----------|--------|-------|---------|----------|
@@ -935,7 +1011,7 @@ Contour rings are connected into a tube mesh directly in the browser — no back
 | **Client-side vtk.js** | Marching cubes on mask | < 1 s | Good | Interactive preview |
 | **Server nii2mesh → MZ3** | Decimation + smoothing | 1–3 s | High | Final visualisation |
 
-### 11.2 Recommended Web Format: MZ3
+### Recommended Web Format: MZ3
 
 - 3–5× smaller than PLY, 10× smaller than STL
 - Binary, gzip-compressed, native Niivue support
@@ -943,48 +1019,103 @@ Contour rings are connected into a tube mesh directly in the browser — no back
 
 ---
 
-## 12. Centerline Extraction & Straightened MPR (CPR)
+## Centerline Extraction & Straightened MPR (CPR)
 
-### 12.1 Overview
+### Overview
 
 **Straightened MPR** (Curved Planar Reformation) "unfolds" a tortuous vessel into a straight view. Essential for assessing stenosis and plaque distribution along the entire vessel length.
 
 **Three steps:**
 1. **Centerline extraction** — centroid of lumen contours (from MEDIS) or Voronoi skeletonisation (from AI mask)
-2. **Bishop (parallel transport) frame** — compute Tangent (T) then propagate Normal (N) and Binormal (B) without relying on curvature (see §12.2 for why Frenet-Serret N must not be used)
+2. **Bishop (parallel transport) frame** — compute Tangent (T) then propagate Normal (N) and Binormal (B) without relying on curvature (see [Mathematical Foundation](#cpr-mathematical-foundation) for why Frenet-Serret N must not be used)
 3. **Cross-section sampling** — extract perpendicular slices → stack into straightened volume
 
-### 12.2 Mathematical Foundation
+### Mathematical Foundation {#cpr-mathematical-foundation}
 
 **Tangent** (finite differences):
 ```
 T[i] = normalize(centerline[i+1] - centerline[i-1])  // central difference
 ```
 
-**Normal** (curvature direction):
-```
-dT = T[i+1] - T[i-1]
-N[i] = normalize(dT)  // or arbitrary perpendicular if straight
-```
+**Normal — Bishop (parallel transport) frame:**
 
-> **Warning: frame flipping:** The Frenet-Serret principal normal `N` is undefined and flips 180° in low-curvature (near-straight) vessel segments, producing rotating or jumping cross-sections in straightened MPR views. The standard solution for vessel CPR is a **Bishop (parallel transport) frame**, which propagates an initial normal along the curve without relying on curvature. `straightenedMPR.ts` must implement Bishop frame propagation, not Frenet-Serret N, to produce stable cross-sections.
+> **Why not Frenet-Serret:** The Frenet-Serret principal normal `N = normalize(dT/ds)` is undefined and flips 180° in low-curvature (near-straight) vessel segments, producing rotating or jumping cross-sections. Bishop frame (rotation-minimizing frame) propagation [@Wang2008RotationMinimizing; @Kanitsar2002CPR] avoids this by carrying an initial normal forward without relying on curvature.
+
+```
+// Initialise with any vector perpendicular to T[0]
+N[0] = arbitrary_perpendicular(T[0])
+
+// Propagate: project previous N onto the plane perpendicular to new T
+for i in 1..n-1:
+    N[i] = normalize(N[i-1] - dot(N[i-1], T[i]) * T[i])
+```
 
 **Binormal**: `B[i] = T[i] × N[i]`
 
 **Cross-section point**: `Q(u,v) = P[i] + u·N[i] + v·B[i]`
 
-### 12.3 Interactive Controls
+### Interactive Controls
 
 - **Position slider:** Select centerline point (0 → N-1)
 - **Rotation slider:** Rotate cross-section around T (Rodrigues' formula)
 - **Zoom slider:** Adjust cross-section FOV
-- **Quad-view:** CTA overview | cross-section | straightened MPR | 3D mesh
+- **Quad-view:** CCTA overview | cross-section | straightened MPR | 3D mesh
 
 ---
 
-## 13. Deployment, Performance & Security
+## Deployment, Performance & Security {#deployment-performance-security}
 
-### 13.1 Infrastructure
+### Hardware Requirements
+
+#### Development Environment
+
+| Component | Minimum | Recommended | Current Setup |
+|-----------|---------|-------------|---------------|
+| **GPU** | RTX 3060 (8 GB) | RTX 2080 Ti (11 GB) | 2× RTX 2080 Ti (11 GB each) |
+| **CPU** | 6-core | 8+ core | Modern workstation |
+| **RAM** | 16 GB | 32 GB+ | Sufficient |
+| **Storage** | 500 GB SSD | 1 TB+ NVMe | Adequate |
+| **CUDA** | 11.8+ | 12.2+ | CUDA 12.2 |
+
+**Development use cases:** model testing, single-user interactive segmentation, DISCHARGE subset processing, active-learning experiments.
+
+#### Production Environment (Charité Clinical Deployment)
+
+| Component | Minimum | Recommended | Notes |
+|-----------|---------|-------------|-------|
+| **GPU Cluster** | 2× RTX 4090 (24 GB) | 4× A100/H100 (40–80 GB) | Concurrent clinical users |
+| **CPU** | 16-core | 32+ core | FastAPI + preprocessing |
+| **RAM** | 64 GB | 128 GB+ | Multiple 3D volumes in memory |
+| **Storage** | 10 TB+ | 50 TB+ | DISCHARGE + clinical data |
+| **Network** | 10 Gbps | 25 Gbps+ | Fast volume transfers |
+| **Redundancy** | RAID 10 | Distributed storage | Clinical data safety |
+
+**Production requirements:** GDPR compliance (all data on-premise), 99.9 % uptime, 5–10 concurrent radiologists, full DISCHARGE batch processing, automated backup and failover.
+
+### GDPR & Deployment Constraints
+
+**WARNING: IN-HOUSE BACKEND MANDATORY FOR CLINICAL USE**
+
+For any clinical deployment, the SAM-Med3D-turbo model **MUST** run on Charité's on-premise infrastructure:
+
+| Requirement | Reason | Alternative |
+|------------|--------|-------------|
+| **On-premise GPU servers** | GDPR — patient data cannot leave hospital | Not allowed: cloud inference |
+| **Charité network** | Secure medical data transmission | Not allowed: public internet |
+| **Hospital authentication** | User access control and audit trails | Not allowed: anonymous access |
+| **Medical device certification** | Clinical safety and regulatory compliance | Not allowed: research-only deployment |
+
+```
+Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
+       ↓                           ↓                        ↓
+   UI/UX + Niivue            Load Balancer          SAM-Med3D-turbo
+   3D visualization          + Authentication       PyTorch Inference
+   User prompts              + Logging               + Medical Data Store
+```
+
+**Non-clinical use cases (anonymised data allowed):** research demos with cloud GPU; local development with sample datasets; open-source contributions via GitHub with synthetic data; educational browser-only UI with mock backend.
+
+### Infrastructure
 
 | Component | Technology |
 |-----------|-----------|
@@ -995,7 +1126,7 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 | Authentication | LDAP / Charité SSO |
 | Compliance | GDPR (all data on-premise, no cloud) |
 
-### 13.2 Performance Targets
+### Performance Targets
 
 | Metric | Target |
 |--------|--------|
@@ -1006,24 +1137,24 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 | Batch throughput | ~50 cases / hour (4 GPUs) — bottleneck is DICOM→NIfTI preprocessing, not GPU |
 | CTA volume memory | ~268 MB (512³ × 2 bytes = 268,435,456 bytes) |
 
-### 13.3 Memory Budget
+### Memory Budget
 
 | Component | Size |
 |-----------|------|
 | CTA volume (512³, int16) | ~268 MB |
 | SAM-Med3D-turbo (FP16) | ~4 GB VRAM |
-| Embedding cache (per volume) | ~500 MB |
+| Embedding cache (per volume) | ~50–500 MB (estimate — depends on patch count and feature map size; to be measured) |
 | Straightened volume (64² × 200) | ~8 MB |
 | Mesh (MZ3, per vessel) | < 5 MB |
 
 ---
 
-## 14. Research Roadmap & Milestones
+## Research Roadmap & Milestones
 
 ### Phase 1: MVP — MEDIS TXT Visualisation (Weeks 1–4)
 
 - [ ] MEDIS TXT parser + client-side mesh in Niivue
-- [ ] Centerline extraction + straightened MPR with **Bishop (parallel transport) frame** (not Frenet-Serret — see §12.2)
+- [ ] Centerline extraction + straightened MPR with **Bishop (parallel transport) frame** (not Frenet-Serret — see [Mathematical Foundation](#cpr-mathematical-foundation))
 - [ ] Quad-view layout with interactive sliders
 - [ ] NIfTI.gz / DICOM loading
 
@@ -1037,14 +1168,15 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 
 ### Phase 3: DISCHARGE Evaluation (Weeks 9–12)
 
-- [ ] Zero-shot baseline on held-out DISCHARGE cases
-- [ ] Quantify Dice, Hausdorff, stenosis % correlation vs. expert
-- [ ] Identify failure modes (motion, calcification, bifurcations)
+- [ ] **Zero-shot baseline — myocardium first:** `LV_MYO` is the closest match to ACDC pre-training targets; establish Dice baseline here before coronary lumen (see [Verified Performance](#verified-performance))
+- [ ] Zero-shot baseline on coronary lumen (held-out DISCHARGE cases)
+- [ ] Quantify Dice, Hausdorff, diameter stenosis % correlation vs. MEDIS QAngio CT expert measurements
+- [ ] Identify failure modes (motion, calcification, bifurcations, patch-boundary seams)
 
 ### Phase 4: Fine-tuning & Active Learning (Weeks 13–20)
 
 - [ ] Fine-tune SAM-Med3D on DISCHARGE annotations (nnU-Net-style data prep)
-- [ ] Active-learning loop: expert corrections → weekly re-training
+- [ ] Active-learning loop [@Budd2021ActiveLearning]: expert corrections → weekly re-training. **Correction data model:** a "correction" is a full per-structure binary NIfTI mask saved by the radiologist after local brush edits in the browser. The backend must convert the in-browser voxel edits (sparse difference from AI mask) into a complete corrected NIfTI matching [Data Format for Fine-tuning](#fine-tuning-data-format) before ingestion into the fine-tuning pipeline.
 - [ ] Benchmark against task-specific nnU-Net baseline
 
 ### Phase 5: Prostate Extension (Weeks 21–28)
@@ -1057,7 +1189,7 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 
 - [ ] Prospective reader study (Dice vs. time vs. inter-observer)
 - [ ] Open-source release + MedSegFM competition baseline
-- [ ] Publication: "Foundation-model-assisted coronary CTA segmentation at scale"
+- [ ] Publication: "Foundation-model-assisted coronary CCTA segmentation at scale"
 
 ### Quarterly Research Milestones
 
@@ -1070,21 +1202,7 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 
 ---
 
-## 15. References & Resources
-
-### 15.1 Core References
-
-1. **Wang H, Guo S, Ye J, Deng Z, Cheng J, Li T, Chen J, Su Y, Huang Z, Shen Y, Fu B, Zhang S, He J, Qiao Y.** SAM-Med3D: Towards General-purpose Segmentation Models for Volumetric Medical Images. *ECCV BIC 2024 (Oral)*. arXiv:2310.15161. [Paper](https://arxiv.org/abs/2310.15161) · [GitHub](https://github.com/uni-medical/SAM-Med3D) · [Checkpoint](https://huggingface.co/blueyo0/SAM-Med3D/blob/main/sam_med3d_turbo.pth) · [Dataset](https://huggingface.co/datasets/blueyo0/SA-Med3D-140K)
-
-2. **Dewey M et al.** Cardiac CT for the diagnosis of coronary artery disease in patients with stable chest pain (DISCHARGE). *NEJM 2022*.
-
-3. **Isensee F, Jaeger PF, Kohl SAA, Petersen J, Maier-Hein KH.** nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. *Nature Methods 2021; 18: 203–211*.
-
-4. **Niivue** — WebGL2 medical image viewer. [GitHub v0.66.0](https://github.com/niivue/niivue)
-
-5. **Kirillov A et al.** Segment Anything. *ICCV 2023*. (SAM — the 2D foundation)
-
-### 15.2 Related Medical Segmentation Models
+## Related Medical Segmentation Models
 
 | Model | Dimension | Modalities | Prompts | Key Difference from SAM-Med3D |
 |-------|-----------|-----------|---------|------------------------------|
@@ -1094,24 +1212,6 @@ N[i] = normalize(dT)  // or arbitrary perpendicular if straight
 | SAM-Med3D | **3D** | **Medical (volumetric)** | **3D point** | **Native 3D — our choice** |
 | nnU-Net | 3D | Medical (task-specific) | None (automatic) | Not promptable; requires per-task training |
 
-### 15.3 Official Citation
-
-```bibtex
-@misc{wang2024sammed3dgeneralpurposesegmentationmodels,
-  title     = {SAM-Med3D: Towards General-purpose Segmentation Models
-               for Volumetric Medical Images},
-  author    = {Haoyu Wang and Sizheng Guo and Jin Ye and Zhongying Deng
-               and Junlong Cheng and Tianbin Li and Jianpin Chen
-               and Yanzhou Su and Ziyan Huang and Yiqing Shen
-               and Bin Fu and Shaoting Zhang and Junjun He and Yu Qiao},
-  year      = {2024},
-  eprint    = {2310.15161},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CV},
-  url       = {https://arxiv.org/abs/2310.15161},
-}
-```
-
 ---
 
-*This document is the living foundation of the Charité Segment Platform research project. All claims about SAM-Med3D are verified against the published paper (arXiv:2310.15161), official GitHub README, and HuggingFace model/dataset cards. Critical caveats about zero-shot performance on coronary CTA and prostate mpMRI (neither directly evaluated in the paper) are noted throughout.*
+*This document is the living foundation of the Charité Segment Platform research project. All claims about SAM-Med3D are verified against the published paper (arXiv:2310.15161), official GitHub README, and HuggingFace model/dataset cards. Critical caveats about zero-shot performance on coronary CTA and prostate mpMRI (neither directly evaluated in the paper) are noted throughout. Full bibliography in `plan/references.bib`.*

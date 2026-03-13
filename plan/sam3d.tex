@@ -1,0 +1,2354 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[top=2.5cm,bottom=1.5cm,left=2.5cm,right=2.0cm]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\usepackage{booktabs}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\IfFontExistsTF{Arial}{\newfontfamily\headerfont{Arial}}{\newfontfamily\headerfont{Arimo}}
+\setlength{\headheight}{14pt}
+\AtBeginDocument{
+  \pagestyle{fancy}
+  \fancyhf{}
+  \fancyhead[L]{\headerfont\fontsize{9}{11}\selectfont Segment Platform Research Foundation Document}
+  \fancyhead[R]{\headerfont\fontsize{9}{11}\selectfont \thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+  \makeatletter\let\ps@plain\ps@fancy\makeatother
+}
+\makeatletter
+\@ifpackageloaded{subfig}{}{\usepackage{subfig}}
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\captionsetup[subfloat]{margin=0.5em}
+\AtBeginDocument{%
+\renewcommand*\figurename{Figure}
+\renewcommand*\tablename{Table}
+}
+\AtBeginDocument{%
+\renewcommand*\listfigurename{List of Figures}
+\renewcommand*\listtablename{List of Tables}
+}
+\newcounter{pandoccrossref@subfigures@footnote@counter}
+\newenvironment{pandoccrossrefsubfigures}{%
+\setcounter{pandoccrossref@subfigures@footnote@counter}{0}
+\begin{figure}\centering%
+\gdef\global@pandoccrossref@subfigures@footnotes{}%
+\DeclareRobustCommand{\footnote}[1]{\footnotemark%
+\stepcounter{pandoccrossref@subfigures@footnote@counter}%
+\ifx\global@pandoccrossref@subfigures@footnotes\empty%
+\gdef\global@pandoccrossref@subfigures@footnotes{{##1}}%
+\else%
+\g@addto@macro\global@pandoccrossref@subfigures@footnotes{, {##1}}%
+\fi}}%
+{\end{figure}%
+\addtocounter{footnote}{-\value{pandoccrossref@subfigures@footnote@counter}}
+\@for\f:=\global@pandoccrossref@subfigures@footnotes\do{\stepcounter{footnote}\footnotetext{\f}}%
+\gdef\global@pandoccrossref@subfigures@footnotes{}}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Segment Platform Research Foundation Document},
+  pdfauthor={Steffen Lukas steffen.lukas@charite.de},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Segment Platform Research Foundation Document}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Browser-Based Interactive 3D Medical Segmentation with
+SAM-Med3D-turbo}
+\author{Steffen Lukas
+\href{mailto:steffen.lukas@charite.de}{\nolinkurl{steffen.lukas@charite.de}}}
+\date{13 March 2026}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\setstretch{1.2}
+\subsection*{Abstract}\label{abstract}
+\addcontentsline{toc}{subsection}{Abstract}
+
+This document is a technical and research foundation for the Segment
+platform, a browser-based 3D medical segmentation environment built
+around SAM-Med3D-turbo. It defines the clinical targets, model
+assumptions, workflow patterns, system architecture, and evaluation path
+for two initial application domains: coronary CCTA in DISCHARGE and
+prostate mpMRI. It is an internal technical reference and research
+planning document rather than a deployment certification package.
+
+\subsection*{Purpose}\label{purpose}
+\addcontentsline{toc}{subsection}{Purpose}
+
+This reference serves as the working document for framing the
+segmentation problem, the platform requirements, and the validation
+roadmap for Charité-led development.
+
+It is \textbf{not}:
+
+\begin{itemize}
+\tightlist
+\item
+  a production deployment architecture specification;
+\item
+  a finished browser-platform product brief;
+\item
+  a standalone funding proposal.
+\end{itemize}
+
+\subsection*{Why Segmentation Matters
+Here}\label{why-segmentation-matters-here}
+\addcontentsline{toc}{subsection}{Why Segmentation Matters Here}
+
+The current programme needs segmentation for three distinct but linked
+tasks:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Coronary lumen geometry} for stenosis quantification,
+  centreline extraction, and straightened MPR analysis.
+\item
+  \textbf{Outer-wall and plaque context} where vessel-wall estimation
+  and plaque-burden measurements are clinically relevant.
+\item
+  \textbf{Prostate zones, lesions, and organs at risk} for biopsy
+  support, radiotherapy planning, and multi-domain testing of
+  foundation-model generalisation.
+\end{enumerate}
+
+\subsection*{Document Snapshot}\label{document-snapshot}
+\addcontentsline{toc}{subsection}{Document Snapshot}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Field
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detail
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Institution} & Charité - Universitätsmedizin Berlin \\
+\textbf{Core Stack} & TypeScript · Vite · Niivue 0.66 · FastAPI ·
+PyTorch \\
+\textbf{Foundation Model} & SAM-Med3D-turbo (3D ViT-B/16, 91 M
+params) \\
+\textbf{Primary Dataset} & DISCHARGE (\textasciitilde25 M DICOM slices
+across 3,561 patients) \\
+\textbf{Pre-training Corpus} & SA-Med3D-140K (21 729 volumes, 143 518
+masks, 245 categories) \\
+\textbf{Clinical Domains} & Coronary CCTA (lumen / outer wall / plaque)
+· Prostate mpMRI (zones / lesions / OARs) \\
+\end{longtable}
+
+\subsection{Executive Summary \& Research
+Vision}\label{executive-summary-research-vision}
+
+\subsubsection{Clinical Gap}\label{clinical-gap}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5294}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4706}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Problem
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impact
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Manual coronary segmentation & 30--60 min / case, €200--400 \\
+Limited scalability & DISCHARGE (3 561 patients) still largely
+un-segmented \\
+Prostate mpMRI zone/lesion contouring & Equally time-intensive for
+biopsy/radiotherapy planning \\
+Centre-specific expertise & Manual segmentation available only at
+specialised sites \\
+\end{longtable}
+
+\subsubsection{Our Solution}\label{our-solution}
+
+A \textbf{single, universal, browser-based platform} powered by
+\textbf{SAM-Med3D-turbo}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{1--3 point prompts} (3D coordinates in mm space) → any
+  anatomy, any modality
+\item
+  \textbf{Zero installation} --- runs in Chrome / Firefox / Safari
+\item
+  \textbf{On-premise GPU inference} at Charité (GDPR-compliant; no data
+  leaves the hospital)
+\item
+  \textbf{Interactive workflow} for radiologists + \textbf{batch
+  research mode} for DISCHARGE processing + \textbf{active-learning
+  loop} for continuous improvement
+\end{itemize}
+
+\subsubsection{Research Foundation}\label{research-foundation}
+
+This platform is a \textbf{test-bed for foundation-model research} in
+cardiovascular imaging:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Evaluate \textbf{zero-shot / few-shot generalisation} of
+  SAM-Med3D-turbo on unseen DISCHARGE cases
+\item
+  Quantify \textbf{active-learning gains} (weekly fine-tuning on expert
+  corrections)
+\item
+  Benchmark against \textbf{nnU-Net} task-specific models on clinical
+  endpoints (stenosis \%, plaque burden, FFR-CT correlation)
+\item
+  Open-source modular components for the broader MedAI community
+\end{enumerate}
+
+\subsubsection{Success Targets (6-month
+horizon)}\label{success-targets-6-month-horizon}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Metric & Target \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DISCHARGE cases auto-processed & \textgreater{} 80 \% of dataset \\
+End-to-end latency & \textless{} 2 s per vessel / per prostate gland \\
+Dice (coronary lumen) & \textgreater{} 0.85 vs.~expert \\
+Dice (prostate whole-gland) & \textgreater{} 0.90 vs.~expert \\
+Cost reduction & 10× cheaper than manual contouring \\
+\end{longtable}
+
+\begin{quote}
+\textbf{Critical note on Dice targets:} The SAM-Med3D paper reports
+\textbf{87.12 \% Dice on cardiac structures} with 1 prompt point (Table
+5 in\textsuperscript{1}). However, this was measured on the ACDC dataset
+(cardiac MRI short-axis cine), \textbf{not} coronary CTA. Coronary
+arteries are smaller, noisier, and motion-affected --- published
+coronary lumen Dice values for task-specific models
+(nnU-Net\textsuperscript{2}) range 0.75--0.88 depending on vessel
+branch. Our 0.85 target is therefore ambitious but grounded.
+\end{quote}
+
+\begin{quote}
+\textbf{Hardware \& deployment requirements} (GPU specs, production
+cluster, GDPR constraints) are in §13.
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Foundation Model: SAM-Med3D-turbo --- Verified Technical
+Profile}\label{foundation-model-sam-med3d-turbo-verified-technical-profile}
+
+\subsubsection{Paper \& Publication}\label{paper-publication}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Field
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Title} & SAM-Med3D: Towards General-purpose Segmentation Models
+for Volumetric Medical Images \\
+\textbf{Authors} & Haoyu Wang, Sizheng Guo, Jin Ye, Zhongying Deng,
+Junlong Cheng, Tianbin Li, Jianpin Chen, Yanzhou Su, Ziyan Huang, Yiqing
+Shen, Bin Fu, Shaoting Zhang, Junjun He, Yu Qiao \\
+\textbf{Venue} & \textbf{ECCV BIC 2024 --- Oral} \\
+\textbf{arXiv} & \href{https://arxiv.org/abs/2310.15161}{2310.15161} \\
+\textbf{License} & Apache 2.0 \\
+\end{longtable}
+
+\subsubsection{Architecture (Verified from Paper §4.1 \&
+GitHub)}\label{architecture-verified-from-paper-4.1-github}
+
+SAM-Med3D uses a \textbf{fully 3D architecture trained from scratch}
+(Method 3 in the paper). The authors explicitly compared three
+adaptation strategies in preliminary experiments (Table 2):
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+Strategy & Seen Dice & Unseen Dice & Chosen? \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+3D Adapter + Frozen SAM & Lower & Moderate & No \\
+Fine-tune SAM 2D→3D weights & Good & Poor (broken priors) & No \\
+\textbf{Train 3D from scratch} & \textbf{Good} & \textbf{Best} & Yes \\
+\end{longtable}
+
+\textbf{Rationale (Paper §4.1):} ``Training from scratch emerges as a
+better trade-off, exhibiting superior average performance'' --- the
+2D-to-3D weight transition ``might further break down the prior
+knowledge of SAM, which is harmful to generalization.''
+
+\textbf{Component breakdown:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3056}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3611}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Architecture
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parameters
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Image Encoder & 3D ViT-B/16 (3D positional encoding, 3D convolutions, 3D
+LayerNorm) & \textasciitilde86 M \\
+Prompt Encoder & 3D point/box encoder (learned embeddings) &
+\textasciitilde1 M \\
+Mask Decoder & Lightweight 3D decoder (2-layer transformer + upsampling)
+& \textasciitilde4 M \\
+\textbf{Total} & & \textbf{\textasciitilde91 M} \\
+\end{longtable}
+
+\begin{quote}
+\textbf{Critical note:} The paper states ``86M encoder + 5M decoder'' in
+various summaries. The exact split varies by source. The model is
+\textbf{not} a modified SAM (Meta) --- it is architecturally distinct,
+sharing only the conceptual prompt-based paradigm.
+\end{quote}
+
+\subsubsection{Training (Verified from Paper
+§4.2)}\label{training-verified-from-paper-4.2}
+
+\textbf{Two-stage procedure:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Stage
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Data
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Epochs
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Purpose
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Stage 1: Pre-training} & All 131 K masks from SA-Med3D-140K
+training set & 800 & Build general 3D medical understanding \\
+\textbf{Stage 2: Fine-tuning} & \textasciitilde75 K filtered
+high-quality masks & Additional & Improve prompt efficiency on
+challenging targets \\
+\end{longtable}
+
+\textbf{SAM-Med3D-turbo} (from
+\href{https://github.com/uni-medical/SAM-Med3D/issues/2\#issuecomment-1849002225}{GitHub
+issue \#2}): - Fine-tuned on \textbf{44 additional datasets} beyond the
+base SA-Med3D-140K - Optimised for \textbf{sub-second inference} with
+FP16 - This is the recommended checkpoint for deployment
+
+\subsubsection{SA-Med3D-140K Dataset (Verified from
+HuggingFace)}\label{sa-med3d-140k-dataset-verified-from-huggingface}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3889}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Total 3D images & 21 729 \\
+Total 3D masks & 143 518 \\
+Anatomical categories & 245 \\
+Modalities & 28 (CT, MR, US, and more) \\
+Sources & 70 public datasets + 8,128 privately licensed cases from 24
+hospitals \\
+Primary task & General-purpose promptable segmentation \\
+\end{longtable}
+
+\subsubsection{Verified Performance (from Paper Tables
+3--5)}\label{verified-performance-from-paper-tables-35}
+
+\textbf{Overall (Table 3):} - SAM-Med3D with 1 point: \textbf{+60.12 \%
+overall Dice} improvement over original SAM - Consistently outperforms
+SAM-Med2D across all prompt counts - Operates at \textbf{1--26 \% of
+inference time} compared to slice-by-slice SAM
+
+\textbf{By anatomy (Table 5, 1 prompt point):}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+Anatomy & SAM & SAM-Med2D & SAM-Med3D \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Cardiac (seen) & Poor & Moderate & \textbf{87.12 \%} \\
+Organs (seen) & Poor & Moderate & \textbf{Best} \\
+Lesions (unseen) & Very poor & Moderate & Competitive \\
+Bones/muscles & Very poor & Moderate & \textbf{Greatest advantage} \\
+\end{longtable}
+
+\textbf{Key finding (Paper §5.1.5):} ``SAM-Med3D using 1 point
+outperforms SAM-Med2D with N points in \textbf{45 targets out of 49},
+achieving up to +68.2\% improvement.''
+
+\textbf{Transferability (Paper §5.1.6, Table 6):} When SAM-Med3D's ViT
+encoder is used as pre-trained backbone for UNETR, it yields up to
+\textbf{+5.63 \% Dice improvement} over training from scratch ---
+confirming value as a foundation model.
+
+\begin{quote}
+\textbf{Critical caveat for our project:} The ``cardiac'' results (87.12
+\%) are from the \textbf{ACDC dataset} (cardiac MRI, short-axis cine ---
+segmenting LV/RV/myocardium). This is \textbf{not} coronary artery
+segmentation from CTA. Coronary arteries are 1.5--4 mm diameter,
+motion-affected, and require dual-wall segmentation --- a substantially
+harder task not directly evaluated in the paper. The model has
+\textbf{never been benchmarked on coronary CTA lumen segmentation}. Our
+project will provide this missing evaluation.
+\end{quote}
+
+\begin{quote}
+\textbf{Strategic implication:} Because LV/RV/myocardium from cardiac
+MRI \emph{is} the dominant pre-trained cardiac target,
+\textbf{myocardial segmentation from CCTA should be the first zero-shot
+validation task} --- not coronary lumen. It is the easiest
+coronary-domain target for the model given pre-training priors, provides
+a large structure (easy Dice baseline), and is directly needed for
+FFR-CT territory assignment and MACE prediction from the DISCHARGE data.
+The coronary lumen evaluation should follow once the myocardial baseline
+is established.
+\end{quote}
+
+\subsubsection{Official Resources}\label{official-resources}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Resource
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Link
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GitHub &
+\href{https://github.com/uni-medical/SAM-Med3D}{uni-medical/SAM-Med3D} \\
+Paper & \href{https://arxiv.org/abs/2310.15161}{arXiv:2310.15161} \\
+Supplementary &
+\href{https://github.com/uni-medical/SAM-Med3D/blob/main/paper/SAM_Med3D_ECCV_Supplementary.pdf}{ECCV
+Supplementary PDF} \\
+Turbo checkpoint &
+\href{https://huggingface.co/blueyo0/SAM-Med3D/resolve/main/sam_med3d_turbo.pth}{HuggingFace:
+sam\_med3d\_turbo.pth} \\
+Dataset &
+\href{https://huggingface.co/datasets/blueyo0/SA-Med3D-140K}{HuggingFace:
+SA-Med3D-140K} \\
+MedIM loader &
+\href{https://github.com/uni-medical/MedIM}{uni-medical/MedIM} \\
+CVPR25 Challenge &
+\href{https://www.codabench.org/competitions/5263/}{MedSegFM
+Competition} \\
+\end{longtable}
+
+\subsubsection{Environment Setup (Verified from GitHub
+README)}\label{environment-setup-verified-from-github-readme}
+
+\textbf{Model / research environment:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{conda}\NormalTok{ create }\AttributeTok{{-}{-}name}\NormalTok{ sammed3d python=3.10}
+\ExtensionTok{conda}\NormalTok{ activate sammed3d}
+\ExtensionTok{pip}\NormalTok{ install uv}
+\ExtensionTok{uv}\NormalTok{ pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0}
+\ExtensionTok{uv}\NormalTok{ pip install torchio opencv{-}python{-}headless matplotlib prefetch\_generator monai edt surface{-}distance medim}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Backend (FastAPI server) --- additional dependencies:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{uv}\NormalTok{ pip install fastapi uvicorn nibabel SimpleITK celery redis}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Compile this document to PDF:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{./code/md2pdf.sh}\NormalTok{ plan/sam3d.md}
+\CommentTok{\# Optional: also produce DOCX}
+\ExtensionTok{./code/md2pdf.sh}\NormalTok{ plan/sam3d.md }\AttributeTok{{-}{-}docx}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Model Loading (Verified from
+GitHub)}\label{model-loading-verified-from-github}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ medim}
+
+\CommentTok{\# Option A: Direct from HuggingFace (downloads automatically)}
+\CommentTok{\# Use /resolve/ (raw file), NOT /blob/ (HTML page)}
+\NormalTok{ckpt\_path }\OperatorTok{=} \StringTok{"https://huggingface.co/blueyo0/SAM{-}Med3D/resolve/main/sam\_med3d\_turbo.pth"}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ medim.create\_model(}\StringTok{"SAM{-}Med3D"}\NormalTok{, pretrained}\OperatorTok{=}\VariableTok{True}\NormalTok{, checkpoint\_path}\OperatorTok{=}\NormalTok{ckpt\_path)}
+
+\CommentTok{\# Option B: Local checkpoint (recommended for deployment)}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ medim.create\_model(}
+    \StringTok{"SAM{-}Med3D"}\NormalTok{,}
+\NormalTok{    pretrained}\OperatorTok{=}\VariableTok{True}\NormalTok{,}
+\NormalTok{    checkpoint\_path}\OperatorTok{=}\StringTok{"app/models/checkpoints/sam\_med3d\_turbo.pth"}
+\NormalTok{)}
+
+\CommentTok{\# Optimise for inference}
+\ImportTok{import}\NormalTok{ torch}
+\NormalTok{device }\OperatorTok{=} \StringTok{"cuda"} \ControlFlowTok{if}\NormalTok{ torch.cuda.is\_available() }\ControlFlowTok{else} \StringTok{"cpu"}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ model.to(device).half()  }\CommentTok{\# FP16 for speed + memory}
+\NormalTok{model.}\BuiltInTok{eval}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Data Format for Fine-tuning (Verified from
+GitHub)}\label{data-format-for-fine-tuning-verified-from-github}
+
+SAM-Med3D expects \textbf{nnU-Net-style}\textsuperscript{2} directory
+layout with \textbf{per-structure binary masks}. Unlike nnU-Net which
+accepts a single multi-class integer mask (0=background, 1=class1,
+\ldots), SAM-Med3D requires one separate binary NIfTI file (values 0/1)
+per anatomical structure. Using a single multi-class mask will silently
+produce incorrect training prompts.
+
+\begin{verbatim}
+data/medical_preprocessed/
+├── coronary/
+│   ├── ct_DISCHARGE/
+│   │   ├── imagesTr/
+│   │   │   ├── discharge_0001.nii.gz
+│   │   │   └── ...
+│   │   └── labelsTr/
+│   │       ├── discharge_0001.nii.gz  (binary mask)
+│   │       └── ...
+└── prostate/
+    └── mr_CHARITE/
+        ├── imagesTr/
+        └── labelsTr/
+\end{verbatim}
+
+\begin{quote}
+\textbf{Important (from GitHub):} Ground-truth labels are required to
+generate prompt points during training. For inference without ground
+truth, ``generate a fake ground-truth with the target region for prompt
+annotated.''
+\end{quote}
+
+\subsubsection{Turbo vs.~Standard
+Comparison}\label{turbo-vs.-standard-comparison}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Metric & Standard (base .pth) & Turbo (sam\_med3d\_turbo.pth) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Pre-training data & 131 K masks & 131 K + 44 additional datasets \\
+Average Dice (1 prompt) & \textasciitilde0.75 & \textasciitilde0.82+ \\
+Inference time & 4--8 s & 0.5--1.5 s \\
+VRAM usage & \textasciitilde10 GB (FP32) & \textasciitilde4 GB (FP16) \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Clinical Domain A: Coronary CCTA Segmentation
+(DISCHARGE)}\label{clinical-domain-a-coronary-ccta-segmentation-discharge}
+
+\subsubsection{DISCHARGE Trial Overview}\label{discharge-trial-overview}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Field
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Full name} & Diagnostic Imaging Strategies for Patients with
+Stable Chest Pain and Intermediate Risk of Coronary Artery Disease \\
+\textbf{Reference} & Dewey et al., NEJM 2022\textsuperscript{3} \\
+\textbf{Design} & Multicentre randomised controlled trial \\
+\textbf{Patients} & 3 561 \\
+\textbf{Images} & \textasciitilde25 M DICOM slices (across 3,561
+patients; not 25 M cases) \\
+\textbf{Modality} & Coronary Computed Tomography Angiography (CCTA) \\
+\textbf{Institution} & Charité, Berlin (lead site) \\
+\end{longtable}
+
+\subsubsection{\texorpdfstring{Standardised Nomenclature (CAD-RADS 2.0 /
+AHA 17-segment
+compatible)\textsuperscript{4}}{Standardised Nomenclature (CAD-RADS 2.0 / AHA 17-segment compatible)4}}\label{standardised-nomenclature-cad-rads-2.0-aha-17-segment-compatible-maurovich2020cadrads}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1954}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2989}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1494}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3563}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Clinical Feature
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Segmentation Class Label
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+HU Range (contrast-enhanced CT)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Myocardium (LV)} & \texttt{LV\_MYO} & Muscular wall of left
+ventricle & 50--120 HU \\
+\textbf{Endocardial Lumen} & \texttt{Endocardial\_Lumen} & Inner chamber
+blood pool & 250--400 HU \\
+\textbf{Coronary Lumen} &
+\texttt{Lumen\_\{LAD\textbackslash{}\textbar{}RCA\textbackslash{}\textbar{}LCx\textbackslash{}\textbar{}LM\}}
+& Vessel blood pool --- per AHA branch & 300--400 HU \\
+\textbf{Outer Wall (EEM)} & \texttt{VesselWall\_EEM} & External elastic
+membrane boundary & --- (morphological) \\
+\textbf{Calcified Plaque} & \texttt{Plaque\_Calc} & High-density stable
+plaque & \textgreater{} 130 HU (often 500--1000) \\
+\textbf{Fibrous Plaque} & \texttt{Plaque\_Fibrous} &
+Intermediate-density plaque & 60--130 HU \\
+\textbf{Low-Attenuation Plaque} & \texttt{Plaque\_LAP} & Lipid-rich /
+necrotic core --- \textbf{high risk} & \textless{} 60 HU \\
+\end{longtable}
+
+\subsubsection{Why Coronary Arteries are the Hardest Segmentation
+Target}\label{why-coronary-arteries-are-the-hardest-segmentation-target}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4074}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2963}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Challenge
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detail
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impact
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Motion artefacts} & Heart beats 60--80 bpm; RCA most affected &
+Blurred vessel edges despite ECG gating \\
+\textbf{Small calibre} & 1.5--4 mm diameter & Partial volume effects at
+0.5 mm resolution \\
+\textbf{Low-contrast plaque} & Lipid-rich plaque 20--50 HU vs.~lumen
+300--400 HU & Nearly invisible on standard windowing \\
+\textbf{Blooming} & Calcification \textgreater{} 130 HU causes beam
+hardening & Obscures adjacent soft plaque \\
+\textbf{Complex topology} & Bifurcations, overlapping branches,
+tortuosity & Single-click prompts often insufficient \\
+\textbf{Dual-wall requirement} & Must segment lumen AND outer wall
+separately & Wall thickness 0.5--3 mm = 1--5 voxels \\
+\end{longtable}
+
+\subsubsection{SAM-Med3D-turbo Prompting Strategy for Coronary
+CCTA}\label{sam-med3d-turbo-prompting-strategy-for-coronary-ccta}
+
+\paragraph{A. Multi-Point Centerline Prompt (``String''
+Prompt)}\label{a.-multi-point-centerline-prompt-string-prompt}
+
+Standard single-click prompts fail for thin, tortuous vessels spanning
+100+ slices. Instead:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  User clicks \textbf{proximal ostium} (positive point)
+\item
+  User clicks \textbf{distal vessel tip} (positive point)
+\item
+  Model ``fills in'' the lumen tube between points
+\item
+  If mask leaks into \textbf{great cardiac vein} → place
+  \textbf{negative point} on vein
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Coronary lumen segmentation with multi{-}point prompt}
+\NormalTok{lumen\_mask }\OperatorTok{=}\NormalTok{ model.segment(}
+\NormalTok{    volume}\OperatorTok{=}\NormalTok{cta\_volume,}
+\NormalTok{    points}\OperatorTok{=}\NormalTok{[ostium\_xyz, mid\_vessel\_xyz, distal\_xyz],}
+\NormalTok{    labels}\OperatorTok{=}\NormalTok{[}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{],  }\CommentTok{\# all positive}
+\NormalTok{)}
+
+\CommentTok{\# If leakage detected → add negative point}
+\NormalTok{lumen\_mask\_refined }\OperatorTok{=}\NormalTok{ model.segment(}
+\NormalTok{    volume}\OperatorTok{=}\NormalTok{cta\_volume,}
+\NormalTok{    points}\OperatorTok{=}\NormalTok{[ostium\_xyz, mid\_vessel\_xyz, distal\_xyz, vein\_xyz],}
+\NormalTok{    labels}\OperatorTok{=}\NormalTok{[}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{],  }\CommentTok{\# last point is negative}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{B. Dual-Wall Nested Segmentation (Lumen →
+EEM)}\label{b.-dual-wall-nested-segmentation-lumen-eem}
+
+Critical for calculating \textbf{stenosis \%} and \textbf{plaque
+burden}:
+
+\begin{quote}
+\textbf{Stenosis \% definition:} Report \textbf{diameter stenosis} = (1
+− D\_min / D\_ref) × 100, consistent with CAD-RADS 2.0 grading. D\_ref
+is the mean diameter of the nearest healthy proximal and distal
+reference segments. Do \textbf{not} use area stenosis (more sensitive
+but not the CAD-RADS standard), and document the reference segment
+selection method explicitly --- QAngio CT (MEDIS) uses interpolated
+reference; our pipeline must match this for Dice/correlation comparisons
+against expert measurements.
+\end{quote}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Step 1:} Segment lumen (bright contrast, easier target)
+\item
+  \textbf{Step 2:} Use lumen mask as \textbf{dense prompt} → expand
+  outward to EEM
+\item
+  \textbf{Result:}
+  \texttt{vessel\_wall\ =\ outer\_mask\ \&\ \textasciitilde{}lumen\_mask}
+  → plaque volume
+\end{enumerate}
+
+\begin{quote}
+\textbf{Implementation warning:} SAM-Med3D does \textbf{not} natively
+support a \texttt{dense\_prompt} argument in its published codebase. The
+pseudocode below shows the \emph{intended} design. Two implementation
+paths exist: (a) custom modification of the prompt encoder to accept a
+prior mask, or (b) a two-stage pipeline where the lumen mask surface is
+sampled into additional positive point prompts. This is a research
+contribution we must implement before the code below is functional.
+\end{quote}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# PSEUDOCODE — dense\_prompt is not yet implemented in SAM{-}Med3D}
+
+\CommentTok{\# Step 1: Lumen}
+\NormalTok{lumen\_mask }\OperatorTok{=}\NormalTok{ model.segment(volume, points}\OperatorTok{=}\NormalTok{[ostium, distal], labels}\OperatorTok{=}\NormalTok{[}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{])}
+
+\CommentTok{\# Step 2: Outer wall using lumen as prior (requires custom prompt encoder)}
+\NormalTok{outer\_mask }\OperatorTok{=}\NormalTok{ model.segment(}
+\NormalTok{    volume,}
+\NormalTok{    points}\OperatorTok{=}\NormalTok{[ostium],}
+\NormalTok{    dense\_prompt}\OperatorTok{=}\NormalTok{lumen\_mask,  }\CommentTok{\# NOT natively supported — must be implemented}
+\NormalTok{    labels}\OperatorTok{=}\NormalTok{[}\DecValTok{1}\NormalTok{]}
+\NormalTok{)}
+
+\CommentTok{\# Step 3: Derive vessel wall}
+\NormalTok{vessel\_wall }\OperatorTok{=}\NormalTok{ outer\_mask }\OperatorTok{\&} \OperatorTok{\textasciitilde{}}\NormalTok{lumen\_mask}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{C. Post-Processing: Plaque Characterisation by HU
+Thresholds}\label{c.-post-processing-plaque-characterisation-by-hu-thresholds}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ characterise\_plaque(volume, vessel\_wall\_mask):}
+    \CommentTok{"""Classify plaque components by HU value within the vessel wall mask."""}
+\NormalTok{    hu\_values }\OperatorTok{=}\NormalTok{ volume[vessel\_wall\_mask }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{]}
+
+\NormalTok{    calcified    }\OperatorTok{=}\NormalTok{ (hu\_values }\OperatorTok{\textgreater{}} \DecValTok{130}\NormalTok{).}\BuiltInTok{sum}\NormalTok{()}
+\NormalTok{    fibrous      }\OperatorTok{=}\NormalTok{ ((hu\_values }\OperatorTok{\textgreater{}=} \DecValTok{60}\NormalTok{) }\OperatorTok{\&}\NormalTok{ (hu\_values }\OperatorTok{\textless{}=} \DecValTok{130}\NormalTok{)).}\BuiltInTok{sum}\NormalTok{()}
+\NormalTok{    lipid\_rich   }\OperatorTok{=}\NormalTok{ (hu\_values }\OperatorTok{\textless{}} \DecValTok{60}\NormalTok{).}\BuiltInTok{sum}\NormalTok{()}
+\NormalTok{    total        }\OperatorTok{=}\NormalTok{ vessel\_wall\_mask.}\BuiltInTok{sum}\NormalTok{()}
+
+    \ControlFlowTok{return}\NormalTok{ \{}
+        \StringTok{"calcified\_pct"}\NormalTok{: calcified }\OperatorTok{/}\NormalTok{ total }\OperatorTok{*} \DecValTok{100}\NormalTok{,}
+        \StringTok{"fibrous\_pct"}\NormalTok{:   fibrous }\OperatorTok{/}\NormalTok{ total }\OperatorTok{*} \DecValTok{100}\NormalTok{,}
+        \StringTok{"lipid\_rich\_pct"}\NormalTok{: lipid\_rich }\OperatorTok{/}\NormalTok{ total }\OperatorTok{*} \DecValTok{100}\NormalTok{,}
+        \StringTok{"high\_risk"}\NormalTok{: (lipid\_rich }\OperatorTok{/}\NormalTok{ total) }\OperatorTok{\textgreater{}} \FloatTok{0.04}\NormalTok{,  }\CommentTok{\# \textgreater{}4\% LAP = vulnerable}
+\NormalTok{    \}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{HU calibration warning:} The thresholds above (\textless{} 60
+LAP, 60--130 fibrous, \textgreater{} 130 calcified) are defined for
+\textbf{standard 120 kVp with soft-kernel reconstruction}. DISCHARGE is
+a multi-centre trial with varying tube voltages (80--140 kVp) and
+reconstruction kernels (soft vs.~sharp). Sharp-kernel reconstruction
+shifts apparent HU upward and increases blooming around calcification.
+These thresholds require per-centre calibration against phantom
+measurements or paired soft/sharp kernel scans before cross-site plaque
+comparisons are valid. Record the reconstruction kernel and tube voltage
+for every DISCHARGE case in the metadata.
+\end{quote}
+
+\subsubsection{DISCHARGE-Specific Processing
+Considerations}\label{discharge-specific-processing-considerations}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6522}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3478}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Consideration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detail
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Scanner heterogeneity} & Multi-centre trial → varying scanner
+vendors, protocols, contrast timing \\
+\textbf{Reconstruction kernels} & Soft vs.~sharp kernels affect HU
+accuracy for plaque \\
+\textbf{Contrast timing} & Early arterial phase optimal; late phase
+reduces lumen-wall contrast \\
+\textbf{ECG gating} & Prospective vs.~retrospective gating affects
+motion artefact severity \\
+\textbf{Data format} & DICOM (clinical) → convert to NIfTI.gz for model
+input \\
+\textbf{Annotations} & MEDIS QAngio CT (expert contours) available for
+subset → ground truth \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Clinical Domain B: Prostate mpMRI
+Segmentation}\label{clinical-domain-b-prostate-mpmri-segmentation}
+
+\subsubsection{Imaging Standard}\label{imaging-standard}
+
+\textbf{Multiparametric MRI (mpMRI)} is the clinical standard for
+prostate imaging, using: - \textbf{T2-weighted (T2W):} Anatomical detail
+--- zonal anatomy - \textbf{Diffusion-weighted imaging (DWI) + ADC map:}
+Cellularity --- lesion detection - \textbf{Dynamic contrast-enhanced
+(DCE):} Vascularity --- supplementary
+
+Reporting follows \textbf{PI-RADS v2.1} (Prostate Imaging-Reporting and
+Data System).
+
+\subsubsection{Anatomical Segmentation --- The
+``Zones''}\label{anatomical-segmentation-the-zones}
+
+The prostate is divided into distinct zones with different MRI
+appearances and cancer risk:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0952}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2063}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2063}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2540}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2381}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zone
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Abbreviation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cancer Risk
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+T2W Appearance
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Clinical Role
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Peripheral Zone} & PZ & 70--75 \% of cancers & Bright (high
+signal) & Primary cancer surveillance region \\
+\textbf{Transition Zone} & TZ & 20--25 \% of cancers & Heterogeneous
+(BPH nodules) & BPH assessment, cancer in older men \\
+\textbf{Central Zone} & CZ & \textless{} 5 \% of cancers & Low signal
+(dense stroma) & Indistinguishable from TZ on MRI --- grouped with TZ
+per PI-RADS v2.1 \\
+\textbf{Anterior Fibromuscular Stroma} & AFMS & Non-glandular & Very low
+signal & Can be invaded by anterior tumours \\
+\end{longtable}
+
+\subsubsection{Pathology Segmentation --- The
+``Lesions''}\label{pathology-segmentation-the-lesions}
+
+When segmenting pathology, the target is \textbf{clinically significant
+prostate cancer (csPCa)}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2708}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2708}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4583}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Lesion Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Clinical Significance
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Index Lesion} & Largest / most aggressive tumour & Primary
+target for biopsy and treatment \\
+\textbf{Satellite Lesions} & Secondary foci (prostate cancer is often
+multifocal) & May affect treatment strategy \\
+\textbf{Extracapsular Extension (ECE)} & Tumour breaches the prostatic
+capsule & Staging: T3a --- affects surgical planning \\
+\textbf{Seminal Vesicle Invasion (SVI)} & Tumour extends into seminal
+vesicles & Staging: T3b --- impacts prognosis \\
+\end{longtable}
+
+\subsubsection{Organs at Risk (OARs) for
+Radiotherapy}\label{organs-at-risk-oars-for-radiotherapy}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Structure
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Abbreviation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why Segment?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Neurovascular Bundles} & NVB & Nerve-sparing surgery ---
+preserve potency \\
+\textbf{Rectal Wall} & Rectum\_Wall & Monitor tumour--rectum distance \\
+\textbf{Bladder Neck} & Bladder\_Neck & Preserve urinary continence \\
+\end{longtable}
+
+\subsubsection{Segmentation Class Labels for the AI
+Model}\label{segmentation-class-labels-for-the-ai-model}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Segment Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Class Label
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Modality
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Clinical Goal
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Whole Gland & \texttt{Prostate\_WG} & T2W & Volume / PSA density
+calculation \\
+Peripheral Zone & \texttt{PZ} & T2W & Cancer surveillance background \\
+Transition Zone & \texttt{TZ} & T2W & BPH assessment background \\
+Suspicious Lesion &
+\texttt{Lesion\_PIRADS\_\{3\textbackslash{}\textbar{}4\textbackslash{}\textbar{}5\}}
+& DWI/ADC & Targeted biopsy (MR-US fusion) \\
+Seminal Vesicles & \texttt{SV} & T2W & Local staging (T3b) \\
+Neurovascular Bundles & \texttt{NVB} & T2W & Nerve-sparing planning \\
+Rectal Wall & \texttt{OAR\_Rectum} & T2W & Radiotherapy constraints \\
+\end{longtable}
+
+\subsubsection{SAM-Med3D-turbo Prompting Strategy for Prostate
+mpMRI}\label{sam-med3d-turbo-prompting-strategy-for-prostate-mpmri}
+
+\textbf{Context-dependent prompting:} The same model must switch
+behaviour based on \emph{where} the user clicks and \emph{which
+sequence} is active.
+
+\paragraph{Scenario 1: Anatomical Zone Segmentation
+(T2W)}\label{scenario-1-anatomical-zone-segmentation-t2w}
+
+\begin{verbatim}
+1. User clicks bright outer rim on T2W axial
+   → Model returns PZ mask
+   → Expected Dice: ~0.90 (large, high-contrast structure)
+
+2. User clicks central heterogeneous region on T2W
+   → Model returns TZ mask
+
+3. If mask leaks into rectum → place negative point on rectum
+\end{verbatim}
+
+\paragraph{Scenario 2: Lesion Segmentation
+(DWI/ADC)}\label{scenario-2-lesion-segmentation-dwiadc}
+
+\begin{quote}
+\textbf{Implementation warning:} Step 2 below references using a prior
+PZ mask as a dense prompt. This is the same unimplemented
+\texttt{dense\_prompt} issue described in §3.4.2 --- the same two
+implementation paths apply: (a) custom prompt encoder modification, or
+(b) sampling the PZ mask boundary into additional point prompts.
+\end{quote}
+
+\begin{verbatim}
+1. User clicks hypointense spot on ADC map
+   → Model returns lesion mask (PI-RADS ≥4 region)
+
+2. [PLANNED] Use prior PZ mask as dense prompt context
+   → Constrains lesion to within prostate boundary
+   → Requires dense_prompt implementation (see §3.4.2)
+
+3. Measure lesion volume → maps to PI-RADS size criterion
+\end{verbatim}
+
+\begin{quote}
+\textbf{Critical note:} SAM-Med3D was pre-trained on \textbf{MR data}
+(SA-Med3D-140K includes MR modalities). However, the dataset card does
+not specify which MR sequences or whether prostate mpMRI is represented.
+Zero-shot performance on prostate zones may be moderate; fine-tuning on
+Charité prostate data will likely be necessary. Whole-gland segmentation
+(a large, well-defined structure) should work well zero-shot; zonal
+segmentation (PZ vs.~TZ) is harder due to subtle signal differences.
+\end{quote}
+
+\subsubsection{Prostate vs.~Coronary: Difficulty
+Comparison}\label{prostate-vs.-coronary-difficulty-comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3571}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Factor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Prostate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Coronary
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Structure size & 20--80 mL (large) & 1.5--4 mm diameter (tiny) \\
+Motion & None (static pelvis) & Cardiac motion (60--80 bpm) \\
+Contrast & Good (gland vs.~fat) & Variable (plaque vs.~lumen) \\
+Modality & MRI (multi-sequence) & CT (single phase) \\
+Topology & Compact, roughly ellipsoidal & Thin, tortuous, branching
+tubes \\
+\textbf{Expected Dice} & \textbf{\textgreater{} 0.90 (whole gland)} &
+\textbf{0.75--0.85 (lumen)} \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Technical Challenges \& Model-Aware
+Solutions}\label{technical-challenges-model-aware-solutions}
+
+\subsubsection{Challenge 1: Coronary Artery Motion
+Artefacts}\label{challenge-1-coronary-artery-motion-artefacts}
+
+\textbf{Problem:} Residual cardiac motion blurs vessel edges despite ECG
+gating. RCA most affected.
+
+\textbf{Solution:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ motion\_robust\_segmentation(volume\_4d, heart\_rate, prompt\_points, prompt\_labels):}
+    \ControlFlowTok{if}\NormalTok{ heart\_rate }\OperatorTok{\textgreater{}} \DecValTok{70}\NormalTok{:}
+        \CommentTok{\# Multi{-}phase reconstruction}
+\NormalTok{        phases }\OperatorTok{=}\NormalTok{ extract\_cardiac\_phases(volume\_4d, num\_phases}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+\NormalTok{        masks }\OperatorTok{=}\NormalTok{ [model.segment(phase, points}\OperatorTok{=}\NormalTok{prompt\_points, labels}\OperatorTok{=}\NormalTok{prompt\_labels) }\ControlFlowTok{for}\NormalTok{ phase }\KeywordTok{in}\NormalTok{ phases]}
+        \CommentTok{\# Temporal median filter removes motion ghosts}
+        \ControlFlowTok{return}\NormalTok{ np.median(masks, axis}\OperatorTok{=}\DecValTok{0}\NormalTok{) }\OperatorTok{\textgreater{}} \FloatTok{0.5}
+    \ControlFlowTok{else}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ model.segment(volume\_4d[:,:,:,}\DecValTok{0}\NormalTok{], points}\OperatorTok{=}\NormalTok{prompt\_points, labels}\OperatorTok{=}\NormalTok{prompt\_labels)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{Topology warning:} Pixel-wise median of binary masks across 10
+phases is \textbf{not} topologically safe for thin structures. A distal
+coronary voxel present in only 4/10 phases will be excluded by the
+median, potentially severing the centreline. Preferred alternative:
+select the optimal cardiac phase (75 \% R-R for RCA, 65 \% R-R for
+LAD/LCx at HR \textless{} 70) rather than fusing all phases. If
+multi-phase fusion is required, apply connected-component analysis
+post-median and re-link broken segments by dilation along the
+centreline.
+\end{quote}
+
+\textbf{Additional strategies:} - Edge-preserving denoising (bilateral
+filter) pre-processing - Multi-point prompts every 5--10 mm along vessel
+to guide through corrupted regions - Auto-flag cases with edge sharpness
+\textless{} threshold for expert review
+
+\subsubsection{Challenge 2: Low-Attenuation Plaque
+Detection}\label{challenge-2-low-attenuation-plaque-detection}
+
+\textbf{Problem:} Lipid-rich plaque (20--50 HU) nearly invisible against
+myocardium (50--70 HU).
+
+\textbf{Solution:} Multi-stage approach: 1. Segment lumen and outer wall
+first (high-contrast boundaries) 2. Apply HU thresholding \emph{within}
+the vessel wall mask 3. Use SAM-Med3D's ViT features for texture-based
+refinement (fine-tuning required)
+
+\subsubsection{Challenge 3: Dual-Wall
+Segmentation}\label{challenge-3-dual-wall-segmentation}
+
+\textbf{Problem:} Must segment both lumen and outer wall; wall thickness
+only 0.5--3 mm (1--5 voxels).
+
+\textbf{Solution:} Sequential prompting (see §3.4.2 above).
+
+\subsubsection{Challenge 4: Prostate Zone
+Boundaries}\label{challenge-4-prostate-zone-boundaries}
+
+\textbf{Problem:} PZ-TZ boundary is a gradual signal transition, not a
+sharp edge.
+
+\textbf{Solution:} - Train multi-class model on annotated Charité
+prostate data - Use morphological priors (PZ wraps around TZ
+inferolaterally) - Negative prompts at zone transitions to sharpen
+boundaries
+
+\subsubsection{Challenge 5: Model Limitations --- Honest
+Assessment}\label{challenge-5-model-limitations-honest-assessment}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3548}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2581}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3871}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Limitation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impact
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mitigation
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+No coronary CTA in pre-training & Zero-shot may underperform & Fine-tune
+on DISCHARGE annotations \\
+Binary mask output only & Cannot directly predict PI-RADS score &
+Post-processing pipeline (volume, ADC stats) \\
+No \texttt{dense\_prompt} in codebase & Lumen-as-prior strategy needs
+engineering & Custom prompt encoder modification \\
+128³ patch size constraint & Coronary arteries span \textgreater{} 128
+voxels (300--400 voxels at 0.5 mm) & Sliding window with 50 \% overlap;
+Gaussian-weighted blending at boundaries to prevent double-thick seams;
+connected-component check post-stitch \\
+No multi-class output & One mask per inference call & Multiple
+sequential inferences per case \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Clinical Workflows}\label{clinical-workflows}
+
+\subsubsection{Workflow 1: Interactive Coronary Segmentation
+(Radiologist)}\label{workflow-1-interactive-coronary-segmentation-radiologist}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Radiologist opens browser → logs in (Charité SSO)
+\item
+  Loads DISCHARGE CCTA scan from PACS
+\item
+  Clicks proximal LAD + distal tip → AI segments entire lumen in
+  \textless{} 2 s
+\item
+  Optionally: places negative point to prune vein leakage
+\item
+  Clicks ``Expand to Wall'' → second inference → outer wall mask
+  \textbf{{[}PLANNED --- requires \texttt{dense\_prompt} implementation;
+  see §3.4.2{]}}
+\item
+  Right panel shows: stenosis \% (diameter stenosis, CAD-RADS 2.0),
+  plaque composition, volume
+\item
+  Exports segmentation (NIfTI / DICOM-SEG / CSV report)
+\end{enumerate}
+
+\subsubsection{Workflow 2: Batch Processing for DISCHARGE
+Research}\label{workflow-2-batch-processing-for-discharge-research}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Research coordinator uploads 100 DISCHARGE cases
+\item
+  \textbf{Automated ostium seeding:} template-based registration to a
+  reference coronary atlas provides initial prompt coordinates; cases
+  where registration confidence is low are queued for manual prompt
+  review before inference
+\item
+  AI processes overnight (Celery + multi-GPU batch mode)
+\item
+  Quality control: auto-flag cases with \textbf{disconnected mask
+  components, mask volume outside 3σ of cohort distribution, or model
+  confidence score below threshold} (ground truth is not available in
+  batch mode --- Dice cannot be computed)
+\item
+  Expert reviews flagged cases → corrections exported as corrected
+  per-structure binary NIfTI masks → feed active-learning loop
+\item
+  Export refined segmentations for MACE prediction analysis
+\end{enumerate}
+
+\subsubsection{Workflow 3: MEDIS TXT + Mesh + Straightened MPR
+(Reference
+Contours)}\label{workflow-3-medis-txt-mesh-straightened-mpr-reference-contours}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Load CCTA volume (NIfTI.gz) in browser
+\item
+  Load MEDIS TXT file (expert contour rings)
+\item
+  Client-side mesh generation: parse TXT → NVMesh (50--100 ms)
+\item
+  Overlay lumen + vessel wall meshes on CCTA
+\item
+  Generate straightened MPR for longitudinal plaque assessment
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{System Architecture}\label{system-architecture}
+
+\subsubsection{High-Level Overview}\label{high-level-overview}
+
+\begin{verbatim}
+┌─────────────────────────────────────────────────────────────┐
+│                    Charité Browser (HTTPS)                   │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │  Frontend: TypeScript + Vite + Niivue 0.66            │  │
+│  │  - Volume rendering (WebGL2, 60 FPS)                  │  │
+│  │  - Interactive prompting (click → 3D coordinates)     │  │
+│  │  - Mesh overlay, quad-view MPR                        │  │
+│  └───────────────┬───────────────────────────────────────┘  │
+└──────────────────┼──────────────────────────────────────────┘
+                   │ REST API (JSON + NIfTI blobs)
+┌──────────────────┼──────────────────────────────────────────┐
+│  Backend: FastAPI + PyTorch (on-premise GPU cluster)        │
+│  ┌───────────────┼───────────────────────────────────────┐  │
+│  │  API Gateway (auth, rate-limit, CORS)                 │  │
+│  ├───────────────┼───────────────────────────────────────┤  │
+│  │  SAM-Med3D-turbo  │  nnU-Net (prior)  │  HU Pipeline │  │
+│  ├───────────────┼───────────────────────────────────────┤  │
+│  │  Redis (embedding cache) │ Celery (batch queue)       │  │
+│  ├───────────────┼───────────────────────────────────────┤  │
+│  │  NVIDIA A100 GPUs (4×)  │  DICOM/NIfTI storage       │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsubsection{Frontend Directory
+Structure}\label{frontend-directory-structure}
+
+\begin{verbatim}
+flow-segment-frontend/
+├── src/
+│   ├── main.ts                    # Entry point
+│   ├── App.ts                     # Main app component
+│   ├── components/
+│   │   ├── NiivueViewer.ts        # Niivue canvas wrapper (single/quad)
+│   │   ├── Toolbar.ts             # Top toolbar
+│   │   ├── SegmentPanel.ts        # AI segmentation controls
+│   │   ├── ResultsPanel.ts        # Plaque analysis / zone selector
+│   │   ├── PromptHistory.ts       # Point prompt log + undo
+│   │   └── MPRView.ts             # Multi-planar reconstruction
+│   ├── services/
+│   │   ├── api.ts                 # Backend API client
+│   │   ├── niivue.ts              # Niivue init & config
+│   │   ├── loader.ts              # NIfTI.gz + DICOM loading
+│   │   ├── medisParser.ts         # MEDIS TXT parsing
+│   │   ├── medisMeshDirect.ts     # Client-side contour→mesh
+│   │   ├── straightenedMPR.ts     # CPR (see §12)
+│   │   └── auth.ts                # LDAP/SSO
+│   ├── types/
+│   │   ├── volume.ts
+│   │   ├── segmentation.ts
+│   │   ├── mesh.ts
+│   │   └── api.ts
+│   └── utils/
+│       ├── coordinates.ts         # 3D coordinate transforms
+│       ├── meshGenerator.ts       # Marching cubes (vtk.js)
+│       └── export.ts              # NIfTI / DICOM-SEG / CSV export
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── index.html
+\end{verbatim}
+
+\subsubsection{Backend Directory
+Structure}\label{backend-directory-structure}
+
+\begin{verbatim}
+flow-segment-backend/
+├── app/
+│   ├── main.py                    # FastAPI application
+│   ├── config.py                  # Environment config
+│   ├── models/
+│   │   ├── sam_med3d.py           # SAM-Med3D-turbo wrapper
+│   │   ├── nnu_net.py             # nnU-Net (anatomical prior)
+│   │   └── plaque_analyser.py     # HU-based plaque classification
+│   ├── api/
+│   │   ├── segment.py             # Segmentation endpoints
+│   │   ├── volumes.py             # Volume management
+│   │   ├── mesh.py                # Mesh generation (nii2mesh)
+│   │   └── auth.py                # LDAP/SSO
+│   └── services/
+│       ├── cache.py               # Redis embedding cache
+│       ├── dicom_processor.py     # DICOM → NIfTI (SimpleITK)
+│       ├── mesh_generator.py      # nii2mesh wrapper
+│       └── registration.py        # Elastix (longitudinal)
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Frontend: Niivue Viewer \&
+UI/UX\textsuperscript{5}}{Frontend: Niivue Viewer \& UI/UX5}}\label{frontend-niivue-viewer-uiux-niivue2024}
+
+\subsubsection{Key Niivue v0.66.0
+Capabilities}\label{key-niivue-v0.66.0-capabilities}
+
+\begin{itemize}
+\tightlist
+\item
+  WebGL2 rendering: 60 FPS for 512³ volumes
+\item
+  \texttt{onLocationChange} / \texttt{onMouseUp} → capture 3D mm
+  coordinates for prompts
+\item
+  Multi-planar reconstruction (axial / coronal / sagittal sync)
+\item
+  \texttt{nv.addMesh()} for 3D surface overlay with adjustable opacity
+\item
+  Full TypeScript definitions
+\item
+  In-browser DICOM via dcm2niix-wasm
+\end{itemize}
+
+\subsubsection{UI Layout: Single View
+(Default)}\label{ui-layout-single-view-default}
+
+\begin{verbatim}
+┌─────────────────────────────────────────────────────────────┐
+│  [Logo] Segment    [Load NII/DCM] [Save] [Settings] [User] [◧ Quad]│
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────┐  ┌───────────────────┐ │
+│  │                                 │  │  Segmentation     │ │
+│  │   Niivue 3D Canvas             │  │  ┌──────────────┐  │ │
+│  │   [Click to place prompt]      │  │  │ ● Point      │  │ │
+│  │                                 │  │  │ □ Box        │  │ │
+│  │                                 │  │  │ ▶ Segment    │  │ │
+│  │                                 │  │  └──────────────┘  │ │
+│  │                                 │  │                    │ │
+│  │                                 │  │  Prompt History    │ │
+│  │                                 │  │  + (120.5, 85, 42) │ │
+│  │                                 │  │  - (118.2, 90, 42) │ │
+│  │                                 │  │                    │ │
+│  │                                 │  │  Results           │ │
+│  │                                 │  │  Stenosis: 62 %    │ │
+│  │                                 │  │  Calc: 45 %        │ │
+│  │                                 │  │  LAP: 18 %         │ │
+│  └─────────────────────────────────┘  └───────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsubsection{UI Layout: Quad View (MPR +
+3D)}\label{ui-layout-quad-view-mpr-3d}
+
+\begin{verbatim}
+┌─────────────────────────────────────────────────────────────┐
+│  [Logo] Segment    [Load NII/DCM] [Save] [Settings] [User] [◫ 1x1]│
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────────┐ ┌──────────────────┐  ┌────────────┐ │
+│  │  Axial           │ │  Sagittal        │  │ Controls   │ │
+│  │  + crosshair     │ │  + crosshair     │  │            │ │
+│  ├──────────────────┤ ├──────────────────┤  │ Zone/Vessel│ │
+│  │  Coronal         │ │  3D Render       │  │ Selector   │ │
+│  │  + crosshair     │ │  + mesh overlay  │  │            │ │
+│  └──────────────────┘ └──────────────────┘  └────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsubsection{Design Principles}\label{design-principles}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Dark theme} (\#1a1a1a) --- reduces eye strain for long
+  sessions
+\item
+  \textbf{Minimal chrome} --- maximise canvas area
+\item
+  \textbf{Radiologist-first} --- optimised for clinical workflow
+\item
+  Primary: Blue (\#3b82f6), Accent: Green (\#10b981), Warning: Orange
+  (\#f59e0b), Error: Red (\#ef4444)
+\end{itemize}
+
+\subsubsection{Keyboard Shortcuts}\label{keyboard-shortcuts}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Key & Action \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{P} & Place positive prompt point \\
+\texttt{N} & Place negative prompt point \\
+\texttt{Enter} & Run segmentation with current prompts \\
+\texttt{Z} & Undo last prompt point \\
+\texttt{Escape} & Cancel current prompt session \\
+\texttt{Q} & Toggle single / quad view \\
+\texttt{W} / \texttt{L} & Adjust window / level (hold + drag) \\
+\texttt{Space} & Toggle mesh overlay visibility \\
+\end{longtable}
+
+\subsubsection{General-Purpose Rotatable Volume
+Viewer}\label{general-purpose-rotatable-volume-viewer}
+
+Port of legacy \texttt{viewer.py} (PyQtGraph) to WebGL:
+
+\begin{itemize}
+\tightlist
+\item
+  Free rotation via mouse drag (Rodrigues' rotation formula)
+\item
+  Three-panel orthogonal views (YZ, XZ, XY) --- all rotate together
+\item
+  Drag modes: Rotation (0), Paint/Label (1), Window/Level (2)
+\item
+  Real-time volume resampling (SimpleITK → WebGL equivalent)
+\item
+  Target: 30--60 FPS during rotation
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Backend: Inference Pipeline \&
+API}\label{backend-inference-pipeline-api}
+
+\subsubsection{API Endpoints}\label{api-endpoints}
+
+\begin{verbatim}
+# Segmentation (AI)
+POST /api/segment/point        # Point-based prompting (SAM-Med3D)
+POST /api/segment/box          # Bounding box prompting
+POST /api/segment/refine       # Refine with negative points
+
+# Volume Management
+POST /api/volumes/upload       # Upload DICOM / NIfTI
+GET  /api/volumes/{id}         # Retrieve processed volume
+
+# Mesh Generation
+POST /api/mesh/from-mask       # Mask → MZ3 mesh (nii2mesh)
+POST /api/mesh/quick           # Fast preview (marching cubes)
+
+# MEDIS TXT Processing
+POST /api/medis/upload         # Upload MEDIS TXT
+POST /api/medis/to-mesh        # Convert contours to mesh
+
+# Straightened MPR
+POST /api/straighten/create    # Centerline → straightened volume
+
+# Batch Processing
+POST /api/batch/process        # Queue batch of cases
+GET  /api/batch/{job_id}       # Job status
+
+# Authentication
+POST /api/auth/login           # LDAP / Charité SSO
+GET  /api/health               # Health check + GPU status
+\end{verbatim}
+
+\subsubsection{Segmentation Endpoint
+(Core)}\label{segmentation-endpoint-core}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+\ImportTok{from}\NormalTok{ fastapi }\ImportTok{import}\NormalTok{ APIRouter}
+\ImportTok{from}\NormalTok{ pydantic }\ImportTok{import}\NormalTok{ BaseModel}
+\ImportTok{import}\NormalTok{ nibabel }\ImportTok{as}\NormalTok{ nib}
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+\ImportTok{import}\NormalTok{ medim}
+
+\NormalTok{router }\OperatorTok{=}\NormalTok{ APIRouter()}
+
+\KeywordTok{class}\NormalTok{ SegmentRequest(BaseModel):}
+\NormalTok{    volume\_id: }\BuiltInTok{str}
+\NormalTok{    coordinates: }\BuiltInTok{list}\NormalTok{[}\BuiltInTok{list}\NormalTok{[}\BuiltInTok{float}\NormalTok{]]   }\CommentTok{\# [[x,y,z], ...] in mm — one or more points}
+\NormalTok{    labels: Optional[}\BuiltInTok{list}\NormalTok{[}\BuiltInTok{int}\NormalTok{]] }\OperatorTok{=} \VariableTok{None}  \CommentTok{\# 1=positive, 0=negative per point; defaults to all{-}1}
+
+\CommentTok{\# Model loaded once at startup}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ medim.create\_model(}
+    \StringTok{"SAM{-}Med3D"}\NormalTok{, pretrained}\OperatorTok{=}\VariableTok{True}\NormalTok{,}
+\NormalTok{    checkpoint\_path}\OperatorTok{=}\StringTok{"app/models/checkpoints/sam\_med3d\_turbo.pth"}
+\NormalTok{)}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ model.cuda().half().}\BuiltInTok{eval}\NormalTok{()}
+
+\AttributeTok{@router.post}\NormalTok{(}\StringTok{"/api/segment/point"}\NormalTok{)}
+\ControlFlowTok{async} \KeywordTok{def}\NormalTok{ segment\_point(req: SegmentRequest):}
+    \CommentTok{\# Load volume from cache/disk}
+\NormalTok{    vol\_nii }\OperatorTok{=}\NormalTok{ nib.load(}\SpecialStringTok{f"/data/volumes/}\SpecialCharTok{\{}\NormalTok{req}\SpecialCharTok{.}\NormalTok{volume\_id}\SpecialCharTok{\}}\SpecialStringTok{.nii.gz"}\NormalTok{)}
+\NormalTok{    volume }\OperatorTok{=}\NormalTok{ vol\_nii.get\_fdata()}
+
+    \CommentTok{\# Convert mm → voxel coordinates for each point}
+\NormalTok{    inv\_affine }\OperatorTok{=}\NormalTok{ np.linalg.inv(vol\_nii.affine)}
+\NormalTok{    voxel\_points }\OperatorTok{=}\NormalTok{ [(inv\_affine }\OperatorTok{@}\NormalTok{ [}\OperatorTok{*}\NormalTok{pt, }\DecValTok{1}\NormalTok{])[:}\DecValTok{3}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ pt }\KeywordTok{in}\NormalTok{ req.coordinates]}
+
+\NormalTok{    effective\_labels }\OperatorTok{=}\NormalTok{ req.labels }\KeywordTok{or}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{*} \BuiltInTok{len}\NormalTok{(voxel\_points)}
+
+    \CommentTok{\# Run SAM{-}Med3D inference}
+\NormalTok{    mask }\OperatorTok{=}\NormalTok{ model.segment(volume, points}\OperatorTok{=}\NormalTok{voxel\_points, labels}\OperatorTok{=}\NormalTok{effective\_labels)}
+
+    \CommentTok{\# Return mask as NIfTI}
+\NormalTok{    mask\_nii }\OperatorTok{=}\NormalTok{ nib.Nifti1Image(mask.astype(np.uint8), vol\_nii.affine)}
+    \CommentTok{\# ... serialize and return}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{MEDIS TXT Reference
+Pipeline}\label{medis-txt-reference-pipeline}
+
+\subsubsection{Format Description}\label{format-description}
+
+MEDIS TXT contains vessel wall contours from MEDIS QAngio CT: -
+\textbf{Lumen} contours: define inner wall (blood pool boundary) -
+\textbf{VesselWall} contours: define outer wall (including plaque) -
+Each contour: group label, slice distance, N points in 3D mm coordinates
+
+\subsubsection{Parser (TypeScript)}\label{parser-typescript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{export} \KeywordTok{interface}\NormalTok{ MedisContour \{}
+\NormalTok{  group}\OperatorTok{:} \StringTok{"Lumen"} \OperatorTok{|} \StringTok{"VesselWall"}\OperatorTok{;}
+\NormalTok{  sliceDistance}\OperatorTok{:} \DataTypeTok{number}\OperatorTok{;}           \CommentTok{// mm along vessel}
+\NormalTok{  points}\OperatorTok{:}\NormalTok{ \{ x}\OperatorTok{:} \DataTypeTok{number}\OperatorTok{;}\NormalTok{ y}\OperatorTok{:} \DataTypeTok{number}\OperatorTok{;}\NormalTok{ z}\OperatorTok{:} \DataTypeTok{number}\NormalTok{ \}[]}\OperatorTok{;}
+\NormalTok{\}}
+
+\ImportTok{export} \KeywordTok{function} \FunctionTok{parseMedisTxt}\NormalTok{(content}\OperatorTok{:} \DataTypeTok{string}\NormalTok{)}\OperatorTok{:}\NormalTok{ MedisContour[] \{}
+  \KeywordTok{const}\NormalTok{ lines }\OperatorTok{=}\NormalTok{ content}\OperatorTok{.}\FunctionTok{split}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{const}\NormalTok{ contours}\OperatorTok{:}\NormalTok{ MedisContour[] }\OperatorTok{=}\NormalTok{ []}\OperatorTok{;}
+  \KeywordTok{let}\NormalTok{ current}\OperatorTok{:} \BuiltInTok{Partial}\OperatorTok{\textless{}}\NormalTok{MedisContour}\OperatorTok{\textgreater{}} \OperatorTok{=}\NormalTok{ \{\}}\OperatorTok{;}
+  \KeywordTok{let}\NormalTok{ points}\OperatorTok{:}\NormalTok{ \{ x}\OperatorTok{:} \DataTypeTok{number}\OperatorTok{;}\NormalTok{ y}\OperatorTok{:} \DataTypeTok{number}\OperatorTok{;}\NormalTok{ z}\OperatorTok{:} \DataTypeTok{number}\NormalTok{ \}[] }\OperatorTok{=}\NormalTok{ []}\OperatorTok{;}
+
+  \ControlFlowTok{for}\NormalTok{ (}\KeywordTok{const}\NormalTok{ line }\KeywordTok{of}\NormalTok{ lines) \{}
+    \ControlFlowTok{if}\NormalTok{ (line}\OperatorTok{.}\FunctionTok{startsWith}\NormalTok{(}\StringTok{"\# group:"}\NormalTok{)) \{}
+\NormalTok{      current}\OperatorTok{.}\AttributeTok{group} \OperatorTok{=}\NormalTok{ line}\OperatorTok{.}\FunctionTok{split}\NormalTok{(}\StringTok{":"}\NormalTok{)[}\DecValTok{1}\NormalTok{]}\OperatorTok{.}\FunctionTok{trim}\NormalTok{() }\ImportTok{as} \StringTok{"Lumen"} \OperatorTok{|} \StringTok{"VesselWall"}\OperatorTok{;}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (line}\OperatorTok{.}\FunctionTok{startsWith}\NormalTok{(}\StringTok{"\# SliceDistance:"}\NormalTok{)) \{}
+\NormalTok{      current}\OperatorTok{.}\AttributeTok{sliceDistance} \OperatorTok{=} \PreprocessorTok{parseFloat}\NormalTok{(line}\OperatorTok{.}\FunctionTok{split}\NormalTok{(}\StringTok{":"}\NormalTok{)[}\DecValTok{1}\NormalTok{])}\OperatorTok{;}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (line}\OperatorTok{.}\FunctionTok{startsWith}\NormalTok{(}\StringTok{"\# Contour index:"}\NormalTok{)) \{}
+      \ControlFlowTok{if}\NormalTok{ (current}\OperatorTok{.}\AttributeTok{group} \OperatorTok{\&\&}\NormalTok{ points}\OperatorTok{.}\AttributeTok{length} \OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{        contours}\OperatorTok{.}\FunctionTok{push}\NormalTok{(\{ }\OperatorTok{...}\NormalTok{current}\OperatorTok{,}\NormalTok{ points \} }\ImportTok{as}\NormalTok{ MedisContour)}\OperatorTok{;}
+\NormalTok{      \}}
+      \CommentTok{// Reset both points AND current so the next contour does not inherit}
+      \CommentTok{// stale group/sliceDistance values from the previous block.}
+\NormalTok{      current }\OperatorTok{=}\NormalTok{ \{\}}\OperatorTok{;}
+\NormalTok{      points }\OperatorTok{=}\NormalTok{ []}\OperatorTok{;}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (line}\OperatorTok{.}\FunctionTok{trim}\NormalTok{() }\OperatorTok{\&\&} \OperatorTok{!}\NormalTok{line}\OperatorTok{.}\FunctionTok{startsWith}\NormalTok{(}\StringTok{"\#"}\NormalTok{)) \{}
+      \KeywordTok{const}\NormalTok{ [x}\OperatorTok{,}\NormalTok{ y}\OperatorTok{,}\NormalTok{ z] }\OperatorTok{=}\NormalTok{ line}\OperatorTok{.}\FunctionTok{trim}\NormalTok{()}\OperatorTok{.}\FunctionTok{split}\NormalTok{(}\SpecialStringTok{/}\SpecialCharTok{\textbackslash{}s+}\SpecialStringTok{/}\NormalTok{)}\OperatorTok{.}\FunctionTok{map}\NormalTok{(}\BuiltInTok{Number}\NormalTok{)}\OperatorTok{;}
+      \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\PreprocessorTok{isNaN}\NormalTok{(x)) points}\OperatorTok{.}\FunctionTok{push}\NormalTok{(\{ x}\OperatorTok{,}\NormalTok{ y}\OperatorTok{,}\NormalTok{ z \})}\OperatorTok{;}
+\NormalTok{    \}}
+\NormalTok{  \}}
+  \ControlFlowTok{if}\NormalTok{ (current}\OperatorTok{.}\AttributeTok{group} \OperatorTok{\&\&}\NormalTok{ points}\OperatorTok{.}\AttributeTok{length} \OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{    contours}\OperatorTok{.}\FunctionTok{push}\NormalTok{(\{ }\OperatorTok{...}\NormalTok{current}\OperatorTok{,}\NormalTok{ points \} }\ImportTok{as}\NormalTok{ MedisContour)}\OperatorTok{;}
+\NormalTok{  \}}
+  \ControlFlowTok{return}\NormalTok{ contours}\OperatorTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Direct Client-Side Mesh Construction (\textless{} 100
+ms)}\label{direct-client-side-mesh-construction-100-ms}
+
+Contour rings are connected into a tube mesh directly in the browser ---
+no backend round-trip needed. Algorithm: connect ring N to ring N+1 with
+triangle pairs.
+
+\textbf{Performance comparison:} \textbar{} Method \textbar{} Latency
+\textbar{} Network \textbar{}
+\textbar--------\textbar---------\textbar---------\textbar{} \textbar{}
+Backend (buildstl.py → STL → download) \textbar{} 500--2000 ms
+\textbar{} Required \textbar{} \textbar{} \textbf{Client-side (TXT →
+NVMesh)} \textbar{} \textbf{50--100 ms} \textbar{} \textbf{None}
+\textbar{}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Mesh Generation
+Strategies}\label{mesh-generation-strategies}
+
+\subsubsection{Three Approaches}\label{three-approaches}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2273}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1818}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1591}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2045}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2273}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Approach
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Quality
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Ultra-Simple} & Connect contour rings → STL & \textless{} 50 ms
+& Faceted & MEDIS export \\
+\textbf{Client-side vtk.js} & Marching cubes on mask & \textless{} 1 s &
+Good & Interactive preview \\
+\textbf{Server nii2mesh → MZ3} & Decimation + smoothing & 1--3 s & High
+& Final visualisation \\
+\end{longtable}
+
+\subsubsection{Recommended Web Format:
+MZ3}\label{recommended-web-format-mz3}
+
+\begin{itemize}
+\tightlist
+\item
+  3--5× smaller than PLY, 10× smaller than STL
+\item
+  Binary, gzip-compressed, native Niivue support
+\item
+  Target: \textless{} 5 MB per mesh, 50K--200K triangles, 60 FPS
+  rendering
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Centerline Extraction \& Straightened MPR
+(CPR)}\label{centerline-extraction-straightened-mpr-cpr}
+
+\subsubsection{Overview}\label{overview}
+
+\textbf{Straightened MPR} (Curved Planar Reformation) ``unfolds'' a
+tortuous vessel into a straight view. Essential for assessing stenosis
+and plaque distribution along the entire vessel length.
+
+\textbf{Three steps:} 1. \textbf{Centerline extraction} --- centroid of
+lumen contours (from MEDIS) or Voronoi skeletonisation (from AI mask) 2.
+\textbf{Bishop (parallel transport) frame} --- compute Tangent (T) then
+propagate Normal (N) and Binormal (B) without relying on curvature (see
+§12.2 for why Frenet-Serret N must not be used) 3. \textbf{Cross-section
+sampling} --- extract perpendicular slices → stack into straightened
+volume
+
+\subsubsection{Mathematical Foundation}\label{mathematical-foundation}
+
+\textbf{Tangent} (finite differences):
+
+\begin{verbatim}
+T[i] = normalize(centerline[i+1] - centerline[i-1])  // central difference
+\end{verbatim}
+
+\textbf{Normal --- Bishop (parallel transport) frame:}
+
+\begin{quote}
+\textbf{Why not Frenet-Serret:} The Frenet-Serret principal normal
+\texttt{N\ =\ normalize(dT/ds)} is undefined and flips 180° in
+low-curvature (near-straight) vessel segments, producing rotating or
+jumping cross-sections. Bishop frame (rotation-minimizing frame)
+propagation\textsuperscript{6,7} avoids this by carrying an initial
+normal forward without relying on curvature.
+\end{quote}
+
+\begin{verbatim}
+// Initialise with any vector perpendicular to T[0]
+N[0] = arbitrary_perpendicular(T[0])
+
+// Propagate: project previous N onto the plane perpendicular to new T
+for i in 1..n-1:
+    N[i] = normalize(N[i-1] - dot(N[i-1], T[i]) * T[i])
+\end{verbatim}
+
+\textbf{Binormal}: \texttt{B{[}i{]}\ =\ T{[}i{]}\ ×\ N{[}i{]}}
+
+\textbf{Cross-section point}:
+\texttt{Q(u,v)\ =\ P{[}i{]}\ +\ u·N{[}i{]}\ +\ v·B{[}i{]}}
+
+\subsubsection{Interactive Controls}\label{interactive-controls}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Position slider:} Select centerline point (0 → N-1)
+\item
+  \textbf{Rotation slider:} Rotate cross-section around T (Rodrigues'
+  formula)
+\item
+  \textbf{Zoom slider:} Adjust cross-section FOV
+\item
+  \textbf{Quad-view:} CCTA overview \textbar{} cross-section \textbar{}
+  straightened MPR \textbar{} 3D mesh
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Deployment, Performance \&
+Security}\label{deployment-performance-security}
+
+\subsubsection{Hardware Requirements}\label{hardware-requirements}
+
+\paragraph{Development Environment}\label{development-environment}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2292}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1875}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2708}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3125}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Minimum
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Recommended
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Current Setup
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{GPU} & RTX 3060 (8 GB) & RTX 2080 Ti (11 GB) & 2× RTX 2080 Ti
+(11 GB each) \\
+\textbf{CPU} & 6-core & 8+ core & Modern workstation \\
+\textbf{RAM} & 16 GB & 32 GB+ & Sufficient \\
+\textbf{Storage} & 500 GB SSD & 1 TB+ NVMe & Adequate \\
+\textbf{CUDA} & 11.8+ & 12.2+ & CUDA 12.2 \\
+\end{longtable}
+
+\textbf{Development use cases:} model testing, single-user interactive
+segmentation, DISCHARGE subset processing, active-learning experiments.
+
+\paragraph{Production Environment (Charité Clinical
+Deployment)}\label{production-environment-charituxe9-clinical-deployment}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2750}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3250}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1750}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Minimum
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Recommended
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{GPU Cluster} & 2× RTX 4090 (24 GB) & 4× A100/H100 (40--80 GB) &
+Concurrent clinical users \\
+\textbf{CPU} & 16-core & 32+ core & FastAPI + preprocessing \\
+\textbf{RAM} & 64 GB & 128 GB+ & Multiple 3D volumes in memory \\
+\textbf{Storage} & 10 TB+ & 50 TB+ & DISCHARGE + clinical data \\
+\textbf{Network} & 10 Gbps & 25 Gbps+ & Fast volume transfers \\
+\textbf{Redundancy} & RAID 10 & Distributed storage & Clinical data
+safety \\
+\end{longtable}
+
+\textbf{Production requirements:} GDPR compliance (all data on-premise),
+99.9 \% uptime, 5--10 concurrent radiologists, full DISCHARGE batch
+processing, automated backup and failover.
+
+\subsubsection{GDPR \& Deployment
+Constraints}\label{gdpr-deployment-constraints}
+
+\textbf{WARNING: IN-HOUSE BACKEND MANDATORY FOR CLINICAL USE}
+
+For any clinical deployment, the SAM-Med3D-turbo model \textbf{MUST} run
+on Charité's on-premise infrastructure:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3636}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2424}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3939}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Requirement
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alternative
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{On-premise GPU servers} & GDPR --- patient data cannot leave
+hospital & Not allowed: cloud inference \\
+\textbf{Charité network} & Secure medical data transmission & Not
+allowed: public internet \\
+\textbf{Hospital authentication} & User access control and audit trails
+& Not allowed: anonymous access \\
+\textbf{Medical device certification} & Clinical safety and regulatory
+compliance & Not allowed: research-only deployment \\
+\end{longtable}
+
+\begin{verbatim}
+Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
+       ↓                           ↓                        ↓
+   UI/UX + Niivue            Load Balancer          SAM-Med3D-turbo
+   3D visualization          + Authentication       PyTorch Inference
+   User prompts              + Logging               + Medical Data Store
+\end{verbatim}
+
+\textbf{Non-clinical use cases (anonymised data allowed):} research
+demos with cloud GPU; local development with sample datasets;
+open-source contributions via GitHub with synthetic data; educational
+browser-only UI with mock backend.
+
+\subsubsection{Infrastructure}\label{infrastructure}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Component & Technology \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Containerisation & Docker + NVIDIA Container Toolkit \\
+GPU & 4× NVIDIA A100 (80 GB each) \\
+Embedding cache & Redis (sub-second for repeated prompts) \\
+Batch queue & Celery + Redis broker \\
+Authentication & LDAP / Charité SSO \\
+Compliance & GDPR (all data on-premise, no cloud) \\
+\end{longtable}
+
+\subsubsection{Performance Targets}\label{performance-targets}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Target
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Single-click → mask & \textless{} 2 s end-to-end \\
+Embedding computation (first prompt) & \textasciitilde1 s \\
+Subsequent prompts (cached embedding) & \textless{} 0.5 s \\
+Mesh generation (MZ3) & \textless{} 3 s \\
+Batch throughput & \textasciitilde50 cases / hour (4 GPUs) ---
+bottleneck is DICOM→NIfTI preprocessing, not GPU \\
+CTA volume memory & \textasciitilde268 MB (512³ × 2 bytes = 268,435,456
+bytes) \\
+\end{longtable}
+
+\subsubsection{Memory Budget}\label{memory-budget}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6471}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3529}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Size
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CTA volume (512³, int16) & \textasciitilde268 MB \\
+SAM-Med3D-turbo (FP16) & \textasciitilde4 GB VRAM \\
+Embedding cache (per volume) & \textasciitilde50--500 MB (estimate ---
+depends on patch count and feature map size; to be measured) \\
+Straightened volume (64² × 200) & \textasciitilde8 MB \\
+Mesh (MZ3, per vessel) & \textless{} 5 MB \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Research Roadmap \&
+Milestones}\label{research-roadmap-milestones}
+
+\subsubsection{Phase 1: MVP --- MEDIS TXT Visualisation (Weeks
+1--4)}\label{phase-1-mvp-medis-txt-visualisation-weeks-14}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  MEDIS TXT parser + client-side mesh in Niivue
+\item[$\square$]
+  Centerline extraction + straightened MPR with \textbf{Bishop (parallel
+  transport) frame} (not Frenet-Serret --- see §12.2)
+\item[$\square$]
+  Quad-view layout with interactive sliders
+\item[$\square$]
+  NIfTI.gz / DICOM loading
+\end{itemize}
+
+\subsubsection{Phase 2: SAM-Med3D Integration (Weeks
+5--8)}\label{phase-2-sam-med3d-integration-weeks-58}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Backend: load turbo checkpoint, expose \texttt{/api/segment/point}
+\item[$\square$]
+  Frontend: click → prompt → mask overlay
+\item[$\square$]
+  Redis embedding cache for sub-second repeated prompts
+\item[$\square$]
+  \textbf{Implement \texttt{dense\_prompt} support} --- either (a)
+  custom prompt encoder modification to accept a prior mask, or (b)
+  lumen mask surface → additional positive point prompts; required
+  blocker for dual-wall pipeline
+\item[$\square$]
+  Dual-wall sequential segmentation pipeline (depends on above)
+\end{itemize}
+
+\subsubsection{Phase 3: DISCHARGE Evaluation (Weeks
+9--12)}\label{phase-3-discharge-evaluation-weeks-912}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  \textbf{Zero-shot baseline --- myocardium first:} \texttt{LV\_MYO} is
+  the closest match to ACDC pre-training targets; establish Dice
+  baseline here before coronary lumen (see §2.5 strategic implication
+  note)
+\item[$\square$]
+  Zero-shot baseline on coronary lumen (held-out DISCHARGE cases)
+\item[$\square$]
+  Quantify Dice, Hausdorff, diameter stenosis \% correlation vs.~MEDIS
+  QAngio CT expert measurements
+\item[$\square$]
+  Identify failure modes (motion, calcification, bifurcations,
+  patch-boundary seams)
+\end{itemize}
+
+\subsubsection{Phase 4: Fine-tuning \& Active Learning (Weeks
+13--20)}\label{phase-4-fine-tuning-active-learning-weeks-1320}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Fine-tune SAM-Med3D on DISCHARGE annotations (nnU-Net-style data prep)
+\item[$\square$]
+  Active-learning loop\textsuperscript{8}: expert corrections → weekly
+  re-training. \textbf{Correction data model:} a ``correction'' is a
+  full per-structure binary NIfTI mask saved by the radiologist after
+  local brush edits in the browser. The backend must convert the
+  in-browser voxel edits (sparse difference from AI mask) into a
+  complete corrected NIfTI matching §2.9 training format before
+  ingestion into the fine-tuning pipeline.
+\item[$\square$]
+  Benchmark against task-specific nnU-Net baseline
+\end{itemize}
+
+\subsubsection{Phase 5: Prostate Extension (Weeks
+21--28)}\label{phase-5-prostate-extension-weeks-2128}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Adapt pipeline for prostate mpMRI (multi-sequence input)
+\item[$\square$]
+  Zone-specific class labels (PZ / TZ / lesion)
+\item[$\square$]
+  Validate on Charité prostate cohort
+\end{itemize}
+
+\subsubsection{Phase 6: Clinical Validation \& Publication (Weeks
+29--36)}\label{phase-6-clinical-validation-publication-weeks-2936}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  Prospective reader study (Dice vs.~time vs.~inter-observer)
+\item[$\square$]
+  Open-source release + MedSegFM competition baseline
+\item[$\square$]
+  Publication: ``Foundation-model-assisted coronary CTA segmentation at
+  scale''
+\end{itemize}
+
+\subsubsection{Quarterly Research
+Milestones}\label{quarterly-research-milestones}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3214}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2857}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quarter
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Milestone
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Status
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Q1 2026 (ends 2026-03-31) & Zero-shot baseline on DISCHARGE + MVP
+deployed & In progress - update before end of quarter \\
+Q2 2026 & Active-learning loop running; Dice ≥ 0.80 on coronary lumen &
+Pending \\
+Q3 2026 & Prospective reader study; prostate pipeline validated &
+Pending \\
+Q4 2026 & Open-source release; conference/journal submission &
+Pending \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Related Medical Segmentation
+Models}\label{related-medical-segmentation-models}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1029}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1618}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1618}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1324}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.4412}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dimension
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Modalities
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Prompts
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Difference from SAM-Med3D
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SAM (Meta) & 2D & Natural images & Point/box/text & No medical training,
+2D only \\
+SAM-Med2D & 2D & Medical (slice-wise) & Point/box & 2D → cannot capture
+volumetric context \\
+MedSAM & 2D & Medical (slice-wise) & Box only & Simpler architecture,
+box prompts only \\
+SAM-Med3D & \textbf{3D} & \textbf{Medical (volumetric)} & \textbf{3D
+point} & \textbf{Native 3D --- our choice} \\
+nnU-Net & 3D & Medical (task-specific) & None (automatic) & Not
+promptable; requires per-task training \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{This document is the living foundation of the Charité Segment
+Platform research project. All claims about SAM-Med3D are verified
+against the published paper (arXiv:2310.15161), official GitHub README,
+and HuggingFace model/dataset cards. Critical caveats about zero-shot
+performance on coronary CTA and prostate mpMRI (neither directly
+evaluated in the paper) are noted throughout. Full bibliography in
+\texttt{plan/references.bib}.}
+
+\section*{References}\label{bibliography}
+\addcontentsline{toc}{section}{References}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{0}{1}
+\bibitem[\citeproctext]{ref-Zhang2024SAMMed3D}
+\CSLLeftMargin{1. }%
+\CSLRightInline{Zhang H, Xia Y, Zhao S, Luo M, Zhang Q, Xu M, et al.
+SAM-Med3D: Towards general-purpose segmentation models for volumetric
+medical images. In: European conference on computer vision (ECCV)
+workshops: Bioimage computing {[}Internet{]}. Springer; 2024. p. 1--18.
+doi:\href{https://doi.org/10.1007/978-3-031-72469-6_1}{10.1007/978-3-031-72469-6\_1}}
+
+\bibitem[\citeproctext]{ref-Isensee2021nnUNet}
+\CSLLeftMargin{2. }%
+\CSLRightInline{Isensee F, Jaeger PF, Kohl SAA, Petersen J, Maier-Hein
+KH. nnU-net: A self-configuring method for deep learning-based
+biomedical image segmentation. Nature Methods. 2021;18(2):203--11.
+doi:\href{https://doi.org/10.1038/s41592-020-01008-z}{10.1038/s41592-020-01008-z}}
+
+\bibitem[\citeproctext]{ref-DISCHARGE2022NEJM}
+\CSLLeftMargin{3. }%
+\CSLRightInline{DISCHARGE Trial Group. Computed tomography or invasive
+coronary angiography in patients with stable chest pain. New England
+Journal of Medicine. 2022;386(19):1795--806.
+doi:\href{https://doi.org/10.1056/NEJMoa2200963}{10.1056/NEJMoa2200963}}
+
+\bibitem[\citeproctext]{ref-Maurovich2020CADRADS}
+\CSLLeftMargin{4. }%
+\CSLRightInline{Maurovich-Horvat P, Ferencik M, Voros S, Merkely B,
+Hoffmann U. Comprehensive plaque assessment by coronary CT angiography.
+Nature Reviews Cardiology. 2014;11(7):390--402.
+doi:\href{https://doi.org/10.1038/nrcardio.2014.60}{10.1038/nrcardio.2014.60}}
+
+\bibitem[\citeproctext]{ref-Niivue2024}
+\CSLLeftMargin{5. }%
+\CSLRightInline{Rorden C, Taylor H, Gallivan K, Hanayik T. Niivue: A
+WebGL2-based medical image viewer {[}Internet{]}. GitHub; 2024.
+doi:\href{https://doi.org/10.5281/zenodo.8320937}{10.5281/zenodo.8320937}}
+
+\bibitem[\citeproctext]{ref-Wang2008RotationMinimizing}
+\CSLLeftMargin{6. }%
+\CSLRightInline{Wang W, Jüttler B, Zheng Y, Liu Y. Computation of
+rotation minimizing frames. ACM Transactions on Graphics.
+2008;27(1):1--18.
+doi:\href{https://doi.org/10.1145/1330511.1330512}{10.1145/1330511.1330512}}
+
+\bibitem[\citeproctext]{ref-Kanitsar2002CPR}
+\CSLLeftMargin{7. }%
+\CSLRightInline{Kanitsar A, Ropinski T, Fleischmann D, König A, Gröller
+ME. CPR - curved planar reformation. In: IEEE visualization. IEEE; 2002.
+p. 413--20.
+doi:\href{https://doi.org/10.1109/VIS.2002.5930066}{10.1109/VIS.2002.5930066}}
+
+\bibitem[\citeproctext]{ref-Budd2021ActiveLearning}
+\CSLLeftMargin{8. }%
+\CSLRightInline{Budd S, Robinson EC, Kainz B. A survey on active
+learning and human-in-the-loop deep learning for medical image analysis.
+Medical Image Analysis. 2021;71:102062.
+doi:\href{https://doi.org/10.1016/j.media.2021.102062}{10.1016/j.media.2021.102062}}
+
+\end{CSLReferences}
+
+\end{document}

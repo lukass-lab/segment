@@ -53,6 +53,23 @@ $VERBOSE && echo "Workspace root    : $WORKSPACE"
 $VERBOSE && echo "Input file        : $FULLPATH"
 $VERBOSE && echo "Output stem       : $NAME"
 
+# ── Detect YAML front matter ──────────────────────────────────────────────────
+FRONT_MATTER=""
+if [ "$(sed -n '1p' "$FULLPATH")" = "---" ]; then
+    FRONT_MATTER=$(awk '
+        NR == 1 { next }
+        /^---[[:space:]]*$/ || /^\.\.\.[[:space:]]*$/ { exit }
+        { print }
+    ' "$FULLPATH")
+fi
+
+front_matter_has_key() {
+    local key="$1"
+    [ -n "$FRONT_MATTER" ] && printf '%s\n' "$FRONT_MATTER" | grep -Eq "^[[:space:]]*$key:"
+}
+
+$VERBOSE && { [ -n "$FRONT_MATTER" ] && echo "YAML front matter : detected" || echo "YAML front matter : none"; }
+
 # ── Find bibliography ─────────────────────────────────────────────────────────
 BIB_PATH=""
 for candidate in \
@@ -114,46 +131,24 @@ if ! fc-list | grep -qi "consolas"; then
     fi
 fi
 
-# Emoji / symbol fallback font (suppresses missing-character warnings)
-EMOJIFONT=""
-if fc-list | grep -qi "Noto Color Emoji"; then
-    EMOJIFONT="Noto Color Emoji"
-elif fc-list | grep -qi "Noto Emoji"; then
-    EMOJIFONT="Noto Emoji"
-fi
-
 $VERBOSE && echo "Main font         : $MAINFONT"
 $VERBOSE && echo "Mono font         : $MONOFONT"
 
 # ── Build common pandoc args ──────────────────────────────────────────────────
 COMMON_ARGS=("$FULLPATH" "--filter=pandoc-crossref" "--citeproc")
 
-[ -n "$BIB_PATH" ] && COMMON_ARGS+=("--bibliography=$BIB_PATH")
-[ -n "$CSL_PATH" ] && COMMON_ARGS+=("--csl=$CSL_PATH")
+[ -n "$BIB_PATH" ] && ! front_matter_has_key "bibliography" && COMMON_ARGS+=("--bibliography=$BIB_PATH")
+[ -n "$CSL_PATH" ] && ! front_matter_has_key "csl" && COMMON_ARGS+=("--csl=$CSL_PATH")
 
-# Metadata overrides (can be overridden by YAML front-matter in the .md file)
-COMMON_ARGS+=(
-    "-M" "date=$(date +'%B %Y')"
-    "--standalone"
-    "--toc"
-    "--toc-depth=3"
-    "--number-sections"
-    "--highlight-style=tango"
-)
+COMMON_ARGS+=("--highlight-style=tango")
+! front_matter_has_key "date" && COMMON_ARGS+=("-M" "date=$(date +'%B %Y')")
+! front_matter_has_key "toc" && COMMON_ARGS+=("--toc")
+! front_matter_has_key "toc-depth" && COMMON_ARGS+=("--toc-depth=3")
+! front_matter_has_key "numbersections" && COMMON_ARGS+=("--number-sections")
 
 # ── PDF output ────────────────────────────────────────────────────────────────
 if $MAKE_PDF; then
     PDF_OUT="$DIR/$NAME.pdf"
-
-    # Write emoji/symbol font header to a temp file (avoids stdin blocking)
-    HEADER_TEX=""
-    if [ -n "$EMOJIFONT" ]; then
-        HEADER_TEX=$(mktemp /tmp/md2pdf_header_XXXXXX.tex)
-        # Register emoji font as a fallback; XeLaTeX will use it for missing glyphs
-        printf '\\usepackage{newunicodechar}\n' > "$HEADER_TEX"
-        trap 'rm -f "$HEADER_TEX"' EXIT
-        $VERBOSE && echo "  Emoji font        : $EMOJIFONT (header: $HEADER_TEX)"
-    fi
 
     PDF_ARGS=(
         "${COMMON_ARGS[@]}"
@@ -163,16 +158,11 @@ if $MAKE_PDF; then
         "-V" "mainfont:$MAINFONT"
         "-V" "monofont:$MONOFONT"
         "-V" "mathfont:Latin Modern Math"
-        "-V" "fontsize:11pt"
-        "-V" "geometry:margin=1in"
-        "-V" "colorlinks:true"
-        "-V" "linkcolor:NavyBlue"
-        "-V" "urlcolor:NavyBlue"
-        "-V" "toccolor:black"
-        "-V" "linestretch:1.2"
         "-V" "papersize:a4"
     )
-    [ -n "$HEADER_TEX" ] && PDF_ARGS+=("--include-in-header=$HEADER_TEX")
+    ! front_matter_has_key "fontsize" && PDF_ARGS+=("-V" "fontsize:11pt")
+    ! front_matter_has_key "geometry" && PDF_ARGS+=("-V" "geometry:margin=1in")
+    ! front_matter_has_key "linestretch" && PDF_ARGS+=("-V" "linestretch:1.2")
 
     echo "▶ Building PDF: $PDF_OUT"
     $VERBOSE && echo "  pandoc ${PDF_ARGS[*]}"
@@ -193,7 +183,7 @@ fi
 # ── TEX output ────────────────────────────────────────────────────────────────
 if $MAKE_TEX; then
     TEX_OUT="$DIR/$NAME.tex"
-    TEX_ARGS=("${COMMON_ARGS[@]}" "-o" "$TEX_OUT")
+    TEX_ARGS=("${COMMON_ARGS[@]}" "--standalone" "-o" "$TEX_OUT")
     echo "▶ Building TEX: $TEX_OUT"
     $VERBOSE && echo "  pandoc ${TEX_ARGS[*]}"
     pandoc "${TEX_ARGS[@]}"
