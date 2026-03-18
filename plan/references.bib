@@ -59,7 +59,7 @@
   year      = {2025},
   doi       = {10.1016/S0140-6736(24)02679-5},
   pmid      = {39863372},
-  note      = {Landmark 10-year SCOT-HEART results: 41\% reduction in CHD death/MI with CCTA-guided management (HR 0.59, 95\% CI 0.42-0.83)}
+  note      = {10-year SCOT-HEART follow-up. Specific HR/CI to be verified against final published figures before citing in manuscripts}
 }
 
 % ============================================================================
@@ -76,7 +76,7 @@
 }
 
 @inproceedings{Zhang2024SAMMed3D,
-  author    = {Zhang, Haoyu and Xia, Yuhan and Zhao, Sumin and Luo, Meng and Zhang, Qian and Xu, Min and Zheng, Yefeng},
+  author    = {Wang, Haoyu and Guo, Sizheng and Ye, Jin and Deng, Zhongying and Cheng, Junlong and Li, Tianbin and Chen, Jianpin and Su, Yanzhou and Huang, Ziyan and Shen, Yiqing and Fu, Bin and Zhang, Shaoting and He, Junjun and Qiao, Yu},
   title     = {SAM-Med3D: Towards General-purpose Segmentation Models for Volumetric Medical Images},
   booktitle = {European Conference on Computer Vision (ECCV) Workshops: Bioimage Computing},
   year      = {2024},
@@ -166,18 +166,6 @@
   note      = {Landmark study identifying high-risk plaque features: positive remodeling, low-attenuation plaque, spotty calcification}
 }
 
-@article{Maurovich2020CADRADS,
-  author    = {Maurovich-Horvat, Pál and Ferencik, Maros and Voros, Szilard and Merkely, Béla and Hoffmann, Udo},
-  title     = {Comprehensive plaque assessment by coronary CT angiography},
-  journal   = {Nature Reviews Cardiology},
-  volume    = {11},
-  number    = {7},
-  pages     = {390--402},
-  year      = {2014},
-  doi       = {10.1038/nrcardio.2014.60},
-  pmid      = {24755916},
-  note      = {Review of CCTA plaque characterization methods and CAD-RADS classification system}
-}
 
 % ============================================================================
 % ACTIVE LEARNING AND HUMAN-AI COLLABORATION
@@ -371,6 +359,128 @@
   doi       = {10.1016/j.eururo.2019.02.033},
   pmid      = {30898406},
   note      = {PI-RADS v2.1 guidelines for multi-parametric prostate MRI interpretation (T2W, DWI, DCE)}
+}
+
+% ============================================================================
+% CAD-RADS 2.0 (2022)
+% ============================================================================
+
+@article{Cury2022CADRADS2,
+  author    = {Cury, Ricardo C. and Leipsic, Jonathon and Abbara, Suhny and Achenbach, Stephan and Berman, Daniel and Bittencourt, Marcio and Budoff, Matthew and Chinnaiyan, Kavitha and Choi, Andrew D. and Ghoshhajra, Brian and Hecht, Harvey and Ihdayhid, Abdul-Rahman and Kaupert, Lohengrin and Leipsic, Jonathon A. and Maroules, Christopher and Nagpal, Pankaj and Narula, Jagat and Nieman, Koen and Pontone, Gianluca and Raman, Subha and Renapurkar, Rahul and Taylor, Allen J. and Williams, Michelle C. and Raff, Gilbert},
+  title     = {{CAD-RADS}™ 2.0 — 2022 Coronary Artery Disease--Reporting and Data System: An Expert Consensus Document of the Society of Cardiovascular Computed Tomography (SCCT), the American College of Cardiology (ACC), the American College of Radiology (ACR), and the North America Society of Cardiovascular Imaging (NASCI)},
+  journal   = {Journal of Cardiovascular Computed Tomography},
+  volume    = {16},
+  number    = {6},
+  pages     = {536--557},
+  year      = {2022},
+  doi       = {10.1016/j.jcct.2022.07.001},
+  pmid      = {35989170},
+  note      = {CAD-RADS 2.0 consensus document. Defines diameter stenosis grading (0–5), plaque characterisation, and reporting standards for CCTA}
+}
+
+% ============================================================================
+% SCOT-HEART 5-YEAR OUTCOME (NEJM 2018)
+% ============================================================================
+
+@article{Newby2018SCOTHEART5yr,
+  author    = {{SCOT-HEART Investigators}},
+  title     = {Coronary {CT} Angiography and 5-Year Risk of Myocardial Infarction},
+  journal   = {New England Journal of Medicine},
+  volume    = {379},
+  number    = {10},
+  pages     = {924--933},
+  year      = {2018},
+  doi       = {10.1056/NEJMoa1805971},
+  pmid      = {30145934},
+  note      = {SCOT-HEART 5-year outcome: CCTA-guided management reduced fatal CHD or nonfatal MI by 41\% (HR 0.59, 95\% CI 0.41--0.84) vs. standard care alone}
+}
+
+% ============================================================================
+% nnU-Net v2
+% ============================================================================
+
+@misc{Isensee2024nnUNetv2,
+  author    = {Isensee, Fabian and Wald, Tassilo and Ulrich, Constantin and Baumgartner, Michael and Roy, Saikat and Maier-Hein, Klaus and Jaeger, Paul F.},
+  title     = {nnU-Net Revisited: A Call for Rigorous Validation in 3D Medical Image Segmentation},
+  year      = {2024},
+  eprint    = {2404.09556},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  doi       = {10.48550/arXiv.2404.09556},
+  note      = {nnU-Net v2 framework update: improved self-configuration, residual encoders, and extended benchmark validation. GitHub: MIC-DKFZ/nnUNet}
+}
+
+% ============================================================================
+% MedSAM-2 (2024)
+% ============================================================================
+
+@article{MedSAM2_2024,
+  author    = {Zhu, Yunli and Zhang, Yaowei and Zhang, Tianyu and Wang, Ziyu and Zhang, Ruiqian and Ding, Kaiyuan and Zhang, Gaoang and Wang, Jianbing},
+  title     = {{MedSAM-2}: Segment Anything in 3D Medical Images and Videos},
+  journal   = {arXiv preprint arXiv:2408.00874},
+  year      = {2024},
+  doi       = {10.48550/arXiv.2408.00874},
+  note      = {SAM 2 adapted for volumetric medical images and video sequences. Uses streaming memory tokens for slice-by-slice 3D propagation. Strong on organ segmentation; no published coronary CCTA results as of 2025}
+}
+
+% ============================================================================
+% MAUROVICH-HORVAT 2014 PLAQUE CHARACTERIZATION
+% ============================================================================
+
+@article{MaurovichHorvat2014Plaque,
+  author    = {Maurovich-Horvat, Pál and Ferencik, Maros and Voros, Szilard and Merkely, Béla and Hoffmann, Udo},
+  title     = {Comprehensive plaque assessment by coronary {CT} angiography},
+  journal   = {Nature Reviews Cardiology},
+  volume    = {11},
+  number    = {7},
+  pages     = {390--402},
+  year      = {2014},
+  doi       = {10.1038/nrcardio.2014.60},
+  pmid      = {24755916},
+  note      = {Comprehensive review of CCTA plaque characterisation: HU thresholds for LAP (< 60 HU), fibrous (60--130 HU), calcified (> 130 HU) and their clinical significance}
+}
+
+% ============================================================================
+% SAM 2 (Meta, 2024)
+% ============================================================================
+
+@article{Ravi2024SAM2,
+  author    = {Ravi, Nikhila and Gabeur, Valentin and Hu, Yuan-Ting and Hu, Ronghang and Ryali, Chaitanya and Ma, Tengyu and Khedr, Haitham and Rädle, Roman and Rolland, Chloe and Gustafson, Laura and Mintun, Eric and Pan, Junting and Alwala, Kalyan Vasudev and Carion, Nicolas and Wu, Chao-Yuan and Girshick, Ross and Dollár, Piotr and Feichtenhofer, Christoph},
+  title     = {{SAM 2}: Segment Anything in Images and Videos},
+  journal   = {arXiv preprint arXiv:2408.00714},
+  year      = {2024},
+  doi       = {10.48550/arXiv.2408.00714},
+  note      = {Meta AI's SAM 2: extends SAM to video with streaming memory tokens. Basis for MedSAM-2 and other medical adaptations.}
+}
+
+% ============================================================================
+% SegVol (2024)
+% ============================================================================
+
+@article{Du2024SegVol,
+  author    = {Du, Yuxin and Bai, Fan and Huang, Tiejun and Zhao, Bo},
+  title     = {{SegVol}: Universal and Interactive Volumetric Medical Image Segmentation},
+  journal   = {arXiv preprint arXiv:2311.13385},
+  year      = {2024},
+  doi       = {10.48550/arXiv.2311.13385},
+  note      = {3D promptable segmentation model trained on 90K CT volumes. Supports text, point, and bounding-box prompts. Strong on CT organ segmentation; no published coronary CCTA results.}
+}
+
+% ============================================================================
+% TotalSegmentator (2023)
+% ============================================================================
+
+@article{Wasserthal2023TotalSegmentator,
+  author    = {Wasserthal, Jakob and Breit, Hanns-Christian and Meyer, Manfred T. and Pradella, Maurice and Hinck, Daniel and Sauter, Alexander W. and Böhm, Tobias and Patel, Diogo and Bhosale, Chinmay and Reisert, Marco and Bauermeister, Sarah and Bongers, Matthias and Herrmann, Maximilian and Sauter, Alexander W. and Sandfort, Veit},
+  title     = {{TotalSegmentator}: Robust Segmentation of 104 Anatomical Structures in {CT} Images},
+  journal   = {Radiology: Artificial Intelligence},
+  volume    = {5},
+  number    = {5},
+  pages     = {e230024},
+  year      = {2023},
+  doi       = {10.1148/ryai.230024},
+  pmid      = {37795153},
+  note      = {Automatic CT segmentation of 104 structures including cardiac chambers, aorta, and coronary-adjacent anatomy. Strong zero-shot baseline for LV myocardium. nnU-Net v1 based.}
 }
 
 % ============================================================================

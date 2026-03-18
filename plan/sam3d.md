@@ -2,8 +2,8 @@
 title: "Segment Platform Research Foundation Document"
 subtitle: "Browser-Based Interactive 3D Medical Segmentation with SAM-Med3D-turbo"
 author: "Steffen Lukas <steffen.lukas@charite.de>"
-date: "13 March 2026"
-version: "2026-03-13"
+date: "18 March 2026"
+version: "2026-03-18"
 status: "Technical reference"
 documentclass: article
 geometry:
@@ -40,7 +40,7 @@ header-includes: |
 
 ## Abstract {-}
 
-This document is a technical and research foundation for the Segment platform, a browser-based 3D medical segmentation environment built around SAM-Med3D-turbo. It defines the clinical targets, model assumptions, workflow patterns, system architecture, and evaluation path for two initial application domains: coronary CCTA in DISCHARGE and prostate mpMRI. It is an internal technical reference and research planning document rather than a deployment certification package.
+This document is a technical and research foundation for the Segment platform, a browser-based 3D medical segmentation environment built around SAM-Med3D-turbo. It defines the clinical targets, model assumptions, workflow patterns, system architecture, and evaluation path for two initial application domains: coronary CCTA in DISCHARGE and prostate mpMRI. It is a research planning document and technical reference rather than a deployment certification package.
 
 ## Purpose {-}
 
@@ -53,6 +53,8 @@ It is **not**:
 - a standalone production deployment architecture specification;
 - a finished browser-platform product brief;
 - a standalone funding proposal.
+
+> **Research use only — not for clinical decision-making.** All segmentation code, HU thresholds, stenosis formulae, and AI model configurations in this document are research prototypes. They have not been validated for clinical use, are not CE-marked or FDA-cleared, and must not be used to inform clinical decisions about individual patients without independent expert review and regulatory approval.
 
 ## Why Segmentation Matters Here {-}
 
@@ -100,18 +102,34 @@ This platform is a **test-bed for foundation-model research** in cardiovascular 
 
 1. Evaluate **zero-shot / few-shot generalisation** of SAM-Med3D-turbo on unseen DISCHARGE cases, then test external generalisation on SCOT-HEART
 2. Quantify **active-learning gains** (weekly fine-tuning on expert corrections)
-3. Benchmark against **nnU-Net** task-specific models on segmentation-derived endpoints (stenosis %, plaque burden, myocardium volume)
+3. Benchmark against **nnU-Net v2** [@Isensee2024nnUNetv2] task-specific models on segmentation-derived endpoints (stenosis %, plaque burden, myocardium volume)
 4. Open-source modular components for the broader MedAI community
 
 ### Success Targets (6-month horizon)
 
-| Metric | Target |
-|--------|--------|
-| DISCHARGE cases auto-processed | > 80 % of dataset |
-| End-to-end latency | < 2 s per vessel / per prostate gland |
-| Dice (coronary lumen) | > 0.85 vs. expert |
-| Dice (prostate whole-gland) | > 0.90 vs. expert |
-| Cost reduction | 10× cheaper than manual contouring |
+| Metric | Target | Notes |
+|--------|--------|-------|
+| DISCHARGE cases auto-processed | > 80 % of dataset | Batch mode |
+| End-to-end latency | < 2 s per click (interactive) | Single-patch response; full vessel via background queue (10–60 s) |
+| DSC (coronary lumen) | > 0.85 vs. expert | Phase 4 fine-tuned target |
+| DSC (prostate whole-gland) | > 0.90 vs. expert | Phase 4 fine-tuned target |
+| Cost reduction | 10× cheaper than manual contouring | Based on 30–60 min manual vs. < 5 min AI-assisted |
+
+### Evaluation Metrics & Go/No-Go Thresholds {#evaluation-metrics}
+
+Segmentation quality is reported as **DSC (Dice Similarity Coefficient)** and **HD95 (95th-percentile Hausdorff Distance, mm)**. "Dice" and "DSC" are used interchangeably throughout this document; all numeric targets refer to DSC. HD95 is essential for coronary work: a high-Dice mask with a single missed distal branch creates a large HD95 spike that would fail clinical acceptance.
+
+| Structure | Phase 2 gate (zero-shot) | Phase 4 gate (fine-tuned) | HD95 max (mm) | Notes |
+|-----------|--------------------------|---------------------------|---------------|-------|
+| LV myocardium (CCTA) | DSC ≥ 0.82 | DSC ≥ 0.88 | ≤ 3.0 | Closest to ACDC pre-training — use as first zero-shot benchmark |
+| Coronary lumen (LAD/RCA/LCx) | DSC ≥ 0.70 | DSC ≥ 0.85 | ≤ 2.0 | Primary clinical target |
+| Outer wall / EEM | DSC ≥ 0.65 | DSC ≥ 0.80 | ≤ 2.5 | Requires dense-prompt implementation |
+| Diameter stenosis % | r ≥ 0.80 vs. QAngio CT | r ≥ 0.90 vs. QAngio CT | — | Pearson correlation; bias < 5 % |
+| Prostate whole gland (T2W) | DSC ≥ 0.85 | DSC ≥ 0.92 | ≤ 3.0 | Large structure; high zero-shot prior expected |
+| Prostate peripheral zone | — (fine-tuning first) | DSC ≥ 0.80 | ≤ 4.0 | Subtle PZ–TZ boundary |
+| Prostate suspicious lesion | — | DSC ≥ 0.60 | ≤ 5.0 | Small target; predicted vs. reference lesion volume (mL) Pearson correlation as secondary clinical metric |
+
+**Phase gate rule:** a phase transition is blocked if *any* mandatory structure falls below the Phase N gate threshold on the held-out DISCHARGE validation split (n = 100 cases, fixed before Phase 3 begins, not used for fine-tuning).
 
 > **Critical note on Dice targets:** The SAM-Med3D paper reports **87.12 % Dice on cardiac structures** with 1 prompt point (Table 5 in [@Zhang2024SAMMed3D]). However, this was measured on the ACDC dataset (cardiac MRI short-axis cine), **not** coronary CTA. Coronary arteries are smaller, noisier, and motion-affected — published coronary lumen Dice values for task-specific models (nnU-Net [@Isensee2021nnUNet]) range 0.75–0.88 depending on vessel branch. Our 0.85 target is therefore ambitious but grounded.
 
@@ -284,7 +302,7 @@ data/medical_preprocessed/
         └── labelsTr/
 ```
 
-> **Important (from GitHub):** Ground-truth labels are required to generate prompt points during training. For inference without ground truth, "generate a fake ground-truth with the target region for prompt annotated."
+> **Important (from GitHub):** Ground-truth labels are required to generate prompt points during training. For inference without ground truth, "generate a fake ground-truth with the target region for prompt annotated." (i.e., a rough bounding mask indicating *where* to place automatic prompt points — it is not used for loss computation and does not need to be accurate.)
 
 ### Turbo vs. Standard Comparison
 
@@ -319,11 +337,11 @@ data/medical_preprocessed/
 | **References** | Williams et al., Lancet 2015 [@Williams2015SCOTHEART]; 10-year follow-up [@Williams2025SCOTHEART10yr] |
 | **Design** | Multicentre randomised controlled trial |
 | **Patients** | 4,146 |
-| **Key result** | CCTA-guided management → 41 % reduction in CHD death/MI at 10 years (HR 0.59) |
+| **Key result** | CCTA-guided management → 41 % reduction in CHD death/MI (HR 0.59, 95 % CI 0.41–0.84) at 5-year follow-up [@Newby2018SCOTHEART5yr]; 10-year follow-up data pending verification [@Williams2025SCOTHEART10yr] |
 | **Modality** | CCTA |
 | **Role in this project** | Secondary validation dataset; extends generalisability beyond Charité site |
 
-### Standardised Nomenclature (CAD-RADS 2.0 / AHA 17-segment compatible) [@Maurovich2020CADRADS]
+### Standardised Nomenclature (CAD-RADS 2.0 / AHA 17-segment compatible) [@Cury2022CADRADS2]
 
 | Clinical Feature | Segmentation Class Label | Description | HU Range (contrast-enhanced CT) |
 |-----------------|--------------------------|-------------|-------------------------------|
@@ -383,7 +401,9 @@ Critical for calculating **stenosis %** and **plaque burden**:
 2. **Step 2:** Use lumen mask as **dense prompt** → expand outward to EEM
 3. **Result:** `vessel_wall = outer_mask & ~lumen_mask` → plaque volume
 
-> **Implementation warning:** SAM-Med3D does **not** natively support a `dense_prompt` argument in its published codebase. The pseudocode below shows the *intended* design. Two implementation paths exist: (a) custom modification of the prompt encoder to accept a prior mask, or (b) a two-stage pipeline where the lumen mask surface is sampled into additional positive point prompts. This is a research contribution we must implement before the code below is functional.
+> **Implementation decision:** SAM-Med3D does **not** natively support a `dense_prompt` argument in its published codebase. Two paths were evaluated: (a) custom prompt-encoder modification to accept a dense prior mask; (b) **surface-sampling** — erode the lumen mask, extract boundary voxels, and pass them as additional positive point prompts alongside the original ostium/distal pair. **Path (b) is the chosen approach for Phase 2**: no architecture change, immediately implementable, and validated in the SAM literature as effective for boundary-guided prompting. Concretely: sample ~30 points from the lumen mask surface using **farthest-point sampling** on the eroded boundary voxel set (maximises spatial coverage; avoids clustering all points on the nearest boundary face), append to `points` list with `label=1`. Path (a) (full dense conditioning) is deferred to Phase 4 if surface-sampling EEM Dice falls below 0.80 on the DISCHARGE validation split. The pseudocode below reflects the *intended* interface; replace `dense_prompt=lumen_mask` with the surface-sampled point list for the Phase 2 implementation.
+
+*Note for non-technical readers: the code below is illustrative pseudocode showing the intended design — it is not yet runnable production code.*
 
 ```python
 # PSEUDOCODE — dense_prompt is not yet implemented in SAM-Med3D
@@ -406,6 +426,10 @@ vessel_wall = outer_mask & ~lumen_mask
 #### C. Post-Processing: Plaque Characterisation by HU Thresholds
 
 ```python
+LAP_THRESHOLD = 0.04  # Research placeholder — no published consensus; tune against outcomes
+HU_LAP_MAX    = 60    # < 60 HU = low-attenuation (lipid-rich / necrotic) plaque
+HU_CALC_MIN   = 130   # > 130 HU = calcified plaque (Motoyama 2009; Maurovich-Horvat 2014)
+
 def characterise_plaque(volume, vessel_wall_mask):
     """Classify plaque components by HU value within the vessel wall mask."""
     hu_values = volume[vessel_wall_mask > 0]
@@ -416,12 +440,20 @@ def characterise_plaque(volume, vessel_wall_mask):
     total        = vessel_wall_mask.sum()
 
     return {
-        "calcified_pct": calcified / total * 100,
-        "fibrous_pct":   fibrous / total * 100,
+        "calcified_pct":  calcified / total * 100,
+        "fibrous_pct":    fibrous / total * 100,
         "lipid_rich_pct": lipid_rich / total * 100,
-        "high_risk": (lipid_rich / total) > 0.04,  # >4% LAP = vulnerable
+        # lap_flag: LAP presence flag — threshold is a research placeholder.
+        # No published consensus cutoff exists for LAP % of wall volume.
+        # Motoyama 2009 uses qualitative LAP presence; Maurovich-Horvat 2014
+        # uses absolute LAP volume. Tune against DISCHARGE outcomes data.
+        "lap_flag": (lipid_rich / total) > LAP_THRESHOLD,
     }
 ```
+
+> **Plaque threshold provenance:** The thresholds above (LAP < 60 HU, fibrous 60–130 HU, calcified > 130 HU) follow the scheme used in Motoyama et al. and Maurovich-Horvat et al. [@MaurovichHorvat2014Plaque]. Some publications use stricter necrotic-core thresholds (< 30 HU) or LAP ≤ 50 HU — these are not universally standardised. Always cite the specific scheme used when reporting plaque composition in publications.
+
+> **Positive remodeling:** HU thresholds alone do not capture all high-risk plaque features. Positive remodeling (remodeling index > 1.1 per Motoyama 2009) is an independent high-risk feature that requires comparing lumen cross-sectional area to the EEM area at a reference segment. It is not derivable from HU values — it requires the dual-wall segmentation pipeline (lumen + EEM) to compute. This is an additional output the platform will enable once EEM segmentation is validated.
 
 > **HU calibration warning:** The thresholds above (< 60 LAP, 60–130 fibrous, > 130 calcified) are defined for **standard 120 kVp with soft-kernel reconstruction**. DISCHARGE is a multi-centre trial with varying tube voltages (80–140 kVp) and reconstruction kernels (soft vs. sharp). Sharp-kernel reconstruction shifts apparent HU upward and increases blooming around calcification. These thresholds require per-centre calibration against phantom measurements or paired soft/sharp kernel scans before cross-site plaque comparisons are valid. Record the reconstruction kernel and tube voltage for every DISCHARGE case in the metadata.
 
@@ -510,7 +542,9 @@ When segmenting pathology, the target is **clinically significant prostate cance
 
 #### Scenario 2: Lesion Segmentation (DWI/ADC)
 
-> **Implementation warning:** Step 2 below references using a prior PZ mask as a dense prompt. This is the same unimplemented `dense_prompt` issue described in [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation) — the same two implementation paths apply: (a) custom prompt encoder modification, or (b) sampling the PZ mask boundary into additional point prompts.
+> **PI-RADS v2.1 dominant sequence rule:** DWI is the dominant determining sequence for peripheral zone (PZ) lesions; T2W is dominant for transition zone (TZ) lesions. The prompting strategy below routes all lesion clicks to the ADC map, which is appropriate for PZ. For TZ lesions, the click should be on T2W. The frontend should guide the radiologist accordingly based on anatomical zone.
+
+> **Implementation note:** Step 2 below references using a prior PZ mask as a dense prompt. This follows the same surface-sampling decision made for [Dual-Wall Nested Segmentation](#coronary-dual-wall-segmentation) — sample ~30 points from the PZ mask boundary and pass as additional positive prompts. Full dense conditioning (path a) deferred to Phase 4.
 
 ```
 1. User clicks hypointense spot on ADC map
@@ -534,7 +568,7 @@ When segmenting pathology, the target is **clinically significant prostate cance
 | **Lesion detection vs. segmentation** | PI-RADS lesions can be < 5 mm — smaller than SAM-Med3D's 128³ patch at typical prostate resolution | Ensure patch is centred on clicked lesion; use higher-resolution input if available |
 | **Unknown pre-training coverage** | SA-Med3D-140K dataset card does not confirm prostate mpMRI is represented | Treat prostate as low-confidence zero-shot; plan early fine-tuning on Charité cohort |
 | **Intensity normalisation (MRI)** | MRI intensities are not calibrated across scanners (no HU equivalent) | Apply per-volume z-score normalisation independently for each sequence before inference |
-| **OAR segmentation** | Neurovascular bundles (NVB) are extremely thin on T2W | Multi-point prompts along bundle; expect low zero-shot Dice — fine-tuning required |
+| **OAR segmentation** | Neurovascular bundles (NVB) are extremely thin, especially at 1.5T; high-resolution T2W at 3T is the standard for NVB visualisation | Multi-point prompts along bundle; expect low zero-shot DSC — fine-tuning on 3T data required |
 
 ### Prostate vs. Coronary: Difficulty Comparison
 
@@ -568,7 +602,7 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
         return model.segment(volume_4d[:,:,:,0], points=prompt_points, labels=prompt_labels)
 ```
 
-> **Topology warning:** Pixel-wise median of binary masks across 10 phases is **not** topologically safe for thin structures. A distal coronary voxel present in only 4/10 phases will be excluded by the median, potentially severing the centreline. Preferred alternative: select the optimal cardiac phase (75 % R-R for RCA, 65 % R-R for LAD/LCx at HR < 70) rather than fusing all phases. If multi-phase fusion is required, apply connected-component analysis post-median and re-link broken segments by dilation along the centreline.
+> **Topology warning:** Pixel-wise median of binary masks across 10 phases is **not** topologically safe for thin structures. A distal coronary voxel present in only 4/10 phases will be excluded by the median, potentially severing the centreline. Preferred alternative: select the optimal cardiac phase per SCCT guidelines [@Leipsic2014CCTA] — typically mid-diastole (70–80 % R-R) at HR < 65 bpm, or end-systole (35–45 % R-R) at HR > 75 bpm — rather than fusing all phases. If multi-phase fusion is required, apply connected-component analysis post-median and re-link broken segments by dilation along the centreline.
 
 **Additional strategies:**
 - Edge-preserving denoising (bilateral filter) pre-processing
@@ -608,6 +642,84 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
 | No `dense_prompt` in codebase | Lumen-as-prior strategy needs engineering | Custom prompt encoder modification |
 | 128³ patch size constraint | Coronary arteries span > 128 voxels (300–400 voxels at 0.5 mm) | Sliding window with 50 % overlap; Gaussian-weighted blending at boundaries to prevent double-thick seams; connected-component check post-stitch |
 | No multi-class output | One mask per inference call | Multiple sequential inferences per case |
+| TTA not described | Test-time augmentation (axis flips, small rotations) commonly improves robustness on small structures | Evaluate TTA in Phase 3 as a robustness strategy; expect +2–5 % DSC on coronary lumen at the cost of 3–8× inference time |
+
+### Challenge 6: Coronary Inference — Selective Patch Placement {#selective-patch-placement}
+
+**Problem:** Coronary arteries span 300–400 voxels at 0.5 mm isotropic resolution. A naive 50 % overlap sliding window over a 512³ CCTA volume requires approximately 320 patches, yielding 160–480 s GPU time — 80–240× the 2 s target.
+
+**Solution: Centerline-guided selective patch placement.** Only generate patches that contain centerline voxels; skip background patches entirely. Expected patch count: 20–40 (95 % reduction).
+
+```python
+import numpy as np
+from scipy.ndimage import binary_dilation
+
+def get_coronary_patches(
+    volume: np.ndarray,
+    centerline_voxels: np.ndarray,  # (N, 3) array of voxel indices
+    patch_size: int = 128,
+) -> list[tuple[slice, slice, slice]]:
+    """
+    Return a minimal set of 128³ patch slices covering the entire centerline.
+    Adjacent overlapping patches are merged to avoid redundant inference.
+    """
+    D, H, W = volume.shape
+    half = patch_size // 2
+    # _overlap_ratio(a, b): returns IoU of two slice-tuples as a float in [0,1]
+    # _merge_slices(a, b, shape, patch_size): expands a to cover b, clamped to shape
+    # _gaussian_kernel(n): returns an (n,n,n) array with unit-integral 3D Gaussian
+    # (implementations omitted for brevity — standard numpy/scipy utilities)
+    patches = []
+
+    for point in centerline_voxels:
+        z, y, x = point.astype(int)
+        # Clamp from the far end so patches are always exactly patch_size³.
+        # SAM-Med3D's 3D ViT uses fixed positional embeddings for 128³ input
+        # and cannot accept variable-size patches without padding.
+        z0 = max(0, min(D - patch_size, z - half)); z1 = z0 + patch_size
+        y0 = max(0, min(H - patch_size, y - half)); y1 = y0 + patch_size
+        x0 = max(0, min(W - patch_size, x - half)); x1 = x0 + patch_size
+        sl = (slice(z0, z1), slice(y0, y1), slice(x0, x1))
+        # Merge with last patch if overlap > 50 %
+        if patches and _overlap_ratio(patches[-1], sl) > 0.5:
+            patches[-1] = _merge_slices(patches[-1], sl, (D, H, W), patch_size)
+        else:
+            patches.append(sl)
+
+    return patches
+
+
+def run_selective_inference(volume, model, centerline_voxels, device):
+    """
+    Segment with Gaussian-weighted patch blending to prevent double-thick seams.
+    """
+    mask_accum = np.zeros(volume.shape, dtype=np.float32)
+    weight_accum = np.zeros(volume.shape, dtype=np.float32)
+    gaussian_weight = _gaussian_kernel(128)   # precomputed 128³ Gaussian
+
+    patches = get_coronary_patches(volume, centerline_voxels)
+    for sl in patches:
+        patch = volume[sl]
+        with torch.no_grad():
+            # segment_patch: pseudocode for auto-prompted inference on a single
+            # 128³ patch. In the actual MedIM API, replace with:
+            #   model.segment(patch, points=[centerline_point_in_patch], labels=[1])
+            # where the centerline point is re-expressed in patch-local coordinates.
+            pred = model.segment_patch(patch)   # returns (128,128,128) float
+        mask_accum[sl] += pred * gaussian_weight[:pred.shape[0],
+                                                 :pred.shape[1],
+                                                 :pred.shape[2]]
+        weight_accum[sl] += gaussian_weight[:pred.shape[0],
+                                            :pred.shape[1],
+                                            :pred.shape[2]]
+
+    mask = (mask_accum / np.maximum(weight_accum, 1e-6)) > 0.5
+    return mask
+```
+
+> **Performance expectation:** 20–40 patches × 0.5–1.5 s each (FP16) = 10–60 s. Still above the 2 s interactive target. For interactive use, limit inference to the single patch centred on the user's click point and return a partial mask immediately; run full centerline-guided inference as a background refinement task via the Celery queue.
+
+> **Prerequisite:** A centerline must be available before inference. For interactive use, the user's two click points (ostium + distal) define a coarse 2-point centerline; for batch use, register against the coronary atlas template to seed the centerline automatically (see Workflow 2).
 
 ---
 
@@ -630,7 +742,7 @@ def motion_robust_segmentation(volume_4d, heart_rate, prompt_points, prompt_labe
 3. AI processes overnight (Celery + multi-GPU batch mode)
 4. Quality control: auto-flag cases with **disconnected mask components, mask volume outside 3σ of cohort distribution, or model confidence score below threshold** (ground truth is not available in batch mode — Dice cannot be computed)
 5. Expert reviews flagged cases → corrections exported as corrected per-structure binary NIfTI masks → feed active-learning loop
-6. Export refined segmentations for MACE prediction analysis
+6. Export refined segmentations for MACE (Major Adverse Cardiovascular Events: cardiac death, nonfatal MI, or unplanned revascularisation) prediction analysis
 
 ### Workflow 3: MEDIS TXT + Mesh + Straightened MPR (Reference Contours)
 
@@ -824,6 +936,8 @@ Port of legacy `viewer.py` (PyQtGraph) to WebGL:
 
 ## Backend: Inference Pipeline & API
 
+> **Clinical readers:** this section and the following MEDIS Parser and Patch Placement sections contain implementation-level Python/TypeScript code. They are intended for software engineers and AI researchers. Clinical readers may skip directly to [Deployment, Performance & Security](#deployment-performance-security).
+
 ### API Endpoints
 
 ```
@@ -874,11 +988,54 @@ def normalise_ccta(volume: np.ndarray, clip_min: float = -100, clip_max: float =
     return volume.astype(np.float32)
 ```
 
-> **Note:** The exact normalisation used in SAM-Med3D's SA-Med3D-140K training pipeline is not fully documented for CT modalities. The values above are a clinically reasonable starting point. Measure Dice vs. normalisation window on a held-out validation set and tune accordingly. For prostate mpMRI, normalise each sequence (T2W, ADC) independently using per-volume z-score normalisation.
+> **Note:** The exact normalisation used in SAM-Med3D's SA-Med3D-140K training pipeline is not fully documented for CT modalities. The values above are a clinically reasonable starting point. Before any fine-tuning, run the sweep below to select the optimal config. For prostate mpMRI, normalise each sequence (T2W, ADC) independently using per-volume z-score normalisation.
+
+**Normalisation sweep protocol (B1 — blocking before fine-tuning):** Run all six configs on 10 held-out DISCHARGE cases with available MEDIS ground truth; select the config with highest mean coronary lumen DSC.
+
+| Config | `clip_min` | `clip_max` | Rationale |
+|--------|-----------|-----------|-----------|
+| A | −100 | 700 | Cardiovascular window (default above) |
+| B | −200 | 1000 | Wider; preserves calcification peak |
+| C | −100 | 400 | Lumen-only; excludes dense calcium blooming |
+| D | −300 | 1500 | Matches common SA-Med3D-140K CT pre-processing guesses |
+| E | z-score (μ=0, σ=1) | per-volume | Modality-agnostic baseline |
+| F | nnU-Net v2 scheme | Foreground-voxel (HU > −500) percentile clip [0.5th–99.5th] + z-score over same foreground voxels | De facto standard for CT deep learning (2024–2025) [@Isensee2024nnUNetv2] |
+
+```python
+SWEEP_CONFIGS = [
+    {"clip_min": -100, "clip_max":  700},   # A: cardiovascular window
+    {"clip_min": -200, "clip_max": 1000},   # B: wider, preserves calcium peak
+    {"clip_min": -100, "clip_max":  400},   # C: lumen-only
+    {"clip_min": -300, "clip_max": 1500},   # D: broad SA-Med3D-140K guess
+    {"mode": "zscore"},                      # E: z-score over foreground voxels
+    {"mode": "nnunet_v2"},                   # F: nnU-Net v2 CT scheme
+]
+
+def normalise_ccta_sweep(volume: np.ndarray, cfg: dict) -> np.ndarray:
+    mode = cfg.get("mode")
+    if mode == "zscore":
+        # Compute stats over foreground voxels only (exclude air, HU < -500)
+        fg = volume[volume > -500]
+        return ((volume - fg.mean()) / (fg.std() + 1e-8)).astype(np.float32)
+    if mode == "nnunet_v2":
+        # nnU-Net v2 CT normalisation: percentile clip over foreground voxels,
+        # then z-score over those same foreground voxels.
+        fg = volume[volume > -500]
+        lo, hi = np.percentile(fg, 0.5), np.percentile(fg, 99.5)
+        v = np.clip(volume, lo, hi)
+        return ((v - fg.mean()) / (fg.std() + 1e-8)).astype(np.float32)
+    lo, hi = cfg["clip_min"], cfg["clip_max"]
+    v = np.clip(volume, lo, hi)
+    return ((v - lo) / (hi - lo)).astype(np.float32)
+```
+
+> Record the winning config in `config.py` as `NORM_CLIP_MIN` / `NORM_CLIP_MAX` before Phase 3 zero-shot evaluation. Do not change it after the validation split is locked.
 
 ### Segmentation Endpoint (Core)
 
 ```python
+import re
+import threading
 from typing import Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -889,12 +1046,17 @@ import medim
 
 router = APIRouter()
 
+# Allowlist pattern: alphanumeric, hyphens, underscores only — no path traversal
+_VOLUME_ID_RE = re.compile(r'^[A-Za-z0-9_\-]{1,128}$')
+
 class SegmentRequest(BaseModel):
     volume_id: str
     coordinates: list[list[float]]   # [[x,y,z], ...] in mm — one or more points
     labels: Optional[list[int]] = None  # 1=positive, 0=negative per point; defaults to all-1
 
-# Model loaded once at startup (inside FastAPI lifespan event in production)
+# Model loaded once at startup (inside FastAPI lifespan event in production).
+# _model_lock serialises access across FastAPI's sync thread pool workers —
+# PyTorch inference is not thread-safe with a shared model instance.
 model = medim.create_model(
     "SAM-Med3D", pretrained=True,
     checkpoint_path="app/models/checkpoints/sam_med3d_turbo.pth"
@@ -904,11 +1066,19 @@ model = model.to(device)
 if device == "cuda":
     model = model.half()
 model.eval()
+_model_lock = threading.Lock()
+# NOTE: the lock serialises all inference to one request at a time.
+# For production multi-user workloads (5–10 concurrent radiologists),
+# replace with a dedicated inference server (Triton Inference Server or
+# TorchServe) or multiple model replicas behind a load balancer.
 
 # Use def (not async def): FastAPI runs sync endpoints in a thread pool,
 # keeping the event loop free during blocking GPU inference.
 @router.post("/api/segment/point")
 def segment_point(req: SegmentRequest):
+    # Path traversal guard — reject any volume_id that is not a safe token
+    if not _VOLUME_ID_RE.match(req.volume_id):
+        raise HTTPException(status_code=400, detail="Invalid volume_id format.")
     if not req.coordinates:
         raise HTTPException(status_code=400, detail="At least one coordinate is required.")
     if any(len(pt) != 3 for pt in req.coordinates):
@@ -916,11 +1086,16 @@ def segment_point(req: SegmentRequest):
     if req.labels is not None and len(req.labels) != len(req.coordinates):
         raise HTTPException(status_code=400, detail="labels length must match coordinates length.")
 
-    # Load volume from cache/disk
+    # Load volume from cache/disk.
+    # VOLUMES_BASE_PATH ("/data/volumes") is a deployment-specific config value
+    # set in config.py — not hard-coded in production.
     vol_nii = nib.load(f"/data/volumes/{req.volume_id}.nii.gz")
     volume = vol_nii.get_fdata(dtype=np.float32)
 
-    # Normalise HU values to cardiovascular window before inference
+    # Normalise HU values to cardiovascular window before inference.
+    # NOTE: normalise_ccta() assumes CT (HU values). For MRI volumes (prostate),
+    # use per-volume z-score normalisation instead — this endpoint will need a
+    # modality parameter once prostate mpMRI support is added in Phase 5.
     volume = normalise_ccta(volume)
 
     # Convert mm → voxel coordinates for each point
@@ -929,9 +1104,11 @@ def segment_point(req: SegmentRequest):
 
     effective_labels = req.labels if req.labels is not None else [1] * len(voxel_points)
 
-    # Run SAM-Med3D inference — no_grad disables gradient tracking to halve VRAM use
-    with torch.no_grad():
-        mask = model.segment(volume, points=voxel_points, labels=effective_labels)
+    # Serialise inference: _model_lock prevents concurrent GPU calls from
+    # multiple thread-pool workers corrupting model state.
+    with _model_lock:
+        with torch.no_grad():
+            mask = model.segment(volume, points=voxel_points, labels=effective_labels)
 
     # Return mask as NIfTI
     mask_nii = nib.Nifti1Image(mask.astype(np.uint8), vol_nii.affine)
@@ -1026,7 +1203,7 @@ Contour rings are connected into a tube mesh directly in the browser — no back
 **Straightened MPR** (Curved Planar Reformation) "unfolds" a tortuous vessel into a straight view. Essential for assessing stenosis and plaque distribution along the entire vessel length.
 
 **Three steps:**
-1. **Centerline extraction** — centroid of lumen contours (from MEDIS) or Voronoi skeletonisation (from AI mask)
+1. **Centerline extraction** — centroid of lumen contours (from MEDIS) or Voronoi skeletonisation / VMTK vessel-tree extraction (from AI mask; VMTK handles bifurcations and provides radius estimates at each centreline point)
 2. **Bishop (parallel transport) frame** — compute Tangent (T) then propagate Normal (N) and Binormal (B) without relying on curvature (see [Mathematical Foundation](#cpr-mathematical-foundation) for why Frenet-Serret N must not be used)
 3. **Cross-section sampling** — extract perpendicular slices → stack into straightened volume
 
@@ -1047,7 +1224,13 @@ N[0] = arbitrary_perpendicular(T[0])
 
 // Propagate: project previous N onto the plane perpendicular to new T
 for i in 1..n-1:
-    N[i] = normalize(N[i-1] - dot(N[i-1], T[i]) * T[i])
+    projected = N[i-1] - dot(N[i-1], T[i]) * T[i]
+    // Guard: if T[i] ≈ N[i-1] (degenerate), projected → 0 → divide-by-zero.
+    // Fall back to re-seeding from an arbitrary perpendicular.
+    if |projected| < epsilon:
+        N[i] = arbitrary_perpendicular(T[i])
+    else:
+        N[i] = normalize(projected)
 ```
 
 **Binormal**: `B[i] = T[i] × N[i]`
@@ -1122,7 +1305,7 @@ Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
 | Containerisation | Docker + NVIDIA Container Toolkit |
 | GPU | 4× NVIDIA A100 (80 GB each) |
 | Embedding cache | Redis (sub-second for repeated prompts) |
-| Batch queue | Celery + Redis broker |
+| Batch queue | Celery + Redis broker (each worker pinned to one GPU via `CUDA_VISIBLE_DEVICES`; 4 workers = 4 GPUs = 4 concurrent cases) |
 | Authentication | LDAP / Charité SSO |
 | Compliance | GDPR (all data on-premise, no cloud) |
 
@@ -1143,7 +1326,7 @@ Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
 |-----------|------|
 | CTA volume (512³, int16) | ~268 MB |
 | SAM-Med3D-turbo (FP16) | ~4 GB VRAM |
-| Embedding cache (per volume) | ~50–500 MB (estimate — depends on patch count and feature map size; to be measured) |
+| Embedding cache (per volume) | ~50–500 MB (estimate — depends on patch count and feature map size; to be measured). Assumes image-encoder output is cached in Redis between prompts, so only the prompt encoder + mask decoder run on subsequent clicks. Verify this is supported by the MedIM API before relying on sub-second repeat-prompt performance. |
 | Straightened volume (64² × 200) | ~8 MB |
 | Mesh (MZ3, per vessel) | < 5 MB |
 
@@ -1158,32 +1341,52 @@ Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
 - [ ] Quad-view layout with interactive sliders
 - [ ] NIfTI.gz / DICOM loading
 
+**Phase 1 → Phase 2 gate** (must all pass before starting Phase 2):
+- MEDIS TXT parser handles all DISCHARGE vessel files without crash
+- Bishop-frame CPR renders in Niivue without rotation artefacts at straight segments
+- Quad-view interactive sliders run at ≥ 30 FPS on reference workstation
+- Zero failing TypeScript strict-mode errors in frontend build
+
 ### Phase 2: SAM-Med3D Integration (Weeks 5–8)
 
 - [ ] Backend: load turbo checkpoint, expose `/api/segment/point`
 - [ ] Frontend: click → prompt → mask overlay
 - [ ] Redis embedding cache for sub-second repeated prompts
-- [ ] **Implement `dense_prompt` support** — either (a) custom prompt encoder modification to accept a prior mask, or (b) lumen mask surface → additional positive point prompts; required blocker for dual-wall pipeline
+- [ ] **Implement surface-sampling dense prompt** — erode lumen mask, sample ~30 boundary voxels uniformly, pass as additional positive points; see [Challenge 6](#selective-patch-placement) for implementation detail
 - [ ] Dual-wall sequential segmentation pipeline (depends on above)
+- [ ] Selective centerline-guided patch inference for coronary volumes (see [Challenge 6](#selective-patch-placement))
+
+**Phase 2 → Phase 3 gate** (must all pass before starting Phase 3):
+- `/api/segment/point` returns a mask in ≤ 5 s (single patch, interactive path) on dev GPU
+- Surface-sampling dual-wall pipeline produces non-empty EEM mask on ≥ 5/5 test cases
+- Selective patch inference runs on a 512³ CCTA volume in ≤ 90 s end-to-end (dev GPU)
 
 ### Phase 3: DISCHARGE Evaluation (Weeks 9–12)
 
-- [ ] **Zero-shot baseline — myocardium first:** `LV_MYO` is the closest match to ACDC pre-training targets; establish Dice baseline here before coronary lumen (see [Verified Performance](#verified-performance))
+- [ ] **Zero-shot baseline — myocardium first:** `LV_MYO` is the closest match to ACDC pre-training targets; establish DSC baseline here before coronary lumen (see [Verified Performance](#verified-performance)). Compare against TotalSegmentator [@Wasserthal2023TotalSegmentator] as an additional zero-shot reference for LV myocardium.
+- [ ] Fix held-out validation split: 100 DISCHARGE cases, stratified by scanner site, locked before any fine-tuning begins
 - [ ] Zero-shot baseline on coronary lumen (held-out DISCHARGE cases)
-- [ ] Quantify Dice, Hausdorff, diameter stenosis % correlation vs. MEDIS QAngio CT expert measurements
+- [ ] Quantify DSC, HD95, diameter stenosis % correlation vs. MEDIS QAngio CT expert measurements — report against thresholds in [Evaluation Metrics](#evaluation-metrics)
 - [ ] Identify failure modes (motion, calcification, bifurcations, patch-boundary seams)
+
+**Phase 3 → Phase 4 gate** (must all pass):
+- LV myocardium zero-shot DSC ≥ 0.82 on held-out split
+- Coronary lumen zero-shot DSC ≥ 0.70 on held-out split
+- Normalisation sweep (B1) complete; optimal config selected and documented
 
 ### Phase 4: Fine-tuning & Active Learning (Weeks 13–20)
 
 - [ ] Fine-tune SAM-Med3D on DISCHARGE annotations (nnU-Net-style data prep)
-- [ ] Active-learning loop [@Budd2021ActiveLearning]: expert corrections → weekly re-training. **Correction data model:** a "correction" is a full per-structure binary NIfTI mask saved by the radiologist after local brush edits in the browser. The backend must convert the in-browser voxel edits (sparse difference from AI mask) into a complete corrected NIfTI matching [Data Format for Fine-tuning](#fine-tuning-data-format) before ingestion into the fine-tuning pipeline.
-- [ ] Benchmark against task-specific nnU-Net baseline
+- [ ] Active-learning loop [@Budd2021ActiveLearning]: expert corrections → re-training triggered when correction buffer reaches N = 50 new cases (event-driven), or weekly — whichever comes first. Weekly cadence is a reasonable starting point; the 2024–2025 trend favours event-triggered fine-tuning to avoid unnecessary retraining at low correction volumes. **Correction data model:** a "correction" is a full per-structure binary NIfTI mask saved by the radiologist after local brush edits in the browser. The backend must convert the in-browser voxel edits (sparse difference from AI mask) into a complete corrected NIfTI matching [Data Format for Fine-tuning](#fine-tuning-data-format) before ingestion into the fine-tuning pipeline.
+- [ ] **Catastrophic forgetting mitigation:** weekly fine-tuning on new corrections will degrade performance on earlier cases if the full training set is not replayed. Implement a replay buffer (random sample of 10–20 % of previous fine-tuning cases included in every weekly batch) or elastic weight consolidation before the loop is deployed.
+- [ ] Benchmark against task-specific nnU-Net v2 baseline
 
 ### Phase 5: Prostate Extension (Weeks 21–28)
 
-- [ ] Adapt pipeline for prostate mpMRI (multi-sequence input)
+- [ ] Adapt pipeline for prostate mpMRI (multi-sequence input); add modality parameter to `/api/segment/point` for MRI z-score normalisation
 - [ ] Zone-specific class labels (PZ / TZ / lesion)
-- [ ] Validate on Charité prostate cohort
+- [ ] Establish nnU-Net v2 task-specific baseline on Charité prostate cohort (analogous to the coronary nnU-Net v2 baseline) before evaluating SAM-Med3D-turbo
+- [ ] Validate on Charité prostate cohort; report DSC/HD95 against thresholds in [Evaluation Metrics](#evaluation-metrics)
 
 ### Phase 6: Clinical Validation & Publication (Weeks 29–36)
 
@@ -1204,13 +1407,19 @@ Browser (Hospital Network) → Charité Firewall → Internal GPU Cluster
 
 ## Related Medical Segmentation Models
 
-| Model | Dimension | Modalities | Prompts | Key Difference from SAM-Med3D |
-|-------|-----------|-----------|---------|------------------------------|
-| SAM (Meta) | 2D | Natural images | Point/box/text | No medical training, 2D only |
-| SAM-Med2D | 2D | Medical (slice-wise) | Point/box | 2D → cannot capture volumetric context |
-| MedSAM | 2D | Medical (slice-wise) | Box only | Simpler architecture, box prompts only |
-| SAM-Med3D | **3D** | **Medical (volumetric)** | **3D point** | **Native 3D — our choice** |
-| nnU-Net | 3D | Medical (task-specific) | None (automatic) | Not promptable; requires per-task training |
+| Model | Year | Dimension | Modalities | Prompts | Notes |
+|-------|------|-----------|-----------|---------|-------|
+| SAM (Meta) | 2023 | 2D | Natural images | Point/box/text | No medical training, 2D only |
+| SAM-Med2D | 2023 | 2D | Medical (slice-wise) | Point/box | 2D; cannot capture volumetric context |
+| MedSAM | 2023 | 2D | Medical (slice-wise) | Box only | Simpler architecture, box prompts only |
+| **SAM-Med3D-turbo** | **2024** | **3D** | **Medical (volumetric)** | **3D point** | **Our choice** — native 3D, ECCV Oral, 91 M params |
+| SAM 2 (Meta) | 2024 | 2D+T / pseudo-3D | Natural images + video | Point/box/mask | Video memory tokens [@Ravi2024SAM2]; adapted for slice-by-slice 3D propagation in MedSAM-2 — strong alternative, lacks native isotropic 3D encoder |
+| MedSAM-2 | 2024–25 | Pseudo-3D (slice stack) | Medical (volumetric) | Point/box | SAM 2 adapted for medical volumes [@MedSAM2_2024]; competitive on organ segmentation; to be tracked for coronary evaluation |
+| SegVol | 2024 | 3D | CT (volumetric) | Text + point + box | Semantic text prompts [@Du2024SegVol]; trained on 90 K CT volumes; strong on CT organs; no published coronary results |
+| TotalSegmentator | 2023 | 3D | CT (automatic) | None | 104-structure automatic CT segmentation [@Wasserthal2023TotalSegmentator]; relevant zero-shot baseline for LV myocardium; nnU-Net v1 based |
+| nnU-Net v2 | 2024 | 3D | Medical (task-specific) | None (automatic) | Gold-standard baseline [@Isensee2024nnUNetv2]; not promptable; best for single-task fine-tuned performance |
+
+**Why SAM-Med3D-turbo over SAM 2 / MedSAM-2:** SAM 2 processes volumes as a sequence of 2D slices with memory propagation, not a native isotropic 3D encoder. For thin, tortuous coronary arteries where the vessel may subtend only 1–2 voxels per axial slice, 2D-first processing loses cross-plane spatial context that a 3D ViT encoder retains. MedSAM-2 should be tracked and included in Phase 3 benchmarking. SegVol's text prompts are not suitable for fine-grained coronary anatomy. nnU-Net v2 remains the task-specific performance ceiling and will be used as the benchmark baseline throughout.
 
 ---
 
