@@ -1,0 +1,1496 @@
+% References for CT-FFR DISCHARGE Methods Paper
+% Use with: pandoc ctffr_discharge_methods.md -o paper.pdf --citeproc
+%
+% === VERSION 11: Mass-Enhanced Draft (6 December 2025) ===
+% Key additions for mass-anchored flow estimation:
+%   - choy2008: Myocardial mass to flow scaling law (Q ∝ M^0.75)
+%   - liu2022physiologically: Physiologically personalized coronary blood flow model for noninvasive FFR
+%   - debruyne2014: FAME 2 trial (microvascular resistance context)
+%
+% Segmentation tool: Medis QAngio CT (Leiden, Netherlands)
+
+% === Core FFR Literature ===
+
+@article{pijls1996,
+  author  = {Pijls, Nico H J and De Bruyne, Bernard and Peels, Kathinka and others},
+  title   = {Measurement of fractional flow reserve to assess the functional severity of coronary-artery stenoses},
+  journal = {New England Journal of Medicine},
+  year    = {1996},
+  volume  = {334},
+  number  = {26},
+  pages   = {1703--1708},
+  doi     = {10.1056/NEJM199606273342604}
+}
+
+@article{tonino2009,
+  author  = {Tonino, Pim A L and De Bruyne, Bernard and Pijls, Nico H J and others},
+  title   = {Fractional flow reserve versus angiography for guiding percutaneous coronary intervention},
+  journal = {New England Journal of Medicine},
+  year    = {2009},
+  volume  = {360},
+  number  = {3},
+  pages   = {213--224},
+  doi     = {10.1056/NEJMoa0807611}
+}
+
+@article{bech1998defer,
+  author  = {Bech, G. Jan Willem and De Bruyne, Bernard and Bonnier, Hans J. R. M. and Bartunek, Jozef and Wijns, William and Peels, Kathinka and Heyndrickx, Guy R. and Koolen, Jacques J. and Pijls, Nico H. J.},
+  title   = {Long-term follow-up after deferral of percutaneous transluminal coronary angioplasty of intermediate stenosis on the basis of coronary pressure measurement},
+  journal = {Journal of the American College of Cardiology},
+  year    = {1998},
+  volume  = {31},
+  number  = {4},
+  pages   = {841--847},
+  doi     = {10.1016/S0735-1097(98)00050-3}
+}
+
+% === DISCHARGE Trial ===
+
+@article{discharge2022,
+  author  = {{DISCHARGE Trial Group}},
+  title   = {{CT} or invasive coronary angiography in stable chest pain},
+  journal = {New England Journal of Medicine},
+  year    = {2022},
+  volume  = {386},
+  number  = {17},
+  pages   = {1591--1602},
+  doi     = {10.1056/NEJMoa2200963}
+}
+
+@article{dewey2017,
+  author  = {Napp, Adriane E and Haase, Robert and Laule, Michael and others},
+  title   = {Computed tomography versus invasive coronary angiography: design and methods of the pragmatic randomised multicentre {DISCHARGE} trial},
+  journal = {European Radiology},
+  year    = {2017},
+  volume  = {27},
+  number  = {7},
+  pages   = {2957--2968},
+  doi     = {10.1007/s00330-016-4620-z}
+}
+
+
+@article{discharge2024cac,
+  author  = {{DISCHARGE Trial Group}},
+  title   = {Coronary Artery Calcium Score Predicts Major Adverse Cardiovascular Events in Stable Chest Pain},
+  journal = {Radiology},
+  year    = {2024},
+  volume  = {310},
+  number  = {3},
+  pages   = {e231557},
+  doi     = {10.1148/radiol.231557}
+}
+
+@inproceedings{discharge2024hrp,
+  author    = {{DISCHARGE Trial Group}},
+  title     = {Association of High-Risk {CT} Coronary Artery Plaque Features with Major Adverse Cardiovascular Events},
+  booktitle = {European Congress of Radiology (ECR)},
+  year      = {2024},
+  pages     = {C-23340}
+  % no DOI available as of now
+}
+
+
+% === CT-FFR Clinical Trials & Validation ===
+
+@article{koo2011,
+  author  = {Koo, Bon-Kwon and Erglis, Andrejs and Doh, Joon-Hyung and others},
+  title   = {Diagnosis of ischemia-causing coronary stenoses by noninvasive fractional flow reserve computed from coronary computed tomographic angiograms: results from the prospective multicenter {DISCOVER-FLOW} study},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2011},
+  volume  = {58},
+  number  = {19},
+  pages   = {1989--1997},
+  doi     = {10.1016/j.jacc.2011.06.066}
+}
+
+@article{norgaard2014,
+  author  = {Nørgaard, Bjarne L and Leipsic, Jonathon and Gaur, Sara and others},
+  title   = {Diagnostic performance of noninvasive fractional flow reserve derived from coronary computed tomography angiography in suspected coronary artery disease: the {NXT} trial},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2014},
+  volume  = {63},
+  number  = {12},
+  pages   = {1145--1155},
+  doi     = {10.1016/j.jacc.2013.11.043}
+}
+
+@article{douglas2023,
+  author  = {Douglas, Pamela S and Nanna, Michael G and Kelsey, Michelle D and others},
+  title   = {Comparison of an initial risk-based testing strategy vs usual testing in stable symptomatic suspected coronary artery disease: the {PRECISE} randomized clinical trial},
+  journal = {JAMA Cardiology},
+  year    = {2023},
+  volume  = {8},
+  number  = {10},
+  pages   = {904--914},
+  doi     = {10.1001/jamacardio.2023.2595}
+}
+
+@article{patel2020,
+  author  = {Patel, Manesh R and Nørgaard, Bjarne L and Fairbairn, Timothy A and others},
+  title   = {1-Year impact on medical practice and clinical outcomes of {FFR}$_{CT}$: The {ADVANCE} registry},
+  journal = {JACC: Cardiovascular Imaging},
+  year    = {2020},
+  volume  = {13},
+  number  = {1},
+  pages   = {97--105},
+  doi     = {10.1016/j.jcmg.2019.03.003}
+}
+
+@article{gulati2021chestpain,
+  author  = {Gulati, Martha and Levy, Phillip D and Mukherjee, Debabrata and others},
+  title   = {2021 {AHA}/{ACC}/{ASE}/{CHEST}/{SAEM}/{SCCT}/{SCMR} Guideline for the Evaluation and Diagnosis of Chest Pain: A Report of the American College of Cardiology/American Heart Association Joint Committee on Clinical Practice Guidelines},
+  journal = {Circulation},
+  year    = {2021},
+  volume  = {144},
+  number  = {22},
+  pages   = {e368--e454},
+  doi     = {10.1161/CIR.0000000000001029}
+}
+
+@article{vrints2024ccs,
+  author  = {Vrints, Christiaan and Andreotti, Felicita and Koskinas, Konstantinos C and others},
+  title   = {2024 {ESC} Guidelines for the management of chronic coronary syndromes},
+  journal = {European Heart Journal},
+  year    = {2024},
+  volume  = {45},
+  number  = {36},
+  pages   = {3415--3537},
+  doi     = {10.1093/eurheartj/ehae177}
+}
+
+@article{tesche2018,
+  author  = {Tesche, Christian and De Cecco, Carlo N and Baumann, Stefan and others},
+  title   = {Coronary {CT} angiography-derived fractional flow reserve: machine learning algorithm versus computational fluid dynamics modeling},
+  journal = {Radiology},
+  year    = {2018},
+  volume  = {288},
+  number  = {1},
+  pages   = {64--72},
+  doi     = {10.1148/radiol.2018171291}
+}
+
+% === CT-FFR Methods ===
+
+@article{lyras2021,
+  author  = {Lyras, Konstantinos G and Lee, Jack and Capelli, Claudio and others},
+  title   = {An improved reduced-order model for pressure drop across arterial stenoses},
+  journal = {PLOS ONE},
+  year    = {2021},
+  volume  = {16},
+  number  = {10},
+  pages   = {e0258047},
+  doi     = {10.1371/journal.pone.0258047}
+}
+
+@article{taylor2013,
+  author  = {Taylor, Charles A and Fonte, Timothy A and Min, James K},
+  title   = {Computational fluid dynamics applied to cardiac computed tomography for noninvasive quantification of fractional flow reserve},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2013},
+  volume  = {61},
+  number  = {22},
+  pages   = {2233--2241},
+  doi     = {10.1016/j.jacc.2012.01.083}
+}
+
+@article{tu2016,
+  author  = {Tu, Shengxian and Westra, Sanne and Yang, Jiayue and others},
+  title   = {Diagnostic accuracy of fast computational approaches to derive fractional flow reserve from diagnostic coronary angiography ({FAVOR} pilot study)},
+  journal = {JACC: Cardiovascular Interventions},
+  year    = {2016},
+  volume  = {9},
+  number  = {19},
+  pages   = {2024--2035},
+  doi     = {10.1016/j.jcin.2016.07.013}
+}
+
+@article{itu2016,
+  author  = {Itu, Lucian and Rapaka, Saikiran and Passerini, Tiziano and others},
+  title   = {A machine-learning approach for computation of fractional flow reserve from coronary computed tomography},
+  journal = {Journal of Applied Physiology},
+  year    = {2016},
+  volume  = {121},
+  number  = {1},
+  pages   = {42--52},
+  doi     = {10.1152/japplphysiol.00752.2015}
+}
+
+% === Glagov Remodeling ===
+
+@article{glagov1987,
+  author  = {Glagov, Seymour and Weisenberg, Elliot and Zarins, Christopher K and others},
+  title   = {Compensatory enlargement of human atherosclerotic coronary arteries},
+  journal = {New England Journal of Medicine},
+  year    = {1987},
+  volume  = {316},
+  number  = {22},
+  pages   = {1371--1375},
+  doi     = {10.1056/NEJM198705283162204}
+}
+
+@article{schoenhagen2000,
+  author  = {Schoenhagen, Paul and Ziada, Khaled M and Kapadia, Samir R and others},
+  title   = {Extent and direction of arterial remodeling in stable versus unstable coronary syndromes: an intravascular ultrasound study},
+  journal = {Circulation},
+  year    = {2000},
+  volume  = {101},
+  number  = {6},
+  pages   = {598--603},
+  doi     = {10.1161/01.CIR.101.6.598}
+}
+
+@article{mintz2001,
+  author  = {Mintz, Gary S and Nissen, Steven E and Anderson, William D and others},
+  title   = {American {College} of {Cardiology} clinical expert consensus document on standards for acquisition, measurement and reporting of intravascular ultrasound studies ({IVUS})},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2001},
+  volume  = {37},
+  number  = {5},
+  pages   = {1478--1492},
+  doi     = {10.1016/S0735-1097(01)01175-5}
+}
+
+@article{nissen1991,
+  author  = {Nissen, Steven E and Gurley, John C and Grines, Cindy L and others},
+  title   = {Intravascular ultrasound assessment of lumen size and wall morphology in normal subjects and patients with coronary artery disease},
+  journal = {Circulation},
+  year    = {1991},
+  volume  = {84},
+  number  = {3},
+  pages   = {1087--1099},
+  doi     = {10.1161/01.CIR.84.3.1087}
+}
+
+@article{schartl2001,
+  author  = {Schartl, Maximilian and Bocksch, Wolfgang and Koschyk, Dietrich H and others},
+  title   = {Use of intravascular ultrasound to compare effects of different strategies of lipid-lowering therapy on plaque volume and composition in patients with coronary artery disease},
+  journal = {Circulation},
+  year    = {2001},
+  volume  = {104},
+  number  = {4},
+  pages   = {387--392},
+  doi     = {10.1161/hc2901.093188}
+}
+
+@article{nakamura2001,
+  author  = {Nakamura, Masato and Nishikawa, Hirofumi and Mukai, Shintaro and others},
+  title   = {Impact of coronary artery remodeling on clinical presentation of coronary artery disease: an intravascular ultrasound study},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2001},
+  volume  = {37},
+  number  = {1},
+  pages   = {63--69},
+  doi     = {10.1016/S0735-1097(00)01097-4}
+}
+
+@article{virmani2006,
+  author  = {Virmani, Renu and Burke, Allen P and Farb, Andrew and Kolodgie, Frank D},
+  title   = {Pathology of the vulnerable plaque},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2006},
+  volume  = {47},
+  number  = {8 Suppl},
+  pages   = {C13--C18},
+  doi     = {10.1016/j.jacc.2005.10.065}
+}
+
+@article{stone2011,
+  author  = {Stone, Gregg W and Maehara, Akiko and Lansky, Alexandra J and others},
+  title   = {A prospective natural-history study of coronary atherosclerosis},
+  journal = {New England Journal of Medicine},
+  year    = {2011},
+  volume  = {364},
+  number  = {3},
+  pages   = {226--235},
+  doi     = {10.1056/NEJMoa1002358}
+}
+
+@article{yamamoto2018,
+  author  = {Yamamoto, Hideya and Kihara, Yasuki and Kitagawa, Toshiro and Ohashi, Norihiko and Kunita, Eiji and Iwanaga, Yoshitaka and Kobuke, Kazuhiro and Miyazaki, Shunichi and Kawasaki, Tomohiro and Fujimoto, Shinichiro and others},
+  title   = {Coronary plaque characteristics in computed tomography and {2-year} outcomes: the {PREDICT} study},
+  journal = {Journal of Cardiovascular Computed Tomography},
+  year    = {2018},
+  volume  = {12},
+  number  = {5},
+  pages   = {436--443},
+  doi     = {10.1016/j.jcct.2018.06.004}
+}
+
+@article{kim2018,
+  author  = {Kim, Hyung-Bok and Seo, Jung-Bae and Chung, Wook-Jin and others},
+  title   = {Coronary plaque characteristics using cardiac {CT} and their association with fractional flow reserve},
+  journal = {European Radiology},
+  year    = {2018},
+  volume  = {28},
+  number  = {12},
+  pages   = {5115--5124},
+  doi     = {10.1007/s00330-018-5521-3}
+}
+
+@article{chen2024,
+  author  = {Chen, Michael and Almeida, Shone O and Sayre, James W and Karlsberg, Ronald P and Packard, Ren{\'e} R Sevag},
+  title   = {Distal-vessel fractional flow reserve by computed tomography to monitor epicardial coronary artery disease},
+  journal = {European Heart Journal -- Cardiovascular Imaging},
+  year    = {2024},
+  volume  = {25},
+  number  = {2},
+  pages   = {163--172},
+  doi     = {10.1093/ehjci/jead229}
+}
+
+@article{chan2025,
+  author  = {Chan, Cappi and Wang, Min and Kong, Luoyi and Li, Leanne and Chan, Lawrence Wing Chi},
+  title   = {Clinical Applications of Fractional Flow Reserve Derived from Computed Tomography in Coronary Artery Disease},
+  journal = {Mayo Clinic Proceedings: Digital Health},
+  year    = {2025},
+  volume  = {3},
+  number  = {1},
+  pages   = {100187},
+  publisher = {Elsevier},
+  doi     = {10.1016/j.mcpdig.2024.100187}
+}
+
+% === Coronary Flow Measurements ===
+
+@book{gould1999,
+  author    = {Gould, K. Lance},
+  title     = {Coronary Artery Stenosis and Reversing Atherosclerosis},
+  publisher = {Arnold (Distributed by Oxford University Press, USA)},
+  year      = {1999},
+  edition   = {2nd},
+  address   = {London}
+}
+
+@article{johnson2013,
+  author    = {Johnson, Nils P and Kirkeeide, Richard L and Gould, K Lance},
+  title     = {Coronary anatomy to predict physiology: fundamental limits},
+  journal   = {Circulation: Cardiovascular Imaging},
+  year      = {2013},
+  volume    = {6},
+  number    = {5},
+  pages     = {817--832},
+  doi       = {10.1161/CIRCIMAGING.113.000373},
+  publisher = {Lippincott Williams \& Wilkins}
+}
+
+% === Myocardial Mass and Allometric Scaling (NEW for v11/v12) ===
+
+% LV mass normative values (NEW for v12)
+@article{kawelboehm2015,
+  author  = {Kawel-Boehm, Nadine and Maceira, Alicia and Valsangiacomo-Buechel, Emanuela R and others},
+  title   = {Normal values for cardiovascular magnetic resonance in adults and children},
+  journal = {Journal of Cardiovascular Magnetic Resonance},
+  year    = {2015},
+  volume  = {17},
+  number  = {1},
+  pages   = {29},
+  doi     = {10.1186/s12968-015-0111-7}
+}
+
+@article{petersen2016,
+  title    = {Reference ranges for cardiac structure and function using cardiovascular magnetic resonance (CMR) in Caucasians from the UK Biobank population cohort},
+  author   = {Petersen, Steffen E and Aung, Nay and Sanghvi, Mihir M and Zemrak, Filip and Fung, Kenneth and Paiva, Jose Miguel and Francis, Jane M and Khanji, Mohammed Y and Lukaschuk, Elena and Lee, Aaron M and others},
+  journal  = {Journal of cardiovascular magnetic resonance},
+  volume   = {19},
+  number   = {1},
+  pages    = {18},
+  year     = {2017},
+  publisher= {Elsevier},
+  doi     = {10.1186/s12968-017-0327-9}
+}
+
+@article{hiteshi2014,
+  author  = {Hiteshi, Arpit K and Li, Dong and Gao, Yuexin and others},
+  title   = {Gender differences in coronary artery diameter are not related to body habitus or left ventricular mass},
+  journal = {Clinical Cardiology},
+  year    = {2014},
+  volume  = {37},
+  number  = {10},
+  pages   = {605--609},
+  doi     = {10.1002/clc.22310}
+}
+
+@article{schlosser2007,
+  author  = {Schlosser, T and Mohrs, O K and Magedanz, A and Voigtl{\"a}nder, T and Schmermund, A and Barkhausen, J},
+  title   = {Assessment of left ventricular function and mass in patients undergoing computed tomography ({CT}) coronary angiography using 64-detector-row {CT}: comparison to magnetic resonance imaging},
+  journal = {Acta Radiologica},
+  year    = {2007},
+  volume  = {48},
+  number  = {1},
+  pages   = {30--35},
+  doi     = {10.1080/02841850601067611}
+}
+
+% Myocardial density references (NEW for v12)
+@article{paelinck2005,
+  author  = {Paelinck, Bernard P and de Roos, Albert and Bax, Jeroen J and others},
+  title   = {Feasibility of tissue magnetic resonance imaging: a pilot study in comparison with tissue {Doppler} imaging and invasive measurement},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2005},
+  volume  = {45},
+  number  = {7},
+  pages   = {1109--1116},
+  doi     = {10.1016/j.jacc.2004.12.051},
+  note    = {Myocardial density 1.05 g/cm³}
+}
+
+@article{pattynama1993,
+  author  = {Pattynama, Peter M T and Lamb, Hildo J and Van der Velde, Enno A and others},
+  title   = {Left ventricular measurements with cine and spin-echo {MR} imaging: a study of reproducibility with variance component analysis},
+  journal = {Radiology},
+  year    = {1993},
+  volume  = {187},
+  number  = {1},
+  pages   = {261--268},
+  doi     = {10.1148/radiology.187.1.8451425},
+  note    = {Myocardial density 1.05 g/mL standard for LV mass calculation}
+}
+
+@article{choy2008,
+  author  = {Choy, Jenny S and Kassab, Ghassan S},
+  title   = {Scaling of myocardial mass to flow and morphometry of coronary arteries},
+  journal = {Journal of Applied Physiology},
+  year    = {2008},
+  volume  = {104},
+  number  = {5},
+  pages   = {1281--1290},
+  doi     = {10.1152/japplphysiol.01261.2007},
+  note    = {DISAMBIGUATION: mass-to-flow allometric scaling paper (Q~M^0.75); cite for flow-demand allometry. Distinct from choykassab2008 which is about wall thickness}
+}
+
+@article{liu2022,
+  author  = {Liu, Xiujian and Xu, Chuangye and Rao, Simin and Zhang, Ye and Ghista, Dhanjoo and Gao, Zhifan and Yang, Guang},
+  title   = {Physiologically personalized coronary blood flow model to improve the estimation of noninvasive fractional flow reserve},
+  journal = {Medical Physics},
+  year    = {2022},
+  volume  = {49},
+  number  = {1},
+  pages   = {583--597},
+  doi     = {10.1002/mp.15363}
+}
+
+@article{keulards2020,
+  author  = {Keulards, Dani{\"e}lle C J and Westra, Joppe and El Farissi, Zineb and van Zandvoort, Lennert J C and Tomkiewicz-Paj{\k a}k, Lucyna and den Dekker, Wouter K and van de Hoef, Tim P and Koning, Gijsbert and Tu, Shengxian and N{\o}rgaard, Bjarne L and others},
+  title   = {Computed tomographic myocardial mass compared with invasive myocardial perfusion measurement},
+  journal = {Heart},
+  year    = {2020},
+  volume  = {106},
+  number  = {19},
+  pages   = {1489--1494},
+  doi     = {10.1136/heartjnl-2020-316689}
+}
+
+@article{debruyne2014,
+  author  = {De Bruyne, Bernard and Pijls, Nico H J and Kalesan, Bindu and others},
+  title   = {Fractional flow reserve-guided {PCI} for stable coronary artery disease},
+  journal = {New England Journal of Medicine},
+  year    = {2014},
+  volume  = {371},
+  number  = {13},
+  pages   = {1208--1217},
+  doi     = {10.1056/NEJMoa1408758},
+  note    = {FAME 2 trial}
+}
+
+@article{fearon2003,
+  author  = {Fearon, William F and Balsam, Leora B and Farouque, H M Omar and others},
+  title   = {Novel index for invasively assessing the coronary microcirculation},
+  journal = {Circulation},
+  year    = {2003},
+  volume  = {107},
+  number  = {25},
+  pages   = {3129--3132},
+  doi     = {10.1161/01.CIR.0000080700.98607.D1},
+  note    = {Index of microcirculatory resistance (IMR)}
+}
+
+% === Segmentation Software ===
+
+@article{deknegt2018,
+  author  = {de Knegt, Martina C and Haugen, Morten and Linde, Jesper J and Kühl, Jørgen Tobias and Nordestgaard, Børge G and Køber, Lars V and Hove, Jens D and Kofoed, Klaus F},
+  title   = {Reproducibility of quantitative coronary computed tomography angiography in asymptomatic individuals and patients with acute chest pain},
+  journal = {PLoS One},
+  year    = {2018},
+  volume  = {13},
+  number  = {12},
+  pages   = {e0207980},
+  doi     = {10.1371/journal.pone.0207980},
+  note    = {Demonstrates semi-automated lumen and outer vessel wall contour detection using QAngio CT Research Edition}
+}
+
+@misc{medis2024,
+  author  = {{Medis Medical Imaging Systems}},
+  title   = {{QAngio CT}: Coronary Artery Analysis Software},
+  year    = {2024},
+  howpublished = {\url{https://www.medisimaging.com}},
+  address = {Leiden, Netherlands},
+  note    = {Used for lumen, outer-wall, and myocardial segmentation}
+}
+
+% === Hemodynamics ===
+
+@article{young1973,
+  author  = {Young, Donald F and Tsai, Frank Y},
+  title   = {Flow characteristics in models of arterial stenoses—{I}. {Steady} flow},
+  journal = {Journal of Biomechanics},
+  year    = {1973},
+  volume  = {6},
+  number  = {4},
+  pages   = {395--410},
+  doi     = {10.1016/0021-9290(73)90099-7}
+}
+
+@article{morris2015,
+  author  = {Morris, Paul D and van de Vosse, Frans N and Lawford, Patricia V and others},
+  title   = {``{Virtual}'' (computed) fractional flow reserve: current challenges and limitations},
+  journal = {JACC: Cardiovascular Interventions},
+  year    = {2015},
+  volume  = {8},
+  number  = {8},
+  pages   = {1009--1017},
+  doi     = {10.1016/j.jcin.2015.04.006}
+}
+
+@article{murray1926,
+  author  = {Murray, Cecil D},
+  title   = {The physiological principle of minimum work: {I}. {The} vascular system and the cost of blood volume},
+  journal = {Proceedings of the National Academy of Sciences},
+  year    = {1926},
+  volume  = {12},
+  number  = {3},
+  pages   = {207--214},
+  doi     = {10.1073/pnas.12.3.207}
+}
+
+@article{west1997,
+  author  = {West, Geoffrey B and Brown, James H and Enquist, Brian J},
+  title   = {A general model for the origin of allometric scaling laws in biology},
+  journal = {Science},
+  year    = {1997},
+  volume  = {276},
+  number  = {5309},
+  pages   = {122--126},
+  doi     = {10.1126/science.276.5309.122}
+}
+
+% === SimVascular ===
+
+@article{simvascular,
+  author  = {Updegrove, Adam and Wilson, Nathan M and Merkow, Jameson and others},
+  title   = {{SimVascular}: An open source pipeline for cardiovascular simulation},
+  journal = {Annals of Biomedical Engineering},
+  year    = {2017},
+  volume  = {45},
+  number  = {3},
+  pages   = {525--541},
+  doi     = {10.1007/s10439-016-1762-8}
+}
+
+% === Machine Learning ===
+
+@inproceedings{chen2016xgboost,
+  author    = {Chen, Tianqi and Guestrin, Carlos},
+  title     = {{XGBoost}: A scalable tree boosting system},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  year      = {2016},
+  pages     = {785--794},
+  doi       = {10.1145/2939672.2939785}
+}
+
+@article{lundberg2017shap,
+  author  = {Lundberg, Scott M and Lee, Su-In},
+  title   = {A unified approach to interpreting model predictions},
+  journal = {Advances in Neural Information Processing Systems},
+  year    = {2017},
+  volume  = {30},
+  pages   = {4765--4774}
+}
+
+% === Prognostic Studies ===
+
+@article{scottheart2018,
+  author  = {{SCOT-HEART Investigators}},
+  title   = {Coronary {CT} angiography and 5-year risk of myocardial infarction},
+  journal = {New England Journal of Medicine},
+  year    = {2018},
+  volume  = {379},
+  number  = {10},
+  pages   = {924--933},
+  doi     = {10.1056/NEJMoa1805971}
+}
+
+@article{douglas2015,
+  author  = {Douglas, Pamela S and Hoffmann, Udo and Patel, Manesh R and others},
+  title   = {Outcomes of anatomical versus functional testing for coronary artery disease},
+  journal = {New England Journal of Medicine},
+  year    = {2015},
+  volume  = {372},
+  number  = {14},
+  pages   = {1291--1300},
+  doi     = {10.1056/NEJMoa1415516}
+}
+
+@article{Douglas2011HospitalVariability,
+  author    = {Pamela S. Douglas and Manesh R. Patel and Steven R. Bailey and David Dai and Lisa Kaltenbach and Ralph G. Brindis and John A. Messenger and John S. Rumsfeld and Eric D. Peterson},
+  title     = {Hospital variability in the rate of finding obstructive coronary artery disease at elective, diagnostic coronary angiography},
+  journal   = {Journal of the American College of Cardiology},
+  year      = {2011},
+  volume    = {58},
+  number    = {8},
+  pages     = {801--809},
+  doi       = {10.1016/j.jacc.2011.05.019},
+  issn      = {0735-1097}
+}
+
+% === Computational Methods ===
+
+% @young1973b removed: unsteady-flow companion paper, not cited in v11/v14/segment_v1.
+% Retain only @young1973 (steady-flow paper, the cited one).
+
+@article{itu2012,
+  author  = {Itu, Lucian and Sharma, Puneet and Kamen, Ali and others},
+  title   = {A patient-specific reduced-order model for coronary circulation},
+  journal = {IEEE International Symposium on Biomedical Imaging},
+  year    = {2012},
+  pages   = {832--835},
+  doi     = {10.1109/ISBI.2012.6235675}
+}
+
+@article{coenen2015,
+  author  = {Coenen, Adriaan and Lubbers, Marisa M E and Kurata, Akira and others},
+  title   = {Fractional flow reserve computed from noninvasive {CT} angiography data: diagnostic performance of an on-site clinician-operated computational fluid dynamics algorithm},
+  journal = {Radiology},
+  year    = {2015},
+  volume  = {274},
+  number  = {3},
+  pages   = {674--683},
+  doi     = {10.1148/radiol.14140992}
+}
+
+@article{min2012,
+  author  = {Min, James K. and Leipsic, Jonathon and Pencina, Michael J. and Berman, Daniel S. and Koo, Bon-Kwon and van Mieghem, Nicolas and Erglis, Andrejs and Lin, Feng and Dunning, Alan and Apruzzese, Patrizia and Budoff, Matthew J. and Cole, Jason H. and Jaffer, Farouc A. and Leon, Martin B. and Malpeso, James and Mancini, G. B. John and Park, Sang-Wook and Schwartz, Robert S. and Shaw, Leslee J. and Mauri, Laura},
+  title   = {Diagnostic accuracy of fractional flow reserve from anatomic {CT} angiography},
+  journal = {JAMA},
+  year    = {2012},
+  volume  = {308},
+  number  = {12},
+  pages   = {1237--1245},
+  doi     = {10.1001/2012.jama.11274}
+}
+
+@article{gaur2016,
+  author  = {Gaur, Sara and Achenbach, Stephan and Leipsic, Jonathon and others},
+  title   = {Rationale and design of the {HeartFlowNXT} ({HeartFlow} analysis of coronary blood flow using {CT} angiography: {NeXt} steps) study},
+  journal = {Journal of Cardiovascular Computed Tomography},
+  year    = {2013},
+  volume  = {7},
+  number  = {5},
+  pages   = {279--288},
+  doi     = {10.1016/j.jcct.2013.09.003}
+}
+
+@book{quarteroni2009,
+  author    = {Quarteroni, Alfio and Formaggia, Luca},
+  title     = {Mathematical Modelling and Numerical Simulation of the Cardiovascular System},
+  publisher = {Elsevier},
+  year      = {2009},
+  series    = {Handbook of Numerical Analysis},
+  volume    = {12},
+  pages     = {3--127}
+}
+
+@article{antiga2008,
+  author  = {Antiga, Luca and Piccinelli, Marina and Botti, Lorenzo and others},
+  title   = {An image-based modeling framework for patient-specific computational hemodynamics},
+  journal = {Medical \& Biological Engineering \& Computing},
+  year    = {2008},
+  volume  = {46},
+  number  = {11},
+  pages   = {1097--1112},
+  doi     = {10.1007/s11517-008-0420-1}
+}
+
+@article{gross1998,
+  author  = {Gross, Michael F and Friedman, Morton H},
+  title   = {Dynamics of coronary artery curvature obtained from biplane cineangiograms},
+  journal = {Journal of Biomechanics},
+  year    = {1998},
+  volume  = {31},
+  number  = {5},
+  pages   = {479--484},
+  doi     = {10.1016/S0021-9290(98)00012-8},
+  pmid    = {9727346}
+}
+
+@article{zamir1986branching,
+  author  = {Zamir, Mair and Chee, H},
+  title   = {Branching characteristics of human coronary arteries},
+  journal = {Canadian Journal of Physiology and Pharmacology},
+  year    = {1986},
+  volume  = {64},
+  number  = {5},
+  pages   = {661--668},
+  pmid    = {3756615}
+}
+
+@article{zhu2009geometry,
+  author  = {Zhu, Hui and Ding, Zhaohua and Piana, Robert N and Gehrig, Thomas R and Friedman, Morton H},
+  title   = {Cataloguing the geometry of the human coronary arteries: a potential tool for predicting risk of coronary artery disease},
+  journal = {International Journal of Cardiology},
+  year    = {2009},
+  volume  = {135},
+  number  = {1},
+  pages   = {43--52},
+  doi     = {10.1016/j.ijcard.2008.03.087},
+  pmid    = {18597872}
+}
+
+@article{prado2023geometry,
+  author  = {Prado, Guy F A and Blanco, Pablo J and Bulant, Carlos A and Ares, Gonzalo D and Mariani, Jose Jr and Caixeta, Adriano and Almeida, Breno O and Garzon, Stefano and Pinton, F{\'a}bio A and Barbato, Emanuele and Ribichini, Flavio L and Toth, Gabor G and Mahfoud, Felix and Wijns, William and Garcia-Garcia, Hector M and Lemos, Pedro A},
+  title   = {Quantitative coronary three-dimensional geometry and its association with atherosclerotic disease burden and composition},
+  journal = {Catheterization and Cardiovascular Interventions},
+  year    = {2023},
+  volume  = {101},
+  number  = {6},
+  pages   = {1036--1044},
+  doi     = {10.1002/ccd.30639},
+  pmid    = {37017418}
+}
+
+@article{schwarz2020,
+  author  = {Schwarz, Fabian and D{\"o}ssel, Olaf and Loewe, Axel},
+  title   = {Morphometric and hemodynamic analysis of the human coronary artery tree},
+  journal = {Biomedizinische Technik},
+  year    = {2020},
+  volume  = {65},
+  number  = {3},
+  pages   = {281--293},
+  doi     = {10.1515/bmt-2019-0068},
+  pmid    = {32038291}
+}
+
+@article{hampe2024,
+  author  = {Hampe, Nils and van Velzen, Sanne G. M. and Wolterink, Jelmer M. and Collet, Carlos and Henriques, Jos{\'e} P. S. and Planken, Nils and I{\v s}gum, Ivana},
+  title   = {Graph neural networks for automatic extraction and labeling of the coronary artery tree in {CT} angiography},
+  journal = {Journal of Medical Imaging},
+  year    = {2024},
+  volume  = {11},
+  number  = {3},
+  pages   = {034001},
+  doi     = {10.1117/1.JMI.11.3.034001}
+}
+
+@article{zhang2024curvature,
+  author  = {Zhang, Mingzi and Gharleghi, Ramtin and Shen, Chi and Beier, Susann},
+  title   = {A new understanding of coronary curvature and haemodynamic impact on the course of plaque onset and progression},
+  journal = {Royal Society Open Science},
+  year    = {2024},
+  volume  = {11},
+  number  = {9},
+  pages   = {241267},
+  doi     = {10.1098/rsos.241267},
+  pmid    = {39309260},
+  pmcid   = {PMC11416812}
+}
+
+@article{qiu2025,
+  author  = {Qiu, Yuehui and Shan, Dandan and Wang, Yining and Dong, Pei and Wu, Dijia and Yang, Xinnian and Hong, Qingqi and Shen, Dinggang},
+  title   = {A topology-preserving three-stage framework for fully-connected coronary artery extraction},
+  journal = {Medical Image Analysis},
+  year    = {2025},
+  volume  = {103},
+  pages   = {103578},
+  doi     = {10.1016/j.media.2025.103578}
+}
+
+@article{taylor2024murray,
+  author  = {Taylor, Daniel J. and Saxton, Harry and Halliday, Ian and Newman, Tom and Hose, D. R. and Kassab, Ghassan S. and Gunn, Julian P. and Morris, Paul D.},
+  title   = {Systematic review and meta-analysis of Murray's law in the coronary arterial circulation},
+  journal = {American Journal of Physiology - Heart and Circulatory Physiology},
+  year    = {2024},
+  volume  = {327},
+  number  = {1},
+  pages   = {H182--H190},
+  doi     = {10.1152/ajpheart.00142.2024},
+  pmid    = {38787386},
+  pmcid   = {PMC11380967}
+}
+
+@article{malve2015,
+  author  = {Malv{\`e}, Mauro and Gharib, A M and Yazdani, S K and Finet, G{\'e}rard and Mart{\'i}nez, M A and Pettigrew, R and Ohayon, J},
+  title   = {Tortuosity of coronary bifurcation as a potential local risk factor for atherosclerosis: {CFD} steady state study based on in vivo dynamic {CT} measurements},
+  journal = {Annals of Biomedical Engineering},
+  year    = {2015},
+  volume  = {43},
+  number  = {1},
+  pages   = {82--93},
+  doi     = {10.1007/s10439-014-1056-y},
+  pmid    = {24986333}
+}
+
+@article{singh2025tda,
+  author  = {Singh, Yashbir and Hathaway, Quincy A. and Farrelly, Colleen and Budoff, Matthew J. and Erickson, Bradley and Collins, Jeremy D. and Blaha, Michael J. and Leiner, Tim and Lopez-Jimenez, Francisco and Rozenblit, Jennifer and Sarkar, Deepa and Carlsson, Gunnar},
+  title   = {Topological Data Analysis in the Assessment of Coronary Atherosclerosis: A Comprehensive Narrative Review},
+  journal = {Mayo Clinic Proceedings: Digital Health},
+  year    = {2025},
+  volume  = {3},
+  number  = {2},
+  pages   = {100199},
+  doi     = {10.1016/j.mcpdig.2025.100199}
+}
+
+@article{singh2025uncertainty,
+  author  = {Singh, Yashbir and Hathaway, Quincy A. and Dinakar, Karthik and Shaw, Leslee J. and Erickson, Bradley and Lopez-Jimenez, Francisco and Bhatt, Deepak L.},
+  title   = {Quantifying the Unknowns of Plaque Morphology: The Role of Topological Uncertainty in Coronary Artery Disease},
+  journal = {Mayo Clinic Proceedings: Digital Health},
+  year    = {2025},
+  volume  = {3},
+  number  = {2},
+  pages   = {100217},
+  doi     = {10.1016/j.mcpdig.2025.100217},
+  pmid    = {40290585},
+  pmcid   = {PMC12023886}
+}
+
+@article{cobo2023tortuosity,
+  author  = {Cobo, Manuel and Guti{\'e}rrez, Nicol{\'a}s Grande},
+  title   = {Novel deep learning method for coronary artery tortuosity detection through coronary angiography},
+  journal = {Scientific Reports},
+  year    = {2023},
+  volume  = {13},
+  number  = {1},
+  pages   = {10608},
+  doi     = {10.1038/s41598-023-37270-7},
+  pmid    = {37420204},
+  pmcid   = {PMC10333289}
+}
+
+@article{garcha2025,
+  author  = {Garcha, A. S. and Grande Guti{\'e}rrez, N.},
+  title   = {Sensitivity of coronary hemodynamics to vascular structure variations in health and disease},
+  journal = {Scientific Reports},
+  year    = {2025},
+  volume  = {15},
+  number  = {1},
+  pages   = {3325},
+  doi     = {10.1038/s41598-025-85781-x}
+}
+
+% === AutoPlaque and AI Coronary Segmentation ===
+
+@article{lin2022,
+  author  = {Lin, Andrew and Kolossv{\'a}ry, M{\'a}rton and Yuvaraj, Jayakumar and others},
+  title   = {Deep learning-enabled coronary {CT} angiography for plaque and stenosis quantification and cardiac risk prediction: an international multicentre study},
+  journal = {The Lancet Digital Health},
+  year    = {2022},
+  volume  = {4},
+  number  = {4},
+  pages   = {e256--e265},
+  doi     = {10.1016/S2589-7500(22)00022-X}
+}
+
+@article{follmer2024,
+  author  = {F{\"o}llmer, Bernhard and Maurovich-Horvat, P{\'a}l and Giannopoulos, Andreas A and others},
+  title   = {Roadmap on the use of artificial intelligence for imaging of vulnerable atherosclerotic plaque in coronary arteries},
+  journal = {Nature Reviews Cardiology},
+  year    = {2024},
+  volume  = {21},
+  number  = {1},
+  pages   = {51--64},
+  doi     = {10.1038/s41569-023-00900-3}
+}
+
+@article{meah2021,
+  author  = {Meah, Mohammed N and Singh, Tarun and Williams, Michelle C and others},
+  title   = {Reproducibility of quantitative plaque measurement in advanced coronary artery disease},
+  journal = {Journal of Cardiovascular Computed Tomography},
+  year    = {2021},
+  volume  = {15},
+  number  = {4},
+  pages   = {333--338},
+  doi     = {10.1016/j.jcct.2020.11.005}
+}
+
+@article{florestomasino2024,
+  author  = {Flores Tomasino, Gianluca and Lin, Andrew and Dey, Damini and others},
+  title   = {Reproducibility of artificial intelligence-enabled plaque measurements between systolic and diastolic phases from coronary computed tomography angiography},
+  journal = {European Radiology},
+  year    = {2024},
+  volume  = {82},
+  pages   = {1--10},
+  doi     = {10.1007/s00330-024-10621-5}
+}
+
+@article{lukas2019noise,
+  title   = {Noise reduction and motion elimination in low-dose 4D myocardial computed tomography perfusion (CTP): preliminary clinical evaluation of the ASTRA4D algorithm},
+  author  = {Lukas, Steffen and Feger, Sarah and Rief, Matthias and Zimmermann, Elke and Dewey, Marc},
+  journal = {European Radiology},
+  volume  = {29},
+  number  = {9},
+  pages   = {4572--4582},
+  year    = {2019},
+  doi     = {10.1007/s00330-019-06046-3}
+}
+
+@article{qci2020ischemia,
+  author  = {{Quantitative Cardiovascular Imaging Study Group} and others},
+  title   = {Clinical quantitative cardiac imaging for the assessment of myocardial ischaemia},
+  journal = {Nature Reviews Cardiology},
+  year    = {2020},
+  volume  = {17},
+  number  = {7},
+  pages   = {427--450},
+  doi     = {10.1038/s41569-019-0312-5}
+}
+
+@article{qci2023coronary,
+  author  = {{Quantitative Cardiovascular Imaging Study Group} and others},
+  title   = {Clinical quantitative coronary artery stenosis and coronary atherosclerosis imaging: a Consensus Statement from the Quantitative Cardiovascular Imaging Study Group},
+  journal = {Nature Reviews Cardiology},
+  year    = {2023},
+  volume  = {20},
+  number  = {10},
+  pages   = {680--700},
+  doi     = {10.1038/s41569-023-00880-4}
+}
+
+@article{schulze2025coronary,
+  title   = {Coronary {CT} angiography evaluation with artificial intelligence for individualized medical treatment of atherosclerosis: a Consensus Statement from the {QCI} Study Group},
+  author  = {Schulze, Kenrick and Stantien, Anne-Marieke and Williams, Michelle C and Vassiliou, Vassilios S and Giannopoulos, Andreas A and Nieman, Koen and Maurovich-Horvat, P{\'a}l and Tarkin, Jason M and Vliegenthart, Rozemarijn and Weir-McCall, Jonathan and others},
+  journal = {Nature Reviews Cardiology},
+  year    = {2025},
+  doi     = {10.1038/s41569-025-01191-6},
+  url     = {https://doi.org/10.1038/s41569-025-01191-6}
+}
+
+@article{blanco2018,
+  author  = {Blanco, Pablo Javier and Bulant, Carlos Alberto and M{\"u}ller, Lucas O and Talou, Gonzalo D. Maso and Bezerra, Cristiano Guedes and Lemos, Pedro A. and Feij{\'o}o, Ra{\'u}l Antonino},
+  title   = {Comparison of {1D} and {3D} Models for the Estimation of Fractional Flow Reserve},
+  journal = {Scientific Reports},
+  year    = {2018},
+  volume  = {8},
+  number  = {1},
+  pages   = {17275},
+  doi     = {10.1038/s41598-018-35344-0}
+}
+
+@article{shahzad2013,
+  author  = {Shahzad, Rianne and Kirişli, Hasan and Metz, Cornelis and Tang, Hui and Schaap, Michiel and van Vliet, Lucas and Niessen, Wiro and van Walsum, Theo},
+  title   = {Automatic segmentation, detection and quantification of coronary artery stenoses on {CTA}},
+  journal = {The International Journal of Cardiovascular Imaging},
+  year    = {2013},
+  volume  = {29},
+  number  = {8},
+  pages   = {1847--1859},
+  doi     = {10.1007/s10554-013-0271-1}
+}
+
+@article{grandegutierrez2022,
+  author  = {Grande Guti{\'e}rrez, Noelia and Simpson, Alistair L and Figueroa, C Alberto},
+  title   = {A {1D}--{3D} hybrid model of patient-specific coronary hemodynamics},
+  journal = {Cardiovascular Engineering and Technology},
+  year    = {2022},
+  volume  = {13},
+  number  = {1},
+  pages   = {146--161},
+  doi     = {10.1007/s13239-021-00569-z}
+}
+
+@article{yin2019,
+  author  = {Yin, M and Zanetti, V and Feng, Y and others},
+  title   = {One-dimensional modeling of fractional flow reserve in coronary artery disease: Uncertainty quantification and {Bayesian} optimization},
+  journal = {Computer Methods in Applied Mechanics and Engineering},
+  year    = {2019},
+  volume  = {353},
+  pages   = {66--85},
+  doi     = {10.1016/j.cma.2019.04.037}
+}
+
+@article{kocaman2009,
+  author  = {Kocaman, Sinan A and Arslan, Ugur and Cetin, Mustafa and others},
+  title   = {The relationship between fractional flow reserve, coronary flow reserve and microvascular resistance in patients with mild-to-moderate coronary artery stenosis},
+  journal = {Cardiology Journal},
+  year    = {2009},
+  volume  = {16},
+  number  = {2},
+  pages   = {142--147}
+}
+
+@article{eslami2020,
+  author  = {Eslami, Mahdi and Girasis, Chrysafis},
+  title   = {Diagnostic value of {Delta} {FFR} for the prediction of coronary ischemic lesions},
+  journal = {Anatolian Journal of Cardiology},
+  year    = {2020},
+  volume  = {24},
+  number  = {4},
+  pages   = {256--263},
+  doi     = {10.14744/AnatolJCardiol.2020.94635}
+}
+
+@article{pellicano2022,
+  author  = {Pellicano, Mariano and Van't Veer, Marcel and De Bruyne, Bernard and others},
+  title   = {{PPG} ({Pullback} {Pressure} {Gradient}): A global index to classify coronary artery disease pattern},
+  journal = {JACC: Cardiovascular Interventions},
+  year    = {2022},
+  volume  = {15},
+  number  = {6},
+  pages   = {669--670},
+  doi     = {10.1016/j.jcin.2022.01.282}
+}
+
+@article{sakamoto2023,
+  author  = {Sakamoto, Akiyoshi and Kawakami, Ryo and Collet, Carlos and others},
+  title   = {Coronary Atherosclerosis Phenotypes in Focal and Diffuse Disease Defined by the Pullback Pressure Gradient},
+  journal = {JACC: Cardiovascular Imaging},
+  year    = {2023},
+  volume  = {16},
+  number  = {10},
+  pages   = {1312--1324},
+  doi     = {10.1016/j.jcmg.2023.05.018}
+}
+
+@article{choykassab2008,
+  author  = {Choy, Jenny S and Kassab, Ghassan S},
+  title   = {Wall thickness of coronary vessels varies transmurally in the {LV} but not the {RV}: implications for local stress distribution},
+  journal = {American Journal of Physiology - Heart and Circulatory Physiology},
+  year    = {2008},
+  volume  = {294},
+  number  = {3},
+  pages   = {H1287--H1293},
+  doi     = {10.1152/ajpheart.01027.2007},
+  note    = {DISAMBIGUATION: wall-thickness paper (IMT/radius ratio = 0.19 ± 0.04 for LV arterial vessels); cite for wall-thickness priors. Distinct from choy2008 which is about mass-to-flow allometric scaling}
+}
+
+@article{kassab1993,
+  author  = {Kassab, Ghassan S and Rider, C A and Tang, N J and Fung, Yuan-Cheng},
+  title   = {Morphometry of pig coronary arterial trees},
+  journal = {American Journal of Physiology - Heart and Circulatory Physiology},
+  year    = {1993},
+  volume  = {265},
+  number  = {1},
+  pages   = {H350--H365},
+  doi     = {10.1152/ajpheart.1993.265.1.H350},
+  note    = {Foundational coronary morphometric scaling laws}
+}
+
+@article{debruyne1994,
+  author  = {De Bruyne, Bernard and Pijls, Nico H J and Paulus, Walter J and others},
+  title   = {Transstenotic coronary pressure gradient measurement in humans: in vitro and in vivo evaluation of a new pressure monitoring angioplasty guide wire},
+  journal = {Journal of the American College of Cardiology},
+  year    = {1993},
+  volume  = {22},
+  number  = {1},
+  pages   = {119--126},
+  note    = {Early wire-based human transstenotic pressure measurements; historical physiology background}
+}
+
+@article{sakamoto2013dominance,
+  author  = {Sakamoto, Shingo and Takahashi, Saeko and Coskun, Ahmet U and Papafaklis, Michail I and Takahashi, Akihiko and Saito, Shigeru and Stone, Peter H and Feldman, Charles L},
+  title   = {Relation of distribution of coronary blood flow volume to coronary artery dominance},
+  journal = {American Journal of Cardiology},
+  year    = {2013},
+  volume  = {111},
+  number  = {10},
+  pages   = {1420--1424},
+  doi     = {10.1016/j.amjcard.2013.01.290},
+  pmid    = {23540543},
+  note    = {Territory fraction table by dominance: right-dominant LAD/LCx/RCA=0.42/0.30/0.28; left-dominant=0.42/0.38/0.20; co-dominant=0.42/0.33/0.25. Source for anatomical fraction prior only; distinct from Keulards2020 (CT mass measurement validation)}
+}
+
+% === Coronary Physiology (NEW for v5.24) ===
+
+@article{hoffman1984,
+  author  = {Hoffman, Julien I E},
+  title   = {Maximal coronary flow and the concept of coronary vascular reserve},
+  journal = {Circulation},
+  year    = {1984},
+  volume  = {70},
+  number  = {2},
+  pages   = {153--159},
+  doi     = {10.1161/01.CIR.70.2.153}
+}
+
+@article{kern2006,
+  author  = {Kern, Morton J and Lerman, Amir and Bech, Jan-Willem and others},
+  title   = {Physiological assessment of coronary artery disease in the cardiac catheterization laboratory: a scientific statement from the {American Heart Association} Committee on Diagnostic and Interventional Cardiac Catheterization, Council on Clinical Cardiology},
+  journal = {Circulation},
+  year    = {2006},
+  volume  = {114},
+  number  = {12},
+  pages   = {1321--1341},
+  doi     = {10.1161/CIRCULATIONAHA.106.177276}
+}
+
+@article{meijboom2008,
+  author  = {Meijboom, W Bob and Van Mieghem, Carlos A G and van Pelt, Niels and others},
+  title   = {Comprehensive assessment of coronary artery stenoses: computed tomography coronary angiography versus conventional coronary angiography and correlation with fractional flow reserve in patients with stable angina},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2008},
+  volume  = {52},
+  number  = {8},
+  pages   = {636--643},
+  doi     = {10.1016/j.jacc.2008.05.024}
+}
+
+@article{chareonthaitawee2001,
+  author  = {Chareonthaitawee, Panithaya and Kaufmann, Philipp A and Rimoldi, Ornella and Camici, Paolo G},
+  title   = {Heterogeneity of resting and hyperemic myocardial blood flow in healthy humans},
+  journal = {Cardiovascular Research},
+  year    = {2001},
+  volume  = {50},
+  number  = {1},
+  pages   = {151--161},
+  doi     = {10.1016/S0008-6363(01)00202-4}
+}
+
+@article{vandehoef2014,
+  author  = {van de Hoef, Tim P and van Lavieren, Martijn A and Damman, Peter and others},
+  title   = {Physiological basis and long-term clinical outcome of discordance between fractional flow reserve and coronary flow velocity reserve in coronary stenoses of intermediate severity},
+  journal = {Circulation: Cardiovascular Interventions},
+  year    = {2014},
+  volume  = {7},
+  number  = {3},
+  pages   = {301--311},
+  doi     = {10.1161/CIRCINTERVENTIONS.113.001049}
+}
+
+@article{finet2007,
+  author  = {Finet, Gérard and Gilard, Martine and Perrenot, Benjamin and others},
+  title   = {Fractal geometry of arterial coronary bifurcations: a quantitative coronary angiography and intravascular ultrasound analysis},
+  journal = {EuroIntervention},
+  year    = {2007},
+  volume  = {3},
+  number  = {4},
+  pages   = {490--498}
+}
+
+@article{lavie1986,
+  author  = {Lavie, Carl J and Milani, Richard V and Ventura, Hector O and others},
+  title   = {Left ventricular geometry and mortality in patients >70 years of age with normal ejection fraction},
+  journal = {The American Journal of Cardiology},
+  year    = {1986},
+  volume  = {58},
+  number  = {13},
+  pages   = {1308--1313}
+}
+
+@article{gould2013,
+  author  = {Gould, K Lance and Johnson, Nils P and Bateman, Timothy M and others},
+  title   = {Anatomic versus physiologic assessment of coronary artery disease: role of coronary flow reserve, fractional flow reserve, and positron emission tomography imaging in revascularization decision-making},
+  journal = {Journal of the American College of Cardiology},
+  year    = {2013},
+  volume  = {62},
+  number  = {18},
+  pages   = {1639--1653},
+  doi     = {10.1016/j.jacc.2013.07.076}
+}
+
+@article{kim2010,
+  author  = {Kim, Hyun Jung and Vignon-Clementel, Irene E and Coogan, Jessica S and Figueroa, C Alberto and Jansen, Kenneth E and Taylor, Charles A},
+  title   = {Patient-specific modeling of blood flow and pressure in human coronary arteries},
+  journal = {Annals of Biomedical Engineering},
+  year    = {2010},
+  volume  = {38},
+  number  = {10},
+  pages   = {3195--3209},
+  doi     = {10.1007/s10439-010-0083-6}
+}
+
+% === Additional references for v7 deep review ===
+
+@article{reiber2010,
+  author  = {Reiber, Johan H C and Tuinenburg, Joan C and Kirisli, Hortense A and others},
+  title   = {Quantitative coronary arteriography - State of the art},
+  journal = {Netherlands Heart Journal},
+  year    = {2010},
+  volume  = {18},
+  number  = {10},
+  pages   = {518--524},
+  doi     = {10.1007/s12471-010-0823-5},
+  note    = {Validation of Medis QAngio CT reproducibility}
+}
+
+@article{fearon2013,
+  author  = {Fearon, William F and Shilane, David and Pijls, Nico H J and others},
+  title   = {Fractional flow reserve-guided {PCI} as compared with coronary bypass surgery},
+  journal = {New England Journal of Medicine},
+  year    = {2013},
+  volume  = {368},
+  number  = {18},
+  pages   = {1702--1711},
+  doi     = {10.1056/NEJMoa1301547}
+}
+
+@article{cassot2006,
+  author  = {Cassot, Francis and Lauwers, Frédérique and Fouard, Céline and Prohaska, Steffen and Lauwers-Cances, Valérie},
+  title   = {A novel three-dimensional computer-assisted method for a quantitative study of microvascular networks of the human cerebral cortex},
+  journal = {Microcirculation},
+  year    = {2006},
+  volume  = {13},
+  number  = {1},
+  pages   = {1--18},
+  doi     = {10.1080/10739680500383407},
+  note    = {Allometric scaling of vascular networks}
+}
+
+% === Segmentation methods for segment_v1 ===
+
+@inproceedings{frangi1998,
+  author    = {Frangi, Alejandro F and Niessen, Wiro J and Vincken, Koen L and Viergever, Max A},
+  title     = {Multiscale vessel enhancement filtering},
+  booktitle = {Medical Image Computing and Computer-Assisted Intervention -- MICCAI'98},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {1496},
+  pages     = {130--137},
+  year      = {1998},
+  publisher = {Springer},
+  doi       = {10.1007/BFb0056195},
+  note      = {Foundational Hessian-based vesselness filter used in classical vessel tracking}
+}
+
+@article{metz2009,
+  author  = {Metz, C T and Schaap, M and Weustink, A C and Mollet, N R and van Walsum, T and Niessen, W J},
+  title   = {Coronary centerline extraction from CT coronary angiography images using a minimum cost path approach},
+  journal = {Medical Physics},
+  year    = {2009},
+  volume  = {36},
+  number  = {12},
+  pages   = {5568--5579},
+  doi     = {10.1118/1.3254077},
+  pmid    = {20095269},
+  note    = {Semiautomatic minimum-cost-path coronary centerline extraction with one to two clicks}
+}
+
+@article{ghanem2019,
+  author  = {Ghanem, Ahmed M and Hamimi, Ahmed H and Matta, Jatin R and Carass, Aaron and Elgarf, Reham M and Gharib, Ahmed M and Abd-Elmoniem, Khaled Z},
+  title   = {Automatic Coronary Wall and Atherosclerotic Plaque Segmentation from 3D Coronary CT Angiography},
+  journal = {Scientific Reports},
+  year    = {2019},
+  volume  = {9},
+  number  = {1},
+  pages   = {47},
+  doi     = {10.1038/s41598-018-37168-4},
+  pmid    = {30631101},
+  note    = {Automated coronary wall and plaque segmentation using curved reformations and nested boundary modeling}
+}
+
+@article{vanhamersvelt2019,
+  author  = {van Hamersvelt, Robbert W and Zreik, Majd and Voskuil, Michiel and Viergever, Max A and Isgum, Ivana and Leiner, Tim},
+  title   = {Deep learning analysis of left ventricular myocardium in CT angiographic intermediate-degree coronary stenosis improves the diagnostic accuracy for identification of functionally significant stenosis},
+  journal = {European Radiology},
+  year    = {2019},
+  volume  = {29},
+  number  = {5},
+  pages   = {2350--2359},
+  doi     = {10.1007/s00330-018-5822-3},
+  pmid    = {30421020},
+  note    = {Includes fully automatic LV myocardium segmentation from resting CCTA as part of FFR-related analysis}
+}
+
+@article{guo2020myocardium,
+  author  = {Guo, Bang Jun and He, Xiuxiu and Lei, Yang and Harms, Joseph and Wang, Tonghe and Curran, Walter J and Liu, Tian and Zhang, Long Jiang and Yang, Xiaofeng},
+  title   = {Automated left ventricular myocardium segmentation using 3D deeply supervised attention U-net for coronary computed tomography angiography; CT myocardium segmentation},
+  journal = {Medical Physics},
+  year    = {2020},
+  volume  = {47},
+  number  = {4},
+  pages   = {1775--1785},
+  doi     = {10.1002/mp.14066},
+  pmid    = {32017118},
+  note    = {Dedicated deep-learning LV myocardium segmentation on CCTA}
+}
+
+@article{koo2020myocardium,
+  author  = {Koo, Hyun Jung and Lee, June-Goo and Ko, Ji Yeon and Lee, Gaeun and Kang, Joon-Won and Kim, Young-Hak and Yang, Dong Hyun},
+  title   = {Automated Segmentation of Left Ventricular Myocardium on Cardiac Computed Tomography Using Deep Learning},
+  journal = {Korean Journal of Radiology},
+  year    = {2020},
+  volume  = {21},
+  number  = {6},
+  pages   = {660--669},
+  doi     = {10.3348/kjr.2019.0378},
+  pmid    = {32410405},
+  note    = {Automated LV myocardium segmentation on cardiac CT using deep learning}
+}
+
+@article{baskaran2020segment,
+  author  = {Baskaran, Lohendran and Al'Aref, Subhi J and Maliakal, Gabriel and Lee, Benjamin C and Xu, Zhuoran and Choi, Jeong W and Lee, Sang-Eun and Sung, Ji Min and Lin, Fay Y and Dunham, Simon and others},
+  title   = {Automatic segmentation of multiple cardiovascular structures from cardiac computed tomography angiography images using deep learning},
+  journal = {PLOS ONE},
+  year    = {2020},
+  volume  = {15},
+  number  = {5},
+  pages   = {e0232573},
+  doi     = {10.1371/journal.pone.0232573},
+  pmid    = {32374784},
+  note    = {Multi-structure CCTA segmentation using a U-Net-derived deep learning model}
+}
+
+@article{javorszky2022,
+  author  = {Javorszky, Natasa and Homonnay, Balint and Gerstenblith, Gary and Bluemke, David and Kiss, Peter and Torok, Mihaly and Celentano, David and Lai, Hong and Lai, Shenghan and Kolossvary, Marton},
+  title   = {Deep learning-based atherosclerotic coronary plaque segmentation on coronary CT angiography},
+  journal = {European Radiology},
+  year    = {2022},
+  volume  = {32},
+  pages   = {7217--7226},
+  doi     = {10.1007/s00330-022-08801-8},
+  note    = {Open-source 3D U-Net plaque segmentation with external validation against expert annotations}
+}
+
+@article{bruns2022wholeheart,
+  author  = {Bruns, Steffen and Wolterink, Jelmer M and van den Boogert, Thomas P W and Runge, Jurgen H and Bouma, Berto J and Henriques, Jose P and Baan, Jan and Viergever, Max A and Planken, R Nils and Isgum, Ivana},
+  title   = {Deep learning-based whole-heart segmentation in 4D contrast-enhanced cardiac CT},
+  journal = {Computers in Biology and Medicine},
+  year    = {2022},
+  volume  = {142},
+  pages   = {105191},
+  doi     = {10.1016/j.compbiomed.2021.105191},
+  pmid    = {35026571},
+  note    = {Large-scale whole-heart and LV myocardium segmentation in contrast-enhanced cardiac CT}
+}
+
+@article{ren2023coronarylabel,
+  author  = {Ren, Pengling and He, Yi and Guo, Ning and Luo, Nan and Li, Fang and Wang, Zhenchang and Yang, Zhenghan},
+  title   = {A deep learning-based automated algorithm for labeling coronary arteries in computed tomography angiography images},
+  journal = {BMC Medical Informatics and Decision Making},
+  year    = {2023},
+  volume  = {23},
+  pages   = {249},
+  doi     = {10.1186/s12911-023-02332-y},
+  note    = {Automatic coronary branch labeling in CCTA using deep learning and centerline-based post-processing}
+}
+
+@article{Kirillov2023SAM,
+  author  = {Kirillov, Alexander and Mintun, Eric and Ravi, Nikhila and Mao, Hanzi and Rolland, Chloe and Gustafson, Laura and Xiao, Tete and Whitehead, Spencer and Berg, Alexander C and Lo, Wan-Yen and Dollar, Piotr and Girshick, Ross},
+  title   = {Segment Anything},
+  journal = {arXiv preprint arXiv:2304.02643},
+  year    = {2023},
+  doi     = {10.48550/arXiv.2304.02643},
+  note    = {Promptable segmentation foundation model}
+}
+
+@inproceedings{Zhang2024SAMMed3D,
+  author    = {Zhang, Haoyu and Xia, Yuhan and Zhao, Sumin and Luo, Meng and Zhang, Qian and Xu, Min and Zheng, Yefeng},
+  title     = {SAM-Med3D: Towards General-purpose Segmentation Models for Volumetric Medical Images},
+  booktitle = {European Conference on Computer Vision Workshops},
+  year      = {2024},
+  pages     = {1--18},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-031-72469-6_1},
+  note      = {Volumetric promptable segmentation model trained on a broad medical corpus}
+}
+
+@article{Isensee2021nnUNet,
+  author  = {Isensee, Fabian and Jaeger, Paul F and Kohl, Simon A A and Petersen, Jens and Maier-Hein, Klaus H},
+  title   = {nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation},
+  journal = {Nature Methods},
+  year    = {2021},
+  volume  = {18},
+  number  = {2},
+  pages   = {203--211},
+  doi     = {10.1038/s41592-020-01008-z},
+  pmid    = {33288961},
+  note    = {Strong task-specific deep learning baseline for biomedical segmentation}
+}
+
+@article{hanley1982roc,
+  author  = {Hanley, James A and McNeil, Barbara J},
+  title   = {The meaning and use of the area under a receiver operating characteristic ({ROC}) curve},
+  journal = {Radiology},
+  year    = {1982},
+  volume  = {143},
+  number  = {1},
+  pages   = {29--36},
+  doi     = {10.1148/radiology.143.1.7063747},
+  pmid    = {7063747},
+  note    = {Classical large-sample approximation for ROC AUC interpretation and variance}
+}
+
+@article{delong1988,
+  author  = {DeLong, Elizabeth R and DeLong, David M and Clarke-Pearson, Daniel L},
+  title   = {Comparing the areas under two or more correlated receiver operating characteristic curves: a nonparametric approach},
+  journal = {Biometrics},
+  year    = {1988},
+  volume  = {44},
+  number  = {3},
+  pages   = {837--845},
+  doi     = {10.2307/2531595},
+  pmid    = {3203132},
+  note    = {Standard nonparametric covariance framework for paired ROC AUC comparison}
+}
+
+@article{schoenfeld1983,
+  author  = {Schoenfeld, David A},
+  title   = {Sample-size formula for the proportional-hazards regression model},
+  journal = {Biometrics},
+  year    = {1983},
+  volume  = {39},
+  number  = {2},
+  pages   = {499--503},
+  doi     = {10.2307/2531021},
+  pmid    = {6354290},
+  note    = {Classical event-based power approximation for proportional hazards regression}
+}
+
+@article{peduzzi1995,
+  author  = {Peduzzi, Peter and Concato, John and Feinstein, Alvan R and Holford, Theodore R},
+  title   = {Importance of events per independent variable in proportional hazards regression analysis. {II}. Accuracy and precision of regression estimates},
+  journal = {Journal of Clinical Epidemiology},
+  year    = {1995},
+  volume  = {48},
+  number  = {12},
+  pages   = {1503--1510},
+  doi     = {10.1016/0895-4356(95)00048-8},
+  pmid    = {8543964},
+  note    = {Simulation study underlying the conservative EPV rule for Cox regression}
+}
+
+@article{vittinghoff2007,
+  author  = {Vittinghoff, Eric and McCulloch, Charles E},
+  title   = {Relaxing the rule of ten events per variable in logistic and {Cox} regression},
+  journal = {American Journal of Epidemiology},
+  year    = {2007},
+  volume  = {165},
+  number  = {6},
+  pages   = {710--718},
+  doi     = {10.1093/aje/kwk052},
+  pmid    = {17182981},
+  note    = {Shows the EPV = 10 rule is conservative rather than absolute}
+}
+
+@article{uno2011,
+  author  = {Uno, Hajime and Cai, Tianxi and Pencina, Michael J and D'Agostino, Ralph B and Wei, L J},
+  title   = {On the {C}-statistics for evaluating overall adequacy of risk prediction procedures with censored survival data},
+  journal = {Statistics in Medicine},
+  year    = {2011},
+  volume  = {30},
+  number  = {10},
+  pages   = {1105--1117},
+  doi     = {10.1002/sim.4154},
+  pmid    = {21484848},
+  note    = {Censoring-robust concordance framework for survival-model discrimination}
+}
+
+@article{wilson1927,
+  author  = {Wilson, Edwin B},
+  title   = {Probable inference, the law of succession, and statistical inference},
+  journal = {Journal of the American Statistical Association},
+  year    = {1927},
+  volume  = {22},
+  number  = {158},
+  pages   = {209--212},
+  doi     = {10.2307/2276774},
+  note    = {Foundational paper for the Wilson score interval}
+}
+
+@article{mcnemar1947,
+  author  = {McNemar, Quinn},
+  title   = {Note on the sampling error of the difference between correlated proportions or percentages},
+  journal = {Psychometrika},
+  year    = {1947},
+  volume  = {12},
+  number  = {2},
+  pages   = {153--157},
+  doi     = {10.1007/BF02295996},
+  note    = {Classical paired binary comparison test}
+}
