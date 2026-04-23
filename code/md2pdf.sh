@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Pandoc-based Markdown builder for the Segment workspace.
+# Merged with the useful parts of the newer proposal/compression helpers while
+# preserving Segment's repo-root paths for YAML metadata.
 #
 # Usage:
-#   ./code/md2pdf.sh [file.md] [--docx] [--tex] [--no-pdf] [--csl PATH] [--verbose]
+#   ./code/md2pdf.sh [file.md] [--docx] [--tex] [--no-pdf] [--csl PATH]
 #   ./code/md2pdf.sh col/landscape.md --verbose
 
 set -euo pipefail
@@ -12,12 +14,14 @@ usage() {
 Usage: ./code/md2pdf.sh [file.md] [options]
 
 Options:
-  --docx       Also build DOCX
-  --tex        Also build TeX
-  --no-pdf     Skip PDF generation
-  --csl PATH   Use an explicit CSL file
-  --verbose    Print resolved inputs and full pandoc commands
-  -h, --help   Show this help
+  --docx           Also build DOCX
+  --tex            Also build TeX
+  --no-pdf         Skip PDF generation
+  --csl PATH       Use an explicit CSL file
+  --fontsize SIZE  Override PDF font size, e.g. 11pt or 12pt
+  --margin VALUE   Override PDF margin, e.g. 1in or 2.5cm
+  --verbose        Print resolved inputs and full pandoc commands
+  -h, --help       Show this help
 EOF
 }
 
@@ -35,12 +39,44 @@ font_available() {
     command_exists fc-list && fc-list | grep -Fqi "$query"
 }
 
+read_front_matter() {
+    local file="$1"
+
+    if [[ "$(sed -n '1p' "$file")" != "---" ]]; then
+        return 0
+    fi
+
+    awk '
+        NR == 1 { next }
+        /^---[[:space:]]*$/ || /^\.\.\.[[:space:]]*$/ { exit }
+        { print }
+    ' "$file"
+}
+
+front_matter_has_key() {
+    local key="$1"
+    [[ -n "$FRONT_MATTER" ]] && printf '%s\n' "$FRONT_MATTER" | grep -Eq "^[[:space:]]*${key}[[:space:]]*:"
+}
+
+first_existing_file() {
+    local candidate
+    for candidate in "$@"; do
+        if [[ -f "$candidate" ]]; then
+            realpath "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
 FILE=""
 MAKE_PDF=true
 MAKE_DOCX=false
 MAKE_TEX=false
 VERBOSE=false
 CSL_OVERRIDE=""
+FONT_SIZE_OVERRIDE=""
+MARGIN_OVERRIDE=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -57,6 +93,16 @@ while [[ $# -gt 0 ]]; do
             shift
             [[ $# -gt 0 ]] || die "--csl requires a file path."
             CSL_OVERRIDE="$1"
+            ;;
+        --fontsize)
+            shift
+            [[ $# -gt 0 ]] || die "--fontsize requires a value like 11pt."
+            FONT_SIZE_OVERRIDE="$1"
+            ;;
+        --margin)
+            shift
+            [[ $# -gt 0 ]] || die "--margin requires a value like 1in or 2.5cm."
+            MARGIN_OVERRIDE="$1"
             ;;
         --verbose)
             VERBOSE=true
@@ -100,57 +146,39 @@ if [[ -n "$CSL_OVERRIDE" ]]; then
     CSL_OVERRIDE="$(realpath "$CSL_OVERRIDE")"
 fi
 
-FRONT_MATTER=""
-if [[ "$(sed -n '1p' "$FULLPATH")" == "---" ]]; then
-    FRONT_MATTER="$(
-        awk '
-            NR == 1 { next }
-            /^---[[:space:]]*$/ || /^\.\.\.[[:space:]]*$/ { exit }
-            { print }
-        ' "$FULLPATH"
-    )"
-fi
+FRONT_MATTER="$(read_front_matter "$FULLPATH")"
 
-front_matter_has_key() {
-    local key="$1"
-    [[ -n "$FRONT_MATTER" ]] && printf '%s\n' "$FRONT_MATTER" | grep -Eq "^[[:space:]]*$key:"
-}
-
-BIB_PATH=""
-for candidate in \
+BIB_PATH="$(first_existing_file \
     "$DIR/references.bib" \
+    "$DIR/../references.bib" \
+    "$DIR/../../references.bib" \
     "$WORKSPACE/col/references.bib" \
     "$WORKSPACE/plan/references.bib" \
+    "$WORKSPACE/code/references.bib" \
     "$WORKSPACE/references.bib" \
     "$WORKSPACE/manuscript/references.bib" \
-    "$WORKSPACE/flow/references.bib"
-do
-    if [[ -f "$candidate" ]]; then
-        BIB_PATH="$(realpath "$candidate")"
-        break
-    fi
-done
+    "$WORKSPACE/flow/references.bib" || true)"
 
 CSL_PATH=""
 if [[ -n "$CSL_OVERRIDE" ]]; then
     CSL_PATH="$CSL_OVERRIDE"
 else
-    for candidate in \
+    CSL_PATH="$(first_existing_file \
         "$DIR/vancouver-superscript.csl" \
-        "$DIR/vancouver.csl" \
         "$DIR/nature.csl" \
+        "$DIR/vancouver.csl" \
+        "$DIR/../vancouver-superscript.csl" \
+        "$DIR/../nature.csl" \
+        "$DIR/../vancouver.csl" \
         "$WORKSPACE/plan/vancouver-superscript.csl" \
+        "$WORKSPACE/plan/nature.csl" \
         "$WORKSPACE/plan/vancouver.csl" \
         "$WORKSPACE/code/vancouver-superscript.csl" \
+        "$WORKSPACE/code/nature.csl" \
         "$WORKSPACE/code/vancouver.csl" \
         "$WORKSPACE/manuscript/vancouver-superscript.csl" \
-        "$WORKSPACE/manuscript/vancouver.csl"
-    do
-        if [[ -f "$candidate" ]]; then
-            CSL_PATH="$(realpath "$candidate")"
-            break
-        fi
-    done
+        "$WORKSPACE/manuscript/nature.csl" \
+        "$WORKSPACE/manuscript/vancouver.csl" || true)"
 fi
 
 MAINFONT="Arial"
@@ -170,6 +198,8 @@ if ! font_available "Consolas"; then
         MONOFONT="IBM Plex Mono"
     elif font_available "Noto Sans Mono"; then
         MONOFONT="Noto Sans Mono"
+    elif font_available "Courier New"; then
+        MONOFONT="Courier New"
     elif font_available "Liberation Mono"; then
         MONOFONT="Liberation Mono"
     else
@@ -177,6 +207,16 @@ if ! font_available "Consolas"; then
     fi
 fi
 
+DEFAULT_FONT_SIZE="${FONT_SIZE_OVERRIDE:-11pt}"
+if [[ -n "$MARGIN_OVERRIDE" ]]; then
+    if [[ "$MARGIN_OVERRIDE" == *=* ]]; then
+        DEFAULT_MARGIN="$MARGIN_OVERRIDE"
+    else
+        DEFAULT_MARGIN="margin=$MARGIN_OVERRIDE"
+    fi
+else
+    DEFAULT_MARGIN="margin=1in"
+fi
 RESOURCE_PATH="$WORKSPACE:$DIR:$WORKSPACE/col:$WORKSPACE/plan:$WORKSPACE/code"
 COMMON_ARGS=(
     "$FULLPATH"
@@ -202,6 +242,8 @@ if $VERBOSE; then
     echo "Resource path : $RESOURCE_PATH"
     echo "Main font     : $MAINFONT"
     echo "Mono font     : $MONOFONT"
+    echo "Font size     : $DEFAULT_FONT_SIZE"
+    echo "Margin        : $DEFAULT_MARGIN"
     [[ -n "$FRONT_MATTER" ]] && echo "YAML          : detected" || echo "YAML          : none"
 fi
 
@@ -217,8 +259,8 @@ if $MAKE_PDF; then
         "-V" "mathfont:Latin Modern Math"
         "-V" "papersize:a4"
     )
-    front_matter_has_key "fontsize" || PDF_ARGS+=("-V" "fontsize:11pt")
-    front_matter_has_key "geometry" || PDF_ARGS+=("-V" "geometry:margin=1in")
+    front_matter_has_key "fontsize" || PDF_ARGS+=("-V" "fontsize:$DEFAULT_FONT_SIZE")
+    front_matter_has_key "geometry" || PDF_ARGS+=("-V" "geometry:$DEFAULT_MARGIN")
     front_matter_has_key "linestretch" || PDF_ARGS+=("-V" "linestretch:1.2")
 
     echo "Building PDF: $PDF_OUT"
