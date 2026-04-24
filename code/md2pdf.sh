@@ -5,7 +5,7 @@
 #
 # Usage:
 #   ./code/md2pdf.sh [file.md] [--docx] [--tex] [--no-pdf] [--csl PATH]
-#   ./code/md2pdf.sh col/landscape.md --verbose
+#   ./code/md2pdf.sh col/proposal.md --verbose
 
 set -euo pipefail
 
@@ -122,7 +122,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-FILE="${FILE:-col/landscape.md}"
+FILE="${FILE:-col/proposal.md}"
 [[ -f "$FILE" ]] || die "Markdown file '$FILE' not found."
 
 if ! $MAKE_PDF && ! $MAKE_DOCX && ! $MAKE_TEX; then
