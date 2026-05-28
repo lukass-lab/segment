@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/validation.schema.json",
+  "title": "Validation report",
+  "description": "Output of validate_scene.py. Numerical realisation of every metric in the Mathematical Validation Metrics section of the plan.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "patient_id", "vessel", "centerline",
+               "frame", "medis_rings", "surfaces", "twist_drift", "checks", "summary"],
+  "properties": {
+    "schema_version": { "const": "validation/0.1" },
+    "patient_id":     { "type": "string" },
+    "vessel":         { "type": "string" },
+    "centerline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n_stations", "target_spacing_mm", "arc_length_mm", "coverage", "out_of_bounds"],
+      "properties": {
+        "n_stations":        { "type": "integer", "minimum": 2 },
+        "target_spacing_mm": { "type": "number", "exclusiveMinimum": 0 },
+        "arc_length_mm":     { "type": "number", "exclusiveMinimum": 0 },
+        "coverage":          { "type": "number", "minimum": 0, "maximum": 1 },
+        "out_of_bounds":     { "type": "integer", "minimum": 0 }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epsilon_unit", "epsilon_perp", "det_min"],
+      "properties": {
+        "epsilon_unit": { "type": "number", "minimum": 0 },
+        "epsilon_perp": { "type": "number", "minimum": 0 },
+        "det_min":      { "type": "number" }
+      }
+    },
+    "medis_rings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n_rings", "rho_max_mm", "rho_max_p95_mm", "rho_mean_mm"],
+      "properties": {
+        "n_rings":        { "type": "integer", "minimum": 0 },
+        "rho_max_mm":     { "type": "number",  "minimum": 0 },
+        "rho_max_p95_mm": { "type": "number",  "minimum": 0 },
+        "rho_mean_mm":    { "type": "number",  "minimum": 0 }
+      }
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": true,
+      "patternProperties": {
+        "^(lumen|wall|plaque)$": {
+          "type": "object",
+          "required": ["name", "n_vertices", "n_triangles", "n_edges_nonmanifold", "n_edges_boundary"],
+          "properties": {
+            "name":                  { "type": "string" },
+            "n_vertices":            { "type": "integer", "minimum": 0 },
+            "n_triangles":           { "type": "integer", "minimum": 0 },
+            "n_edges_nonmanifold":   { "type": "integer", "minimum": 0 },
+            "n_edges_boundary":      { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "twist_drift": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene_method", "reference_method", "max_angle_deg", "p95_angle_deg"],
+      "properties": {
+        "scene_method":       { "enum": ["projection_bishop", "double_reflection_wang2008"] },
+        "reference_method":   { "enum": ["projection_bishop", "double_reflection_wang2008"] },
+        "max_angle_deg":      { "type": "number", "minimum": 0 },
+        "p95_angle_deg":      { "type": "number", "minimum": 0 },
+        "projection_vs_double_reflection_max_angle_deg": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Diagnostic-only comparison between the legacy projection frame and the double-reflection frame."
+        },
+        "projection_vs_double_reflection_p95_angle_deg": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Diagnostic-only p95 angle between legacy projection and double-reflection frames."
+        }
+      }
+    },
+    "affine": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "epsilon_origin_mm":  { "type": "number", "minimum": 0 },
+        "epsilon_direction":  { "type": "number", "minimum": 0 },
+        "epsilon_spacing_mm": { "type": "number", "minimum": 0 }
+      }
+    },
+    "scene_frame_method": { "enum": ["projection_bishop", "double_reflection_wang2008"] },
+    "projection_vs_double_reflection": {
+      "type": "object",
+      "properties": {
+        "max_angle_deg": { "type": "number", "minimum": 0 },
+        "p95_angle_deg": { "type": "number", "minimum": 0 }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "value", "threshold", "op", "pass"],
+        "properties": {
+          "name":      { "type": "string" },
+          "value":     { "type": ["number", "integer", "boolean", "null"] },
+          "threshold": { "type": ["number", "integer", "boolean"] },
+          "op":        { "enum": ["lt", "gt", "eq", "le", "ge"] },
+          "units":     { "type": "string" },
+          "pass":      { "type": "boolean" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "passed", "failed"],
+      "properties": {
+        "total":  { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

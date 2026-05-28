@@ -1,0 +1,5 @@
+{
+  "schema": "lesion_summary/0.1",
+  "lesions": [],
+  "note": "placeholder \u2014 populated by quantify_scene.py once implemented"
+}

@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/vessel_scene_manifest.schema.json",
+  "title": "VesselScene manifest",
+  "description": "Top-level descriptor for a vessel_scene_*.zip bundle. Names every artifact in the archive, captures CT provenance, and records algorithm versions used for downstream reproducibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "patient_id", "vessel_name", "source_type",
+    "created_at", "ct", "cpr", "surfaces", "overlays", "quant",
+    "validation", "preview", "algorithm_versions"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^vessel_scene/\\d+\\.\\d+$",
+      "description": "SemVer-style schema tag, e.g. vessel_scene/0.1."
+    },
+    "patient_id":     { "type": "string", "minLength": 1 },
+    "vessel_name":    { "type": "string", "minLength": 1, "examples": ["LAD", "LCX", "RCA", "D1"] },
+    "source_type":    { "enum": ["medis", "mask", "hybrid"] },
+    "created_at":     { "type": "string", "format": "date-time" },
+    "git_commit":     { "type": ["string", "null"], "description": "Short git hash of the code that produced the bundle." },
+    "ct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["embedded", "size", "spacing", "origin", "direction", "sha256"],
+      "properties": {
+        "path_referenced": { "type": ["string", "null"] },
+        "embedded":        { "type": "boolean" },
+        "size":            { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 3, "maxItems": 3 },
+        "spacing":         { "type": "array", "items": { "type": "number", "exclusiveMinimum": 0 }, "minItems": 3, "maxItems": 3 },
+        "origin":          { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "direction":       { "type": "array", "items": { "type": "number" }, "minItems": 9, "maxItems": 9, "description": "Row-major 3x3 direction matrix." },
+        "sha256":          { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "cpr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cross", "long", "frame", "pixel_spacing_mm"],
+      "properties": {
+        "cross":            { "type": "string", "pattern": "\\.nii\\.gz$" },
+        "long":             { "type": "string", "pattern": "\\.nii\\.gz$" },
+        "frame":            { "type": "string", "pattern": "\\.json$" },
+        "pixel_spacing_mm": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "surfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lumen", "wall"],
+      "properties": {
+        "lumen":   { "$ref": "#/$defs/surfaceRef" },
+        "wall":    { "$ref": "#/$defs/surfaceRef" },
+        "plaque":  { "$ref": "#/$defs/surfaceRef" }
+      }
+    },
+    "overlays": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "medis_rings":  { "type": "string" },
+        "mask_contours": { "type": "string" }
+      }
+    },
+    "quant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["per_station", "lesion_summary"],
+      "properties": {
+        "per_station":     { "type": "string", "pattern": "\\.json$" },
+        "lesion_summary":  { "type": "string", "pattern": "\\.json$" }
+      }
+    },
+    "validation":  { "type": "string", "pattern": "\\.json$" },
+    "preview":     { "type": "string", "pattern": "\\.(png|jpg|jpeg)$" },
+    "algorithm_versions": {
+      "type": "object",
+      "description": "Free-form record of method/parameter choices. Required keys list the load-bearing ones; extra keys are allowed.",
+      "additionalProperties": true,
+      "required": ["frame_method", "ct_reformat_order", "mask_reformat_order"],
+      "properties": {
+        "centerline_method":     { "type": "string" },
+        "frame_method":          { "enum": ["projection_bishop", "double_reflection_wang2008"] },
+        "ct_reformat_order":     { "type": "integer", "minimum": 0, "maximum": 5 },
+        "mask_reformat_order":   { "type": "integer", "minimum": 0, "maximum": 5 },
+        "display_interpolation": { "enum": ["nearest", "linear", "cubic"] },
+        "cross_section_fov_mm":  { "type": "number", "exclusiveMinimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "surfaceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path":       { "type": "string", "pattern": "\\.(glb|gltf)$" },
+        "color_rgba": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 255 }, "minItems": 4, "maxItems": 4 }
+      }
+    }
+  }
+}

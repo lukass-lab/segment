@@ -1,0 +1,119 @@
+{
+  "schema_version": "validation/0.1",
+  "patient_id": "01-BER-0088",
+  "vessel": "LAD",
+  "centerline": {
+    "n_stations": 710,
+    "target_spacing_mm": 0.25,
+    "arc_length_mm": 177.96750570572024,
+    "coverage": 1.0,
+    "out_of_bounds": 0
+  },
+  "frame": {
+    "epsilon_unit": 3.9608494262211025e-10,
+    "epsilon_perp": 1.6653345369377348e-16,
+    "det_min": 0.9999999992078302
+  },
+  "medis_rings": {
+    "n_rings": 339,
+    "rho_max_mm": 3.379199828654389,
+    "rho_max_p95_mm": 0.8129387306718953,
+    "rho_mean_mm": 0.2002254507897352
+  },
+  "surfaces": {
+    "lumen": {
+      "name": "lumen",
+      "n_vertices": 21698,
+      "n_triangles": 43392,
+      "n_edges_nonmanifold": 0,
+      "n_edges_boundary": 0
+    },
+    "wall": {
+      "name": "wall",
+      "n_vertices": 21698,
+      "n_triangles": 43392,
+      "n_edges_nonmanifold": 0,
+      "n_edges_boundary": 0
+    }
+  },
+  "twist_drift": {
+    "scene_method": "double_reflection_wang2008",
+    "reference_method": "double_reflection_wang2008",
+    "max_angle_deg": 0.0,
+    "p95_angle_deg": 0.0,
+    "projection_vs_double_reflection_max_angle_deg": 18.55979791406221,
+    "projection_vs_double_reflection_p95_angle_deg": 16.659367803694018
+  },
+  "affine": null,
+  "checks": [
+    {
+      "name": "frame.epsilon_unit",
+      "value": 3.9608494262211025e-10,
+      "threshold": 1e-06,
+      "op": "lt",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "frame.epsilon_perp",
+      "value": 1.6653345369377348e-16,
+      "threshold": 1e-06,
+      "op": "lt",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "frame.det_min",
+      "value": 0.9999999992078302,
+      "threshold": 0.999,
+      "op": "gt",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "centerline.coverage",
+      "value": 1.0,
+      "threshold": 1.0,
+      "op": "eq",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "medis.rho_max_mm",
+      "value": 3.379199828654389,
+      "threshold": 1.0,
+      "op": "lt",
+      "units": "mm",
+      "pass": false
+    },
+    {
+      "name": "surface.lumen.nonmanifold_edges",
+      "value": 0,
+      "threshold": 0,
+      "op": "eq",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "surface.wall.nonmanifold_edges",
+      "value": 0,
+      "threshold": 0,
+      "op": "eq",
+      "units": "",
+      "pass": true
+    },
+    {
+      "name": "twist_drift_deg",
+      "value": 0.0,
+      "threshold": 5.0,
+      "op": "lt",
+      "units": "deg",
+      "pass": true
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 7,
+    "failed": 1
+  }
+}

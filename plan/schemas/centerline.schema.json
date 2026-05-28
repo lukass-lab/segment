@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/centerline.schema.json",
+  "title": "Centerline + local frame",
+  "description": "Arc-length resampled centerline and Rotation-Minimizing Frame in world coordinates (mm). N = n_stations rows in points/tangents/normals/binormals/arc_length.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "n_stations", "spacing_mm", "total_length_mm",
+               "frame_method", "points", "tangents", "normals", "binormals", "arc_length"],
+  "properties": {
+    "schema":          { "const": "centerline/0.1" },
+    "n_stations":      { "type": "integer", "minimum": 2 },
+    "spacing_mm":      { "type": "number",  "exclusiveMinimum": 0 },
+    "total_length_mm": { "type": "number",  "exclusiveMinimum": 0 },
+    "frame_method":    { "enum": ["projection_bishop", "double_reflection_wang2008"] },
+    "points":     { "$ref": "#/$defs/vec3List" },
+    "tangents":   { "$ref": "#/$defs/vec3List" },
+    "normals":    { "$ref": "#/$defs/vec3List" },
+    "binormals":  { "$ref": "#/$defs/vec3List" },
+    "arc_length": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0 },
+      "minItems": 2,
+      "description": "Monotonically non-decreasing cumulative arc length per station (mm)."
+    }
+  },
+  "$defs": {
+    "vec3": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "vec3List": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/vec3" },
+      "minItems": 2
+    }
+  }
+}

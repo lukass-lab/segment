@@ -5,6 +5,9 @@ date: "2026-05-28"
 toc: true
 toc-depth: 2
 numbersections: false
+bibliography: references.bib
+csl: vancouver-superscript.csl
+link-citations: true
 header-includes:
   - \usepackage{tocloft}
   - \setlength{\cftbeforesecskip}{0.12em}
@@ -118,7 +121,7 @@ This contract is the boundary between compute and presentation. Once it is stabl
 - Use nearest-neighbor resampling only for labels, masks, or deliberately voxelated debug views.
 - Keep separate lumen and vessel-wall point-cloud panels on the presentation slide when visibility matters; a combined point-cloud panel is useful as a compact alternative.
 - Treat straightened-MPR contour overlays as projection envelopes unless exact plane/ring intersections are explicitly computed. The envelope is not the true outline of an oblique cut; it is the projected min/max silhouette of the ring set along the selected MPR chord.
-- Keep the current projection-based rotation-minimizing frame for visualisation, but use a stricter double-reflection RMF in a future quantitative viewer [@Wang2008RotationMinimizing].
+- Use double-reflection RMF as the default frame method for CPR and scene bundles [@Wang2008RotationMinimizing]. Validation on the LAD prototype showed projection/Bishop propagation can drift by about `18.6°` relative to double-reflection, so the projection method is retained only as a diagnostic/backwards-compatible comparison.
 - Freeze the `VesselScene` scene-bundle contract before building a larger app. The MEDIS pipeline, the voxel-mask pipeline, and the web viewer should meet at that contract rather than depending on each other's internal file formats.
 - Use `.glb` for future browser-facing 3D surfaces and keep STL/GIfTI only as intermediate or legacy research exports.
 
@@ -227,7 +230,7 @@ Endpoint tangents use one-sided differences.
 
 ### Rotation-Minimizing Frame
 
-Current prototype method: projection/Bishop step. Given $\mathbf{N}_k$ and the next tangent $\mathbf{T}_{k+1}$:
+Legacy comparison method: projection/Bishop step. Given $\mathbf{N}_k$ and the next tangent $\mathbf{T}_{k+1}$:
 
 $$
 \tilde{\mathbf{N}} =
@@ -242,9 +245,9 @@ $$
 \mathbf{T}_{k+1} \times \mathbf{N}_{k+1}.
 $$
 
-This is acceptable for visualisation, but it can accumulate twist drift over long or highly curved vessels.
+This is useful as a simple diagnostic method, but it accumulates measurable twist drift on real LAD geometry and should not be the exported default.
 
-Future preferred method: double-reflection RMF [@Wang2008RotationMinimizing]. Define a reflection about vector $\mathbf{v}$:
+Default method: double-reflection RMF [@Wang2008RotationMinimizing]. Define a reflection about vector $\mathbf{v}$:
 
 $$
 R_{\mathbf{v}}(\mathbf{x}) =
@@ -270,7 +273,13 @@ If $\|\mathbf{v}_1\|$ or $\|\mathbf{v}_2\|$ is numerically tiny, fall back to co
 
 ### Centerline From Voxel Masks
 
-For a filled lumen or filled vessel volume $M$, compute the Euclidean distance transform $d(\mathbf{x})$. A fast-marching medial path solves:
+If a lumen mask $M_{\mathrm{lumen}}$ is available, it is the preferred centerline source. Compute the Euclidean distance transform inside the lumen:
+
+$$
+d(\mathbf{x}) = \mathrm{dist}(\mathbf{x}, \partial M_{\mathrm{lumen}}).
+$$
+
+A fast-marching medial path solves:
 
 $$
 \|\nabla T(\mathbf{x})\| = P(\mathbf{x}),
@@ -279,6 +288,8 @@ P(\mathbf{x}) = \frac{1}{d(\mathbf{x}) + \varepsilon}.
 $$
 
 Here $P$ is the traversal cost/slowness, so high-radius medial voxels have low cost. The centerline is recovered by following the steepest descent path on $T$ from distal seed to proximal seed, biased toward high-distance medial voxels [@Sethian1996FastMarching; @DeschampsCohen2001MinimalPaths].
+
+If a clean lumen surface is available, the VMTK-style surface method is also appropriate: compute the internal Voronoi diagram of the lumen surface and extract a shortest path constrained to that diagram, with cost based on the inverse maximal-inscribed-sphere radius [@Antiga2008VMTK]. This produces centerline points with an associated local lumen radius and is particularly useful when the surface topology is clean and endpoints are known.
 
 Fallback: 3D thinning/skeletonization, graph extraction, endpoint-constrained longest or lowest-cost path, then spline smoothing [@Lee1994Skeletons].
 
@@ -304,7 +315,7 @@ Mesh post-processing:
    - Smooth the raw centerline candidates, for example MEDIS lumen centroids, with a spline first.
    - Reparameterize the smoothed curve by arc length and resample at the target station spacing.
    - Compute a stable rotation-minimizing frame along the centerline.
-   - Future preferred method: double-reflection RMF for reproducibility and lower accumulated twist than simple projection propagation.
+   - Default method: double-reflection RMF for reproducibility and lower accumulated twist than simple projection propagation.
    - Initial frame should eventually have clinical meaning: project an anatomical direction such as anterior or an RAO/LAO reference into the plane perpendicular to the first tangent. The current "axis least aligned with tangent" rule is acceptable for prototype visualisation but arbitrary.
    - Store transforms between world, voxel, CPR, and straightened coordinates.
 
@@ -347,10 +358,11 @@ Future input may be a voxel mask representing the vessel wall/plaque volume betw
 
 The canonical input set should be:
 
-- required: `{CTA, plaque-annulus mask}`;
-- optional: `{lumen mask, outer-wall mask, centerline polyline, endpoint seeds}`.
+- required: `{CTA, at least one vessel mask}`;
+- preferred: `{lumen mask}` if the vendor provides it;
+- optional/additional: `{plaque-annulus mask, outer-wall mask, centerline polyline, endpoint seeds}`.
 
-The pipeline must degrade gracefully across these input shapes. A mask-only annulus can provide outer wall, inner lumen boundary, and an estimated centerline, but failures should fall back to a supplied centerline or endpoint-guided routing.
+The pipeline must degrade gracefully across these input shapes. If a lumen mask exists, use it as the primary source for centerline extraction and lumen-surface geometry. The plaque-annulus or wall mask then adds outer-wall/plaque information. A mask-only annulus can still provide outer wall, inner lumen boundary, and an estimated centerline, but that is the harder fallback case.
 
 Expected handling:
 
@@ -359,26 +371,31 @@ Expected handling:
    - If the mask is aligned but sampled differently, resample the mask to CTA space with nearest-neighbor interpolation.
    - Stop if the metadata implies unresolved registration mismatch.
 
-2. Detect mask topology.
-   - Classify as annulus, solid blob, disconnected components, or multi-branch structure.
+2. Detect mask topology and semantic labels.
+   - Classify each supplied mask as lumen, plaque annulus, outer wall, solid blob, disconnected components, or multi-branch structure.
+   - Prefer a true lumen mask for centerline extraction.
    - For disconnected components, use connected-component filtering or explicit vessel selection.
    - Reject or flag non-annular masks if lumen/wall separation is required and cannot be inferred.
 
 3. Recover or import the centerline, in priority order.
-   - **Default:** distance-transform / fast-marching medial path. Fill the annulus to obtain a full vessel volume, compute a Euclidean distance transform, then route a minimal-cost path with cost approximately `1 / (distance + ε)` so the path follows the medial high-radius ridge [@DeschampsCohen2001MinimalPaths; @Sethian1996FastMarching; @Kimmel1998GeodesicPaths].
+   - **If lumen mask exists:** compute the Euclidean distance transform inside the lumen, then route a fast-marching/minimal-cost path with cost approximately `1 / (distance + ε)` so the path follows the medial high-radius ridge [@DeschampsCohen2001MinimalPaths; @Sethian1996FastMarching; @Kimmel1998GeodesicPaths].
+   - **If a clean lumen surface exists:** optionally use the VMTK/Voronoi centerline route. Extract a lumen surface, cap or define endpoints, compute the internal Voronoi diagram / maximal-inscribed-sphere radius field, and run shortest path with cost `1/R` [@Antiga2008VMTK].
+   - **If only annulus exists:** first recover the lumen hole or inner surface, then use the lumen-mask or lumen-surface route above.
    - **Fallback:** voxel skeleton to graph to longest or endpoint-constrained path; then spline smooth and arc-length resample.
    - **Manual escape hatch:** accept a vendor-provided centerline, uploaded polyline, or two clicked endpoints plus auto-routing.
-   - Validate that each centerline station remains safely inside the filled vessel volume; reject paths whose minimum distance-to-boundary is below a vessel-radius threshold, e.g. `< 1 mm`.
+   - Validate that each centerline station remains safely inside the lumen or filled vessel volume; reject paths whose minimum distance-to-boundary is below a vessel-radius threshold, e.g. `< 1 mm`.
 
 4. Smooth and resample the accepted centerline.
    - Fit a cubic spline or equivalent smooth curve before arc-length resampling.
    - Compute local tangent and RMF.
    - Store all world/voxel/CPR transforms in the scene bundle.
 
-5. Extract surfaces from the annulus mask.
-   - Run marching cubes at `level=0.5` in voxel space, then transform vertices to world coordinates using `world = origin + direction · (spacing · voxel)`.
-   - Split the resulting mesh by connected components. A binary annulus should produce inner and outer surface components.
-   - Label components as lumen and wall using centerline containment/distance and normal direction checks.
+5. Extract surfaces from masks.
+   - From a lumen mask: run marching cubes at `level=0.5` to obtain the lumen surface directly.
+   - From an outer-wall mask: run marching cubes to obtain the outer wall surface.
+   - From a plaque-annulus mask: run marching cubes and split components; a binary annulus may produce inner and outer surface components, but this must be validated.
+   - Always transform vertices to world coordinates using `world = origin + direction · (spacing · voxel)`.
+   - Label components as lumen and wall using mask semantics first, then centerline containment/distance and normal direction checks.
    - Smooth with Taubin smoothing, not plain Laplacian smoothing, to reduce staircase artifacts without shrinking the vessel [@Taubin1995Smoothing].
    - Decimate each surface to a target web budget, for example `8k-12k` triangles per surface.
    - Compute normals and optional per-vertex colors, e.g. wall thickness or plaque class.
@@ -455,6 +472,45 @@ Format choices:
 - `.nii.gz` for CT/CPR volumes because it preserves affine metadata and is supported by NiiVue.
 - JSON for centerline, frame, validation, and quantitative metrics because it is inspectable and browser-native.
 - One zip for upload/download ergonomics and reproducible audit trails.
+
+## Scene Bundle Schemas
+
+The scene bundle contract is now explicit: every JSON artifact in the zip has a JSON Schema in `plan/schemas/` and at least one worked example in `plan/examples/`. The schemas use JSON Schema Draft 2020-12.
+
+Schema files:
+
+- `plan/schemas/vessel_scene_manifest.schema.json` for `manifest.json`.
+- `plan/schemas/centerline.schema.json` for `centerline.json` and `cpr/frame.json`.
+- `plan/schemas/medis_rings.schema.json` for `overlays/medis_rings.json`.
+- `plan/schemas/per_station_metrics.schema.json` for `quant/per_station_metrics.json`.
+- `plan/schemas/lesion_summary.schema.json` for `quant/lesion_summary.json`.
+- `plan/schemas/validation.schema.json` for `validation.json`.
+
+Example files:
+
+- `plan/examples/vessel_scene_manifest.example.json`.
+- `plan/examples/centerline.example.json`.
+- `plan/examples/medis_rings.example.json`.
+- `plan/examples/validation.example.json`.
+- `plan/examples/per_station_metrics.example_placeholder.json` and `plan/examples/per_station_metrics.example_populated.json`.
+- `plan/examples/lesion_summary.example_placeholder.json` and `plan/examples/lesion_summary.example_populated.json`.
+
+The LAD prototype bundle validates with:
+
+```bash
+python code/validate_bundle_schemas.py data/vessel_scene_01-BER-0088_LAD.zip
+```
+
+This schema validation is intentionally separate from medical/numerical validation. It answers "can a frontend or downstream tool safely parse this bundle?" The numerical report in `validation.json` answers "is this bundle geometrically and mathematically trustworthy?"
+
+Schema versioning policy:
+
+- Use `artifact_name/major.minor`, for example `vessel_scene/0.1` or `centerline/0.1`.
+- Breaking changes bump the major version. Examples: renaming required keys, changing coordinate conventions, changing units, or changing array layout.
+- Additive backwards-compatible changes bump the minor version. Examples: optional fields, extra diagnostic metrics, or new optional overlay files.
+- Frontend loaders must reject unknown major versions and may warn on newer minor versions.
+- Keep schemas and examples together: a schema change is not complete until the matching example file validates.
+- The zip-level `manifest.json` is the source of truth for bundle version and paths; individual artifact schemas protect artifact-level parsing.
 
 ## Quantitative Outputs
 
@@ -594,16 +650,36 @@ $$
 < 1\,\mathrm{mm}.
 $$
 
-Mask/CTA affine agreement:
+Mask/CTA affine agreement is checked componentwise, because origin and spacing are in millimetres while the direction matrix is dimensionless; combining them into a single scalar would be unit-inconsistent.
+
+Origin offset (mm):
 
 $$
-\varepsilon_{\mathrm{aff}} =
+\varepsilon_{\mathrm{o}} =
 \|\mathbf{o}_{M}-\mathbf{o}_{CT}\|_2
-+ \|\mathbf{D}_{M}-\mathbf{D}_{CT}\|_F
-+ \|\mathbf{s}_{M}-\mathbf{s}_{CT}\|_2 .
+< 10^{-3}\,\mathrm{mm}.
 $$
 
-If this exceeds the chosen tolerance, resample only when a valid transform is known; otherwise stop.
+Direction-matrix error (dimensionless, Frobenius norm of the difference of two orthonormal $3\times 3$ matrices, so $\varepsilon_{\mathbf{D}}\in[0,2\sqrt{2}]$):
+
+$$
+\varepsilon_{\mathbf{D}} =
+\|\mathbf{D}_{M}-\mathbf{D}_{CT}\|_F
+< 10^{-4}.
+$$
+
+Spacing error (mm):
+
+$$
+\varepsilon_{\mathbf{s}} =
+\|\mathbf{s}_{M}-\mathbf{s}_{CT}\|_2
+< 10^{-3}\,\mathrm{mm}.
+$$
+
+All three thresholds must hold. If any one fails:
+
+- If the mask is on a known grid that is a rigid resample of the CTA (same direction, integer-scaled spacing, aligned origin within $\varepsilon_{\mathrm{o}}$), resample the mask to CTA space with nearest-neighbor interpolation.
+- Otherwise stop and emit a registration-mismatch diagnostic; do not silently resample.
 
 Centerline-in-mask check:
 
@@ -631,11 +707,26 @@ $$
 \right).
 $$
 
-If $\Delta\phi > 5^\circ$ on a long vessel, e.g. RCA, use double-reflection RMF for exported quantitative views.
+If $\Delta\phi > 5^\circ$ for a projection/Bishop scene, regenerate with double-reflection RMF before exported quantitative views. The LAD prototype projection frame measured `18.6°` maximum drift, so double-reflection is now the default.
 
 Straightened MPR contour overlays must be documented as projection envelopes unless exact plane/ring or plane/surface intersections are computed.
 
-Synthetic phantoms should include non-identity direction matrices, anisotropic spacing, known lumen/wall radii, and at least one curved tube where the expected CPR coordinates are known.
+Validation should be interpreted in tiers rather than as one universal binary threshold. Presentation visualisation, clinical-review support, and published quantitative metrics have different tolerance requirements.
+
+| Metric | Viz tier | Review tier | Quant tier | Notes |
+|---|---:|---:|---:|---|
+| Frame unit-length error | `< 1e-6` | `< 1e-6` | `< 1e-8` | numerical sanity check |
+| Frame orthogonality error | `< 1e-6` | `< 1e-6` | `< 1e-8` | numerical sanity check |
+| Frame determinant minimum | `> 0.999` | `> 0.999` | `> 0.9999` | right-handed frame |
+| Centerline CT coverage | `= 1.0` | `= 1.0` | `= 1.0` | all stations inside source CT |
+| MEDIS residual max | `< 5 mm` | `< 2 mm` | `< 1 mm` | max can be endpoint-sensitive |
+| MEDIS residual p95 | `< 2 mm` | `< 1 mm` | `< 0.5 mm` | more useful than max for visual trust |
+| Mask/CTA origin error | `< 1e-3 mm` | `< 1e-3 mm` | `< 1e-4 mm` | before resampling |
+| Centerline-in-mask outside distance | `< 0.5 mm` | `< 0.25 mm` | `= 0 mm` | for mask-derived scenes |
+| Projection-frame twist drift | `< 10 deg` | `< 5 deg` | `< 1 deg` | diagnostic; double-reflection should be default |
+| Surface non-manifold edges | `= 0` | `= 0` | `= 0` | needed for surface quantification |
+
+Under this scheme the LAD prototype is presentation-ready: `medis.rho_max = 3.38 mm` is acceptable for the viz tier, while `medis.rho_p95 = 0.81 mm` satisfies the review tier. The same report should still flag the max residual as a quantitative caution until endpoint rings or ring-to-station matching are tightened.
 
 ## Failure Modes And Fallbacks
 
@@ -694,6 +785,32 @@ Plain TypeScript feasibility:
 - Heavy preprocessing should stay out of the browser. Marching cubes, distance transforms, FMM, Frangi vesselness, and large-volume resampling are technically possible with ITK-WASM/Pyodide/Web Workers, but previous tests were restrictive enough that they should not be the planned path.
 - Production direction: Python local CLI/backend creates the scene bundle; the app frontend remains TypeScript-only.
 
+Minimal frontend API contract:
+
+```ts
+type Vec3 = [number, number, number];
+
+interface VesselScene {
+  manifest: VesselSceneManifest;
+  centerline: CenterlineFrame;
+  validation?: ValidationReport;
+}
+
+interface SceneViewer {
+  loadScene(zipUrlOrFile: string | File): Promise<VesselScene>;
+  setStation(stationIndex: number): void;
+  setMprAngle(thetaDeg: number): void;
+  setWindowLevel(wMinHU: number, wMaxHU: number): void;
+  getHUAt(worldLpsMm: Vec3): number | null;
+  on(
+    event: "stationChanged" | "angleChanged" | "windowLevelChanged",
+    cb: (state: { stationIndex: number; thetaDeg: number }) => void
+  ): () => void;
+}
+```
+
+The concrete TypeScript types should be generated from the JSON Schemas or kept mechanically aligned with them. The central viewer state is still one `stationIndex`: cross-section slice, MPR cursor, 3D highlight, and nearest axial CTA slice all derive from that integer.
+
 ## Validation Report Targets
 
 For every vessel/viewer export, produce a small machine-readable validation summary:
@@ -715,6 +832,70 @@ For every vessel/viewer export, produce a small machine-readable validation summ
 - Algorithm versions: centerline method, smoothing parameters, RMF method, CPR spacing, interpolation order.
 - Window/level, display interpolation, and screenshot timestamp.
 
+## Worked Example: `01-BER-0088` LAD
+
+This prototype case is the reference example for the current bundle contract.
+
+Inputs:
+
+- Patient/vessel: `01-BER-0088`, `LAD`.
+- Source type: MEDIS expert contours plus CTA.
+- MEDIS contours: `339` lumen rings and `339` vessel-wall rings.
+- CTA: `512 x 512 x 512` voxels, spacing approximately `0.39 x 0.39 x 0.25 mm`.
+- Axial orientation: dcm2niix output with direction matrix `(1,0,0; 0,-1,0; 0,0,1)`, so display code must handle the Y flip explicitly.
+
+Generated geometry:
+
+- Centerline length: `177.97 mm`.
+- Stations: `710` at `0.25 mm` target spacing.
+- Frame method: `double_reflection_wang2008`.
+- CPR volumes:
+  - `cpr/cross_volume.nii.gz`;
+  - `cpr/long_volume.nii.gz`;
+  - `cpr/frame.json` duplicate frame for standalone use.
+- Surfaces:
+  - lumen: `21,698` vertices, `43,392` triangles, watertight;
+  - wall: `21,698` vertices, `43,392` triangles, watertight.
+- Bundle: `data/vessel_scene_01-BER-0088_LAD.zip`, approximately `33 MB`.
+
+Validation snapshot:
+
+| Check | Value | Interpretation |
+|---|---:|---|
+| `frame.epsilon_unit` | `3.96e-10` | pass |
+| `frame.epsilon_perp` | `1.67e-16` | pass |
+| `frame.det_min` | `0.999999999` | pass |
+| `centerline.coverage` | `1.0` | pass |
+| `medis.rho_max_mm` | `3.38 mm` | viz-tier pass, quant caution |
+| `medis.rho_max_p95_mm` | `0.81 mm` | review-tier pass |
+| `surface.lumen.nonmanifold_edges` | `0` | pass |
+| `surface.wall.nonmanifold_edges` | `0` | pass |
+| `twist_drift_deg` | `0.0 deg` | pass for double-reflection scene |
+| projection-vs-double diagnostic | `18.6 deg` | confirms why projection RMF should not be default |
+
+Schema validation:
+
+```bash
+python code/validate_bundle_schemas.py data/vessel_scene_01-BER-0088_LAD.zip
+```
+
+Expected result: `manifest.json`, `centerline.json`, `cpr/frame.json`, quantitative placeholders, `validation.json`, and `overlays/medis_rings.json` all pass their schemas.
+
+## Concrete Test Plan
+
+Every implementation should include small synthetic phantoms plus the real LAD case. The synthetic tests protect the geometry and orientation math; the LAD test protects the real-world export path.
+
+| Phantom | Geometry | What it tests | Pass criterion |
+|---|---|---|---|
+| P1 straight cylinder | lumen radius `2 mm`, wall radius `3 mm`, length `50 mm` | world/voxel round-trip, constant area, surface extraction | lumen area variation `< 1%` |
+| P2 circular arc | radius of curvature `30 mm`, `90 deg` sweep | curved centerline, RMF propagation, CPR sampling | centerline and CPR coordinate error `< 0.1 mm` |
+| P3 anisotropic spacing | spacing `0.3 x 0.3 x 1.0 mm` | anisotropic affine handling | round-trip physical error `< 1e-9 mm` |
+| P4 non-identity direction | include LAS-style Y flip and/or oblique direction matrix | regression test for the original all-zero CPR bug | sampled tube intensity nonzero and bbox aligned |
+| P5 branched mask | Y-shaped tube with one target branch and one distractor branch | branch selection, endpoint seeds, FMM/skeleton fallback | selected branch matches seed path |
+| P6 real LAD | `01-BER-0088` LAD MEDIS + CTA | end-to-end scene export and validation | schema pass; validation at least viz tier; surfaces watertight |
+
+Every pull request touching coordinate transforms, CPR sampling, frame computation, or mask handling should rerun at least P4 and P6.
+
 ## Future Implementation Plan
 
 1. Refactor current scripts into reusable modules:
@@ -735,13 +916,7 @@ For every vessel/viewer export, produce a small machine-readable validation summ
    - quantitative metrics;
    - provenance metadata.
 
-3. Add tests with synthetic phantoms:
-   - straight cylinder,
-   - curved tube,
-   - oblique volume orientation,
-   - known lumen/wall radii.
-   - branched mask with a distractor branch,
-   - anisotropic voxel spacing.
+3. Add the concrete phantom tests listed above, starting with P4 and P6 as regression guards.
 
 4. Build scene-bundle export:
    - `manifest.json`;
@@ -786,3 +961,8 @@ For every vessel/viewer export, produce a small machine-readable validation summ
 - Whether production compute is a local Python CLI, FastAPI plus worker/cache, or serverless batch. Browser-only ITK-WASM/Pyodide is not the preferred path for heavy preprocessing.
 - Whether `.glb` surfaces should store wall-thickness/plaque-class colors directly or reference separate scalar arrays.
 - Whether CTA-only endpoint-based segmentation belongs in the first app version or remains a research/fallback module.
+
+## References
+
+::: {#refs}
+:::

@@ -1,0 +1,42 @@
+{
+  "schema": "per_station_metrics/0.1",
+  "n_stations": 3,
+  "metrics": [
+    {
+      "station": 100,
+      "arc_length_mm": 25.0,
+      "lumen_area_mm2": 7.85,
+      "lumen_diam_eff_mm": 3.16,
+      "lumen_diam_min_mm": 2.9,
+      "lumen_diam_max_mm": 3.4,
+      "wall_thickness_mean_mm": 0.62,
+      "wall_thickness_median_mm": 0.58,
+      "wall_thickness_max_mm": 1.1,
+      "plaque_volume_mm3_in_band": 1.4,
+      "calcium_voxels_in_band": 12
+    },
+    {
+      "station": 200,
+      "arc_length_mm": 50.0,
+      "lumen_area_mm2": 3.2,
+      "lumen_diam_eff_mm": 2.02,
+      "lumen_diam_min_mm": 1.4,
+      "lumen_diam_max_mm": 2.6,
+      "wall_thickness_mean_mm": 1.1,
+      "wall_thickness_max_mm": 2.2,
+      "plaque_volume_mm3_in_band": 6.7,
+      "warnings": [
+        "low_lumen_distance"
+      ]
+    },
+    {
+      "station": 300,
+      "arc_length_mm": 75.0,
+      "lumen_area_mm2": 6.5,
+      "lumen_diam_eff_mm": 2.88,
+      "lumen_diam_min_mm": 2.7,
+      "lumen_diam_max_mm": 3.05,
+      "wall_thickness_mean_mm": 0.55
+    }
+  ]
+}

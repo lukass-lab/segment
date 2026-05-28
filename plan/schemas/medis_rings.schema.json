@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/medis_rings.schema.json",
+  "title": "MEDIS expert contour rings",
+  "description": "Original lumen and vessel-wall contour rings in world (mm) coordinates. One ring per MEDIS-traced slice; rings are closed polylines (last point connects back to the first).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "n_lumen", "n_wall", "lumen_world", "wall_world"],
+  "properties": {
+    "schema":   { "const": "medis_rings/0.1" },
+    "n_lumen":  { "type": "integer", "minimum": 0 },
+    "n_wall":   { "type": "integer", "minimum": 0 },
+    "note":     { "type": "string" },
+    "lumen_world": { "$ref": "#/$defs/ringList" },
+    "wall_world":  { "$ref": "#/$defs/ringList" }
+  },
+  "$defs": {
+    "vec3": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3, "maxItems": 3
+    },
+    "ring": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/vec3" },
+      "minItems": 3,
+      "description": "At least 3 points; ring is implicitly closed."
+    },
+    "ringList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ring" }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": "vessel_scene/0.1",
+  "patient_id": "01-BER-0088",
+  "vessel_name": "LAD",
+  "source_type": "medis",
+  "created_at": "2026-05-28T12:14:32.081614+00:00",
+  "git_commit": "00f73be",
+  "ct": {
+    "path_referenced": "data/01-BER-0088.nii.gz",
+    "embedded": false,
+    "size": [
+      512,
+      512,
+      512
+    ],
+    "spacing": [
+      0.38999998569488525,
+      0.38999998569488525,
+      0.25
+    ],
+    "origin": [
+      -74.1796875,
+      99.48530578613281,
+      1873.5
+    ],
+    "direction": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "sha256": "6df3611015c9f156c2fd42edeb9baa7782beacde1c668fad00d83758dde98bdc"
+  },
+  "cpr": {
+    "cross": "cpr/cross_volume.nii.gz",
+    "long": "cpr/long_volume.nii.gz",
+    "frame": "cpr/frame.json",
+    "pixel_spacing_mm": 0.25
+  },
+  "surfaces": {
+    "lumen": {
+      "path": "surfaces/lumen.glb",
+      "color_rgba": [
+        230,
+        57,
+        70,
+        255
+      ]
+    },
+    "wall": {
+      "path": "surfaces/wall.glb",
+      "color_rgba": [
+        61,
+        165,
+        217,
+        90
+      ]
+    }
+  },
+  "overlays": {
+    "medis_rings": "overlays/medis_rings.json"
+  },
+  "quant": {
+    "per_station": "quant/per_station_metrics.json",
+    "lesion_summary": "quant/lesion_summary.json"
+  },
+  "validation": "validation.json",
+  "preview": "preview.png",
+  "algorithm_versions": {
+    "centerline_method": "lumen_centroids (MEDIS) + cubic spline arc-length resample",
+    "frame_method": "double_reflection_wang2008",
+    "ct_reformat_order": 1,
+    "mask_reformat_order": 0,
+    "display_interpolation": "nearest",
+    "cross_section_fov_mm": 14.0
+  }
+}

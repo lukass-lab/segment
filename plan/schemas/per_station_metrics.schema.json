@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/per_station_metrics.schema.json",
+  "title": "Per-station quantitative metrics",
+  "description": "One record per centerline station. Each record holds lumen and wall measurements derived from surface/plane intersections at that station.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "n_stations", "metrics"],
+  "properties": {
+    "schema":     { "const": "per_station_metrics/0.1" },
+    "n_stations": { "type": "integer", "minimum": 0 },
+    "note":       { "type": "string" },
+    "metrics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/stationRecord" },
+      "description": "Empty list permitted (placeholder bundle); when populated, length must equal n_stations."
+    }
+  },
+  "$defs": {
+    "stationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["station", "arc_length_mm"],
+      "properties": {
+        "station":              { "type": "integer", "minimum": 0 },
+        "arc_length_mm":        { "type": "number",  "minimum": 0 },
+        "lumen_area_mm2":       { "type": "number",  "minimum": 0 },
+        "lumen_diam_eff_mm":    { "type": "number",  "minimum": 0, "description": "2 * sqrt(A/pi) effective diameter." },
+        "lumen_diam_min_mm":    { "type": "number",  "minimum": 0, "description": "Minimum Feret/caliper lumen diameter." },
+        "lumen_diam_max_mm":    { "type": "number",  "minimum": 0, "description": "Maximum Feret/caliper lumen diameter." },
+        "wall_thickness_mean_mm":  { "type": "number", "minimum": 0 },
+        "wall_thickness_median_mm":{ "type": "number", "minimum": 0 },
+        "wall_thickness_max_mm":   { "type": "number", "minimum": 0 },
+        "plaque_volume_mm3_in_band": { "type": "number", "minimum": 0, "description": "Plaque volume in a tangent-band around this station." },
+        "calcium_voxels_in_band":   { "type": "integer", "minimum": 0 },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Free-form per-station warning tags (e.g. 'endpoint', 'extrapolated', 'low_lumen_distance')."
+        }
+      }
+    }
+  }
+}

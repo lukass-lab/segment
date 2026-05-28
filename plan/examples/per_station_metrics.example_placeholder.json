@@ -1,0 +1,6 @@
+{
+  "schema": "per_station_metrics/0.1",
+  "n_stations": 710,
+  "metrics": [],
+  "note": "placeholder \u2014 populated by quantify_scene.py once implemented"
+}

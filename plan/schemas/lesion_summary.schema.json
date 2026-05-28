@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://segment-project.local/schemas/lesion_summary.schema.json",
+  "title": "Lesion-level quantitative summary",
+  "description": "Aggregated lesion records derived from per_station_metrics. One entry per identified lesion segment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "lesions"],
+  "properties": {
+    "schema": { "const": "lesion_summary/0.1" },
+    "note":   { "type": "string" },
+    "lesions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/lesion" }
+    }
+  },
+  "$defs": {
+    "lesion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lesion_id", "station_start", "station_end"],
+      "properties": {
+        "lesion_id":       { "type": "string" },
+        "station_start":   { "type": "integer", "minimum": 0 },
+        "station_end":     { "type": "integer", "minimum": 0 },
+        "length_mm":       { "type": "number",  "minimum": 0 },
+        "mld_mm":          { "type": "number",  "minimum": 0, "description": "Minimum lumen diameter (Feret) over the lesion." },
+        "mla_mm2":         { "type": "number",  "minimum": 0, "description": "Minimum lumen area over the lesion." },
+        "area_stenosis":   { "type": "number",  "minimum": 0, "maximum": 1, "description": "1 - A_min / A_ref." },
+        "diam_stenosis":   { "type": "number",  "minimum": 0, "maximum": 1, "description": "1 - D_min / D_ref." },
+        "reference_proximal_station": { "type": "integer", "minimum": 0 },
+        "reference_distal_station":   { "type": "integer", "minimum": 0 },
+        "reference_area_mm2":   { "type": "number", "minimum": 0 },
+        "plaque_volume_mm3":    { "type": "number", "minimum": 0 },
+        "calcium_volume_mm3":   { "type": "number", "minimum": 0 },
+        "calcium_score_agatston":{"type": "number", "minimum": 0,
+                                   "description": "Per-vessel Agatston score; requires non-contrast calcium series." },
+        "plaque_components": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "low_attenuation_mm3": { "type": "number", "minimum": 0 },
+            "fibro_fatty_mm3":     { "type": "number", "minimum": 0 },
+            "fibrous_mm3":         { "type": "number", "minimum": 0 },
+            "calcified_mm3":       { "type": "number", "minimum": 0 }
+          }
+        },
+        "cad_rads_category": { "type": "string", "description": "CAD-RADS 2.0 category if available." },
+        "notes":             { "type": "string" }
+      }
+    }
+  }
+}

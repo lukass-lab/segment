@@ -1,0 +1,28 @@
+{
+  "schema": "lesion_summary/0.1",
+  "lesions": [
+    {
+      "lesion_id": "LAD-mid-01",
+      "station_start": 180,
+      "station_end": 220,
+      "length_mm": 10.0,
+      "mld_mm": 1.4,
+      "mla_mm2": 1.54,
+      "area_stenosis": 0.78,
+      "diam_stenosis": 0.55,
+      "reference_proximal_station": 130,
+      "reference_distal_station": 270,
+      "reference_area_mm2": 7.0,
+      "plaque_volume_mm3": 18.5,
+      "calcium_volume_mm3": 2.3,
+      "plaque_components": {
+        "low_attenuation_mm3": 4.1,
+        "fibro_fatty_mm3": 6.0,
+        "fibrous_mm3": 6.1,
+        "calcified_mm3": 2.3
+      },
+      "cad_rads_category": "4A",
+      "notes": "Mid-LAD eccentric plaque with low-attenuation component."
+    }
+  ]
+}

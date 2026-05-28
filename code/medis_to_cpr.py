@@ -141,8 +141,12 @@ def compute_tangent_vectors(centerline: np.ndarray) -> np.ndarray:
 
 def compute_rotation_minimizing_frame(tangents: np.ndarray) -> tuple:
     """
-    Compute Rotation Minimizing Frame (Bishop Frame).
+    Compute the projection-step Rotation Minimizing Frame (Bishop Frame).
     Avoids the "twist" problem of Frenet-Serret frames.
+
+    This is retained for comparison/backwards compatibility. The production
+    CPR pipeline uses compute_double_reflection_rmf(), which has lower twist
+    drift on real coronary geometry.
     
     Returns:
         normals: Nx3 unit normal vectors
@@ -185,6 +189,58 @@ def compute_rotation_minimizing_frame(tangents: np.ndarray) -> tuple:
         normals[i] = Ni
         binormals[i] = np.cross(Ti, Ni)
     
+    return normals, binormals
+
+
+def compute_double_reflection_rmf(centerline: np.ndarray,
+                                  tangents: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Compute Rotation Minimizing Frame using Wang et al. 2008 double reflection.
+
+    This is second-order accurate and is the default frame method for exported
+    CPR/VesselScene data.
+    """
+    n = len(tangents)
+    normals = np.zeros_like(tangents)
+    binormals = np.zeros_like(tangents)
+
+    T0 = tangents[0]
+    if abs(T0[0]) <= abs(T0[1]) and abs(T0[0]) <= abs(T0[2]):
+        ref = np.array([1.0, 0.0, 0.0])
+    elif abs(T0[1]) <= abs(T0[2]):
+        ref = np.array([0.0, 1.0, 0.0])
+    else:
+        ref = np.array([0.0, 0.0, 1.0])
+
+    normals[0] = np.cross(T0, ref)
+    normals[0] /= np.linalg.norm(normals[0])
+    binormals[0] = np.cross(T0, normals[0])
+
+    for i in range(1, n):
+        v1 = centerline[i] - centerline[i - 1]
+        c1 = float(v1 @ v1)
+        if c1 < 1e-20:
+            normals[i] = normals[i - 1]
+            normals[i] -= (normals[i] @ tangents[i]) * tangents[i]
+            normals[i] /= np.linalg.norm(normals[i])
+            binormals[i] = np.cross(tangents[i], normals[i])
+            continue
+
+        T_l = tangents[i - 1] - (2.0 / c1) * (v1 @ tangents[i - 1]) * v1
+        N_l = normals[i - 1] - (2.0 / c1) * (v1 @ normals[i - 1]) * v1
+
+        v2 = tangents[i] - T_l
+        c2 = float(v2 @ v2)
+        if c2 < 1e-20:
+            normals[i] = N_l
+        else:
+            normals[i] = N_l - (2.0 / c2) * (v2 @ N_l) * v2
+
+        # Re-orthogonalize against current tangent to neutralize round-off.
+        normals[i] -= (normals[i] @ tangents[i]) * tangents[i]
+        normals[i] /= np.linalg.norm(normals[i])
+        binormals[i] = np.cross(tangents[i], normals[i])
+
     return normals, binormals
 
 
@@ -413,7 +469,8 @@ def save_nifti(volume: np.ndarray, spacing: tuple, output_path: str, description
 
 
 def save_centerline_json(centerline: np.ndarray, normals: np.ndarray, binormals: np.ndarray, 
-                         tangents: np.ndarray, output_path: str):
+                         tangents: np.ndarray, output_path: str,
+                         frame_method: str = "double_reflection_wang2008"):
     """
     Save centerline and frame data as JSON for later mesh/point transformation.
     """
@@ -425,6 +482,7 @@ def save_centerline_json(centerline: np.ndarray, normals: np.ndarray, binormals:
         "normals": normals.tolist(),
         "binormals": binormals.tolist(),
         "n_points": len(centerline),
+        "frame_method": frame_method,
         "description": "Rotation Minimizing Frame for CPR coordinate transformation"
     }
     
@@ -493,7 +551,9 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
     # Compute Rotation Minimizing Frame
     print("\n5. Computing Rotation Minimizing Frame...")
     tangents = compute_tangent_vectors(centerline_resampled)
-    normals, binormals = compute_rotation_minimizing_frame(tangents)
+    frame_method = "double_reflection_wang2008"
+    normals, binormals = compute_double_reflection_rmf(centerline_resampled, tangents)
+    print(f"  Frame method: {frame_method}")
     
     # Create cross-sectional CPR
     print("\n6. Creating cross-sectional CPR volume...")
@@ -539,7 +599,8 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
     
     # Save centerline frame for coordinate transformation
     frame_path = os.path.join(output_dir, f"{patient_id}_{vessel_name}_cpr_frame.json")
-    save_centerline_json(centerline_resampled, normals, binormals, tangents, frame_path)
+    save_centerline_json(centerline_resampled, normals, binormals, tangents, frame_path,
+                         frame_method=frame_method)
     output_files.append(frame_path)
     
     print(f"\n{'='*60}")

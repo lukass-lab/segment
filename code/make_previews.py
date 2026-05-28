@@ -180,7 +180,7 @@ def compute_frame_for_cpr(medis_path, cta_path):
     target_sp = min(img.GetSpacing())
     cl = mtc.resample_centerline(centerline_raw, target_sp)
     tan = mtc.compute_tangent_vectors(cl)
-    n, b = mtc.compute_rotation_minimizing_frame(tan)
+    n, b = mtc.compute_double_reflection_rmf(cl, tan)
     return cl, n, b, target_sp
 
 
