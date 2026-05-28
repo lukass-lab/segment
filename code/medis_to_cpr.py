@@ -231,7 +231,9 @@ def create_cross_sectional_cpr(
     normals: np.ndarray,
     binormals: np.ndarray,
     cross_section_size_mm: float = 30.0,
-    pixel_resolution: float = None
+    pixel_resolution: float = None,
+    direction: np.ndarray = None,
+    interpolation_order: int = 1,
 ) -> tuple:
     """
     Create cross-sectional CPR volume (straightened vessel).
@@ -253,39 +255,49 @@ def create_cross_sectional_cpr(
     if pixel_resolution is None:
         # Use average of CTA in-plane spacing
         pixel_resolution = (spacing[0] + spacing[1]) / 2
-    
+
+    # Inverse direction matrix for world->voxel transform. Defaults to identity.
+    if direction is None:
+        D_inv = np.eye(3)
+    else:
+        D_inv = np.asarray(direction).reshape(3, 3).T  # orthonormal, so transpose = inverse
+
     n_slices = len(centerline)
     slice_size = int(cross_section_size_mm / pixel_resolution)
     half_size = slice_size // 2
-    
+
     # Create UV grid (centered at 0)
     u_coords = np.arange(-half_size, half_size) * pixel_resolution
     v_coords = np.arange(-half_size, half_size) * pixel_resolution
     U, V = np.meshgrid(u_coords, v_coords, indexing='xy')
-    
+
     # Output volume
     cpr_volume = np.zeros((slice_size, slice_size, n_slices), dtype=np.float32)
-    
+
     print(f"  Creating cross-sectional CPR: {slice_size}x{slice_size}x{n_slices}")
-    
+
     for i in range(n_slices):
         P = centerline[i]
         N = normals[i]
         B = binormals[i]
-        
+
         # Compute world coordinates for this slice: W = P + u*N + v*B
         world_x = P[0] + U * N[0] + V * B[0]
         world_y = P[1] + U * N[1] + V * B[1]
         world_z = P[2] + U * N[2] + V * B[2]
-        
-        # Convert to voxel coordinates
-        voxel_x = (world_x - origin[0]) / spacing[0]
-        voxel_y = (world_y - origin[1]) / spacing[1]
-        voxel_z = (world_z - origin[2]) / spacing[2]
-        
-        # Sample using trilinear interpolation
+
+        # World -> local (relative to origin) -> voxel index, accounting for direction matrix
+        lx = world_x - origin[0]
+        ly = world_y - origin[1]
+        lz = world_z - origin[2]
+        voxel_x = (D_inv[0, 0] * lx + D_inv[0, 1] * ly + D_inv[0, 2] * lz) / spacing[0]
+        voxel_y = (D_inv[1, 0] * lx + D_inv[1, 1] * ly + D_inv[1, 2] * lz) / spacing[1]
+        voxel_z = (D_inv[2, 0] * lx + D_inv[2, 1] * ly + D_inv[2, 2] * lz) / spacing[2]
+
+        # Sample CT intensities. Use order=1 for linear CT reformats,
+        # order=0 only for label/mask volumes or deliberately voxelated demos.
         coords = [voxel_x.ravel(), voxel_y.ravel(), voxel_z.ravel()]
-        sampled = map_coordinates(volume, coords, order=1, mode='constant', cval=0)
+        sampled = map_coordinates(volume, coords, order=interpolation_order, mode='constant', cval=-1024)
         cpr_volume[:, :, i] = sampled.reshape(slice_size, slice_size)
     
     # Compute slice spacing from centerline
@@ -309,7 +321,9 @@ def create_longitudinal_cpr(
     normals: np.ndarray,
     binormals: np.ndarray,
     cross_section_size_mm: float = 30.0,
-    pixel_resolution: float = None
+    pixel_resolution: float = None,
+    direction: np.ndarray = None,
+    interpolation_order: int = 1,
 ) -> tuple:
     """
     Create longitudinal CPR volume (rotated view of vessel).
@@ -327,40 +341,44 @@ def create_longitudinal_cpr(
     """
     if pixel_resolution is None:
         pixel_resolution = (spacing[0] + spacing[1]) / 2
-    
+
+    if direction is None:
+        D_inv = np.eye(3)
+    else:
+        D_inv = np.asarray(direction).reshape(3, 3).T
+
     n_slices = len(centerline)
     slice_size = int(cross_section_size_mm / pixel_resolution)
     half_size = slice_size // 2
-    
+
     # Create UV grid (centered at 0)
     u_coords = np.arange(-half_size, half_size) * pixel_resolution
     v_coords = np.arange(-half_size, half_size) * pixel_resolution
     U, V = np.meshgrid(u_coords, v_coords, indexing='xy')
-    
+
     # Output volume: (S, U, V) - longitudinal orientation
-    # S = along vessel, U = normal direction, V = binormal direction
     long_volume = np.zeros((n_slices, slice_size, slice_size), dtype=np.float32)
-    
+
     print(f"  Creating longitudinal CPR: {n_slices}x{slice_size}x{slice_size} (S×U×V)")
-    
+
     for i in range(n_slices):
         P = centerline[i]
         N = normals[i]
         B = binormals[i]
-        
-        # Compute world coordinates: W = P + u*N + v*B
+
         world_x = P[0] + U * N[0] + V * B[0]
         world_y = P[1] + U * N[1] + V * B[1]
         world_z = P[2] + U * N[2] + V * B[2]
-        
-        # Convert to voxel coordinates
-        voxel_x = (world_x - origin[0]) / spacing[0]
-        voxel_y = (world_y - origin[1]) / spacing[1]
-        voxel_z = (world_z - origin[2]) / spacing[2]
-        
-        # Sample using trilinear interpolation
+
+        lx = world_x - origin[0]
+        ly = world_y - origin[1]
+        lz = world_z - origin[2]
+        voxel_x = (D_inv[0, 0] * lx + D_inv[0, 1] * ly + D_inv[0, 2] * lz) / spacing[0]
+        voxel_y = (D_inv[1, 0] * lx + D_inv[1, 1] * ly + D_inv[1, 2] * lz) / spacing[1]
+        voxel_z = (D_inv[2, 0] * lx + D_inv[2, 1] * ly + D_inv[2, 2] * lz) / spacing[2]
+
         coords = [voxel_x.ravel(), voxel_y.ravel(), voxel_z.ravel()]
-        sampled = map_coordinates(volume, coords, order=1, mode='constant', cval=0)
+        sampled = map_coordinates(volume, coords, order=interpolation_order, mode='constant', cval=-1024)
         long_volume[i, :, :] = sampled.reshape(slice_size, slice_size)
     
     # Compute slice spacing from centerline
@@ -416,8 +434,9 @@ def save_centerline_json(centerline: np.ndarray, normals: np.ndarray, binormals:
     print(f"  Saved centerline frame: {output_path}")
 
 
-def construct_cpr(medis_path: str, cta_path: str, output_dir: str, 
-                  cross_section_mm: float = 30.0) -> list:
+def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
+                  cross_section_mm: float = 30.0,
+                  interpolation_order: int = 1) -> list:
     """
     Main function to construct CPR volumes from MEDIS file.
     
@@ -426,6 +445,8 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
         cta_path: Path to CTA NIfTI volume
         output_dir: Output directory
         cross_section_mm: Cross-section size in mm (default 30mm = 3cm)
+        interpolation_order: scipy map_coordinates order. Use 1 for CT intensity
+            reformats and 0 for masks/labels.
     
     Returns:
         List of output file paths
@@ -456,9 +477,12 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
     cta_volume = sitk.GetArrayFromImage(cta_sitk).transpose(2, 1, 0)  # Convert to (x, y, z)
     cta_spacing = cta_sitk.GetSpacing()
     cta_origin = cta_sitk.GetOrigin()
+    cta_direction = np.array(cta_sitk.GetDirection()).reshape(3, 3)
     print(f"  Volume shape: {cta_volume.shape}")
     print(f"  Spacing: {cta_spacing} mm")
     print(f"  Origin: {cta_origin}")
+    print(f"  Direction: {cta_direction.flatten().tolist()}")
+    print(f"  Interpolation order: {interpolation_order}")
     
     # Resample centerline to natural CTA spacing
     target_spacing = min(cta_spacing)  # Use finest resolution
@@ -477,7 +501,9 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
         cta_volume, cta_spacing, cta_origin,
         centerline_resampled, normals, binormals,
         cross_section_size_mm=cross_section_mm,
-        pixel_resolution=target_spacing
+        pixel_resolution=target_spacing,
+        direction=cta_direction,
+        interpolation_order=interpolation_order,
     )
     
     # Create longitudinal CPR
@@ -486,7 +512,9 @@ def construct_cpr(medis_path: str, cta_path: str, output_dir: str,
         cta_volume, cta_spacing, cta_origin,
         centerline_resampled, tangents, normals, binormals,
         cross_section_size_mm=cross_section_mm,
-        pixel_resolution=target_spacing
+        pixel_resolution=target_spacing,
+        direction=cta_direction,
+        interpolation_order=interpolation_order,
     )
     
     # Generate output filenames
@@ -540,10 +568,16 @@ Example:
     parser.add_argument('output_dir', help='Output directory')
     parser.add_argument('--size', type=float, default=30.0,
                         help='Cross-section size in mm (default: 30)')
+    parser.add_argument(
+        '--interpolation',
+        choices=['nearest', 'linear', 'cubic'],
+        default='linear',
+        help='Voxel resampling for CT intensities (default: linear). Use nearest for masks/labels.',
+    )
     
     args = parser.parse_args()
-    
-    construct_cpr(args.medis_txt, args.nifti_cta, args.output_dir, args.size)
+    order = {'nearest': 0, 'linear': 1, 'cubic': 3}[args.interpolation]
+    construct_cpr(args.medis_txt, args.nifti_cta, args.output_dir, args.size, order)
 
 
 if __name__ == "__main__":

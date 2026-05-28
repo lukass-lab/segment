@@ -1,2 +1,4 @@
 # Data directory - contains large datasets and sensitive information
 data/
+__pycache__/
+*.py[cod]
