@@ -287,11 +287,27 @@ $$
 P(\mathbf{x}) = \frac{1}{d(\mathbf{x}) + \varepsilon}.
 $$
 
-Here $P$ is the traversal cost/slowness, so high-radius medial voxels have low cost. The centerline is recovered by following the steepest descent path on $T$ from distal seed to proximal seed, biased toward high-distance medial voxels [@Sethian1996FastMarching; @DeschampsCohen2001MinimalPaths].
+Here $P$ is the traversal cost/slowness, so high-radius medial voxels have low cost. In libraries that ask for a speed image $F$ and solve $F\|\nabla T\|=1$, pass $F=d+\varepsilon$ rather than $P$. More generally, $F=(d+\varepsilon)^p$ with $p\geq1$ is a centering-strength knob; start with `p=1` and only increase it if validation shows wall-hugging on noisy masks. The distance transform and gradient must be computed in physical millimetres, using the CTA/mask spacing and direction metadata.
 
-If a clean lumen surface is available, the VMTK-style surface method is also appropriate: compute the internal Voronoi diagram of the lumen surface and extract a shortest path constrained to that diagram, with cost based on the inverse maximal-inscribed-sphere radius [@Antiga2008VMTK]. This produces centerline points with an associated local lumen radius and is particularly useful when the surface topology is clean and endpoints are known.
+To make this reproducible the two implicit steps must be written out explicitly.
 
-Fallback: 3D thinning/skeletonization, graph extraction, endpoint-constrained longest or lowest-cost path, then spline smoothing [@Lee1994Skeletons].
+**Seed selection.** With no contour ordering to inherit, the proximal/distal endpoints must be derived. In priority order: (a) vendor-supplied endpoint seeds, an ostium label, or source/target IDs; (b) two user-clicked source/target points; (c) an automatic farthest-pair only after selecting the largest connected component and, for branched masks, the target vessel branch. For the automatic case, choose an anchor $\mathbf{x}_0$ (ostium label if present, otherwise a high-$d$ voxel in a proximal crop), solve once, set $\mathbf{x}_a=\arg\max T_0$ over finite in-mask voxels, solve again from $\mathbf{x}_a$, then set $\mathbf{x}_b=\arg\max T_a$. The path is recovered from $\mathbf{x}_b$ back to $\mathbf{x}_a$. If several endpoints have similar arrival costs in a bifurcating component, require explicit seeds rather than guessing a vessel.
+
+**Path recovery (backtracking).** The centerline is the steepest-descent integral curve of the arrival-time field from the distal seed $\mathbf{x}_d$ back to the source:
+
+$$
+\frac{d\boldsymbol{\gamma}}{d\tau} = -\frac{\nabla T(\boldsymbol{\gamma})}{\|\nabla T(\boldsymbol{\gamma})\|},
+\qquad
+\boldsymbol{\gamma}(0) = \mathbf{x}_d,
+$$
+
+integrated (e.g. RK4 on the trilinearly-interpolated $T$ and its physical-space gradient) until $T$ falls below a source tolerance or the source is within one voxel. Use a conservative step such as `0.25-0.5 * min(spacing)`, mask invalid/out-of-lumen samples, and fall back to a discrete lowest-neighbour step if $\|\nabla T\|$ is numerically tiny. Because $P$ penalises low-radius voxels, $\boldsymbol{\gamma}$ rides the medial ridge rather than cutting corners. The raw $\boldsymbol{\gamma}$ is then spline-smoothed and arc-length-resampled by the same machinery as the MEDIS path.
+
+**Surface (VMTK / SimVascular) route.** This is optional, not required for the first implementation. If a clean lumen *surface* is available and a heavier dependency is acceptable, the maximal-inscribed-sphere method can build the internal Voronoi diagram of the surface, then extract the path on the Voronoi sheets minimising $\int 1/R\,ds$ where $R$ is the inscribed-sphere radius [@Antiga2008VMTK]. This yields centerline points *with a per-station lumen radius* and natively splits bifurcations. It is the VMTK-based algorithm exposed by SimVascular's centerline tool [@Updegrove2017SimVascular; @Izzo2018VMTK]. It requires a capped, watertight surface and defined inlet/outlet seeds, so it pairs naturally with a trusted marching-cubes lumen surface — not with the raw voxel mask, which the distance-transform route above handles directly.
+
+Fallback: 3D thinning/skeletonization, graph extraction, endpoint-constrained longest or lowest-cost path, then spline smoothing [@Lee1994Skeletons]. If using `scikit-image`, use `skimage.morphology.skeletonize(..., method="lee")`; the older `skeletonize_3d` API is deprecated/removed in current releases. This route is useful for diagnostics, but it is staircase-jagged and leans hardest on the smoothing spline.
+
+In all routes, validate every accepted station against the mask and distance field. Hard reject only if any station leaves the selected lumen component, samples invalid/NaN arrival time, or crosses a near-boundary tolerance consistent with voxel spacing, e.g. $\min d < 0.5\min(\mathbf{s})$. Report low-radius stations (for example `< 1 mm`) as a plausibility warning rather than a universal reject, because true distal coronary lumen radii can be below `1 mm`.
 
 ### Surface Extraction From Masks
 
@@ -303,6 +319,32 @@ Mesh post-processing:
 - Taubin smooth with non-shrinking parameters, e.g. $\lambda=0.50$, $\mu=-0.53$, about `20` iterations [@Taubin1995Smoothing];
 - decimate with quadric error metrics toward a web budget, e.g. `8k-12k` triangles per surface [@Garland1997QuadricDecimation];
 - recompute normals and preserve scalar fields such as wall thickness or plaque class.
+
+## Algorithm Provenance And Library Strategy
+
+The guiding rule is **build the small, stable geometry kernel; use only already-present mature libraries for the hard numerical primitives.** Everything in "Core Mathematical Algorithms" above is short, deterministic, and already implemented in-repo — it should stay first-party for full control and reproducibility. Centerline-from-voxels is the one genuinely hard component, but it can be done without SimVascular, VMTK, or any new large dependency.
+
+The no-large-library first pass is:
+
+1. `scipy.ndimage.distance_transform_edt` or SimpleITK distance transform for $d$.
+2. `SimpleITK.FastMarchingImageFilter` for the arrival-time field, using speed `F=d+eps`.
+3. First-party seed selection, physical-space backtracking, smoothing, resampling, and validation.
+4. Existing VTK/PyVista tooling only where the project already uses it for mesh/raster operations.
+
+| Stage | Approach | Source | Rationale |
+| --- | --- | --- | --- |
+| Arc-length resample, RMF, tangents | First-party | `medis_to_cpr.py` | ~10 lines each, exact, already validated against the MEDIS prototype. No external dep buys anything. |
+| CPR / straightened-MPR sampling | First-party | `medis_to_cpr.py` + `scipy.ndimage.map_coordinates` | Core value of the project; must control interpolation order and coordinate transforms exactly. |
+| Distance transform | Library | `scipy.ndimage.distance_transform_edt` / `SimpleITK` | Standard, fast, no reason to reimplement. |
+| Mask→centerline, **voxel route** | Library | `SimpleITK.FastMarchingImageFilter` + first-party backtracking; optional `scikit-fmm` | FMM eikonal solver is subtle to get right; the backtracking ODE is short and stays first-party. SimpleITK is already in `requirements.txt`, so it is the clean first implementation. For `scikit-fmm`, remember the API takes speed `F=d+eps`, not slowness `P`. |
+| Mask→centerline, **surface route** | Optional library route | **VMTK** (`vmtkcenterlines`) — the engine inside **SimVascular** | Clinically used Voronoi/maximal-inscribed-sphere method; returns per-station radius and splits bifurcations. Heavier dep (VTK + vmtk), needs a watertight capped surface + seeds. Do not include in the first no-large-library implementation. |
+| Skeleton fallback | Library | `skimage.morphology.skeletonize(..., method="lee")` + graph path | Diagnostic escape hatch when FMM/VMTK are unavailable or the mask is degenerate. Adds dependencies if `scikit-image`/graph tooling are not already installed, so it is not the clean default for this repo. |
+| Mask→surface (marching cubes) | Library | VTK/PyVista path already in the repo; `scikit-image` optional | Standard isosurfacing; already used via VTK in `make_lumen_mask.py`, so no new dependency is needed for the first pass. |
+| Mesh smoothing / decimation | Library | VTK/PyVista Taubin smoothing and quadric decimation; `pymeshlab` optional | Standard mesh ops; no first-party value. Prefer existing VTK tooling before adding another mesh dependency. |
+
+On **SimVascular specifically**: its centerline tool is VMTK-based, so the build-vs-buy choice is really "take on the VMTK/VTK dependency or not," and SimVascular vs standalone VMTK is a packaging question, not an algorithmic one. For this project, the answer for the first implementation should be **no**: do not install SimVascular and do not require VMTK. If later quantitative comparison needs this route, standalone **VMTK from conda-forge** or a pinned container is lighter than pulling in the full SimVascular application. Do not plan around the old PyPI `vmtk` package for a modern Python environment. SimVascular is only a reference if a GUI segmentation/editing workflow is later wanted. Either way the surface route requires a clean capped lumen surface and inlet/outlet seeds, which is why it is optional and separate from the SimpleITK voxel route that runs straight on the mask.
+
+Recommended default for the first mask-pipeline implementation: **SimpleITK fast marching on the voxel lumen mask, plus first-party backtracking**. It adds no new dependency to the current repo, runs on the raw AutoPlaque mask, and can be validated today against the rasterized MEDIS mask in `make_lumen_mask.py`. Add `scikit-fmm` only if it proves simpler or faster in the implementation spike; keep the **VMTK/SimVascular surface route** out of the default dependency set.
 
 ## Core Viewer Requirements
 
@@ -378,12 +420,12 @@ Expected handling:
    - Reject or flag non-annular masks if lumen/wall separation is required and cannot be inferred.
 
 3. Recover or import the centerline, in priority order.
-   - **If lumen mask exists:** compute the Euclidean distance transform inside the lumen, then route a fast-marching/minimal-cost path with cost approximately `1 / (distance + ε)` so the path follows the medial high-radius ridge [@DeschampsCohen2001MinimalPaths; @Sethian1996FastMarching; @Kimmel1998GeodesicPaths].
-   - **If a clean lumen surface exists:** optionally use the VMTK/Voronoi centerline route. Extract a lumen surface, cap or define endpoints, compute the internal Voronoi diagram / maximal-inscribed-sphere radius field, and run shortest path with cost `1/R` [@Antiga2008VMTK].
+   - **If lumen mask exists:** compute the Euclidean distance transform inside the lumen, then route a fast-marching/minimal-cost path with slowness approximately `1 / (distance + eps)` (or library speed `distance + eps`) so the path follows the medial high-radius ridge [@DeschampsCohen2001MinimalPaths; @Sethian1996FastMarching; @Kimmel1998GeodesicPaths]. Default implementation: `SimpleITK.FastMarchingImageFilter` plus first-party physical-space backtracking.
+   - **If a clean lumen surface exists and optional external validation is needed later:** compare against the VMTK/Voronoi centerline route (the same algorithm family SimVascular exposes). Extract a lumen surface, cap or define endpoints, compute the internal Voronoi diagram / maximal-inscribed-sphere radius field, and run shortest path with cost `1/R` [@Antiga2008VMTK; @Updegrove2017SimVascular; @Izzo2018VMTK]. Do not make this a first-version dependency.
    - **If only annulus exists:** first recover the lumen hole or inner surface, then use the lumen-mask or lumen-surface route above.
    - **Fallback:** voxel skeleton to graph to longest or endpoint-constrained path; then spline smooth and arc-length resample.
    - **Manual escape hatch:** accept a vendor-provided centerline, uploaded polyline, or two clicked endpoints plus auto-routing.
-   - Validate that each centerline station remains safely inside the lumen or filled vessel volume; reject paths whose minimum distance-to-boundary is below a vessel-radius threshold, e.g. `< 1 mm`.
+   - Validate that each centerline station remains inside the selected lumen or filled vessel component; reject paths that leave the mask or cross a spacing-scale boundary tolerance. Report `< 1 mm` distance-to-boundary as a low-radius warning rather than an automatic failure.
 
 4. Smooth and resample the accepted centerline.
    - Fit a cubic spline or equivalent smooth curve before arc-length resampling.
@@ -684,11 +726,12 @@ All three thresholds must hold. If any one fails:
 Centerline-in-mask check:
 
 $$
-\min_k d(\mathbf{c}_k,\partial M) > r_{\min},
-\qquad r_{\min}=1\,\mathrm{mm}
+\mathbf{c}_k \in M\ \forall k,
+\qquad
+\min_k d(\mathbf{c}_k,\partial M) \geq 0.5\min(\mathbf{s})
 $$
 
-for mask-derived centerlines.
+for mask-derived centerlines. Separately report stations with $d < 1\,\mathrm{mm}$ as low-radius plausibility warnings, not automatic failures.
 
 Surface checks:
 
@@ -961,6 +1004,7 @@ Every pull request touching coordinate transforms, CPR sampling, frame computati
 - Whether production compute is a local Python CLI, FastAPI plus worker/cache, or serverless batch. Browser-only ITK-WASM/Pyodide is not the preferred path for heavy preprocessing.
 - Whether `.glb` surfaces should store wall-thickness/plaque-class colors directly or reference separate scalar arrays.
 - Whether CTA-only endpoint-based segmentation belongs in the first app version or remains a research/fallback module.
+- Whether a later validation branch should add VMTK/VTK for the surface-based (maximal-inscribed-sphere) centerline route. First version should ship the lighter SimpleITK voxel route without SimVascular/VMTK. If this route is ever added, standalone VMTK from conda-forge/container is lighter for a headless CLI than the full SimVascular app.
 
 ## References
 
