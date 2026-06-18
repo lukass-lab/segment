@@ -265,6 +265,8 @@ For each accepted branch edge:
 7. refine the centerline according to the recorded convention: lumen-medial from lumen contours, or outer-wall-aware/vessel-medial where the outer wall is sufficiently supported;
 8. repeat until centerline shifts and MLA change are below configured thresholds.
 
+VesselSDF is a useful surface-reconstruction reference for this stage rather than a complete coronary tree method [@esposito2025vesselsdf]. Its occupancy-to-signed-distance-field refinement suggests that the coronary lumen engine should be allowed to emit a continuous signed-distance representation alongside any binary mask or probability map. That would make lumen contour extraction, marching-cubes surface checks, distance-to-wall QC, and near-boundary station flags less dependent on jagged voxel surfaces. For this project, the SDF layer should remain coupled to the graph contract: it can improve local lumen/surface geometry on accepted or candidate edges, but it does not by itself solve ostium detection, branch labels, outer-wall/plaque inference, or topology repair.
+
 Important caveat: lumen-centroid refinement is biased in eccentric plaque. In a positively remodeled plaque with eccentric narrowing, the lumen centroid can sit on the patent side rather than the original vessel axis. If the project measures plaque burden, remodeling, or wall deformation, the centerline convention must be explicit: `lumen_medial`, `outer_wall_medial`, `imported`, or `mixed`. Otherwise the same numerical centerline may be interpreted incorrectly downstream.
 
 This is the bridge from tree construction to the main scientific object. A centerline tree alone is not enough. The graph edge must carry a local paired wall state:
@@ -391,6 +393,7 @@ The references divide naturally by role:
 - geodesic connectivity and topology-aware vascular tree inference [@moriconi2017vtrails; @moriconi2019geodesicmst];
 - coronary-specific segmentation, reconnection, tree refinement, anatomical labeling, and public CCTA coronary training/validation resources [@Isensee2021nnUNet; @zeng2023imagecas; @gharleghi2022asoca; @gharleghi2023coronaryatlas; @qiu2025; @hampe2024];
 - coronary CTA tube models and surface-derived centerlines [@mohan2009tubular; @antiga2008];
+- implicit SDF surface priors for thin vascular reconstruction and local lumen-contour refinement [@esposito2025vesselsdf];
 - MEDIS/QAngio CT contour exports as optional legacy/prototype validation references, not as default pipeline inputs [@medis2024; @reiber2010];
 - cardiac ROI and whole-heart/cardiac-structure localization [@wasserthal2023totalsegmentator; @zhuang2019mmwhs; @bruns2022wholeheart];
 - CNN orientation/radius tracking as a coronary centerline extraction route once centerline labels are available [@wolterink2019centerline];
