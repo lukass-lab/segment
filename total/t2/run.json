@@ -1,0 +1,32 @@
+{
+  "tool": "TotalSegmentator",
+  "tool_version": "2.13.0",
+  "torch_version": "2.5.1+cu121",
+  "python_version": "3.12.3",
+  "task": "total_mr",
+  "mode": "fast",
+  "scope": "full",
+  "fast": true,
+  "input": "/home/lukass/workspace/frac/subjects/prostatex-0204/t2.nii.gz",
+  "output_dir": "/home/lukass/workspace/frac/seg_out/t2",
+  "device": "cpu",
+  "command": [
+    "TotalSegmentator",
+    "-i",
+    "/home/lukass/workspace/frac/subjects/prostatex-0204/t2.nii.gz",
+    "-o",
+    "/home/lukass/workspace/frac/seg_out/t2",
+    "--task",
+    "total_mr",
+    "--device",
+    "cpu",
+    "--fast"
+  ],
+  "start_epoch": 1779509960,
+  "end_epoch": 1779509973,
+  "runtime_s": 13,
+  "exit_status": 0,
+  "gpu_memory_log": null,
+  "peak_vram_mib": null,
+  "visual_qa_note": "TODO: overlay output masks on the input volume before promotion."
+}

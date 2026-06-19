@@ -1,0 +1,31 @@
+{
+  "tool": "TotalSegmentator",
+  "tool_version": "2.13.0",
+  "torch_version": "2.5.1+cu121",
+  "python_version": "3.12.3",
+  "task": "total_mr",
+  "mode": "full",
+  "scope": "full",
+  "fast": false,
+  "input": "/home/lukass/workspace/frac/subjects/prostatex-0204/t2.nii.gz",
+  "output_dir": "/home/lukass/workspace/frac/seg_out/t2-gpu-full",
+  "device": "gpu",
+  "command": [
+    "TotalSegmentator",
+    "-i",
+    "/home/lukass/workspace/frac/subjects/prostatex-0204/t2.nii.gz",
+    "-o",
+    "/home/lukass/workspace/frac/seg_out/t2-gpu-full",
+    "--task",
+    "total_mr",
+    "--device",
+    "gpu"
+  ],
+  "start_epoch": 1779509335,
+  "end_epoch": 1779509397,
+  "runtime_s": 62,
+  "exit_status": 0,
+  "gpu_memory_log": "/home/lukass/workspace/frac/seg_out/t2-gpu-full/gpu-memory.csv",
+  "peak_vram_mib": 3621,
+  "visual_qa_note": "TODO: overlay output masks on the input volume before promotion."
+}
